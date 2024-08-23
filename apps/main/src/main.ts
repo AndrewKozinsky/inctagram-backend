@@ -6,7 +6,7 @@ async function bootstrap() {
 	app.setGlobalPrefix('api/v1')
 	await app.listen(process.env.MAIN_MICROSERVICE_PORT)
 	console.log('MAIN_MICROSERVICE_PORT:', process.env.MAIN_MICROSERVICE_PORT)
-	console.log('some2')
+	console.log('some 3')
 }
 
 bootstrap()
