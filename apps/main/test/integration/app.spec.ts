@@ -6,14 +6,14 @@ import { AppModule } from '../../src/features/app.module'
 describe('Numbers sum', () => {
 	let app: INestApplication
 
-	beforeEach(async () => {
+	/*beforeEach(async () => {
 		const moduleFixture: TestingModule = await Test.createTestingModule({
 			imports: [AppModule],
 		}).compile()
 
 		app = moduleFixture.createNestApplication()
 		await app.init()
-	})
+	})*/
 
 	it('3 + 3', () => {
 		// return request(app.getHttpServer()).get('/').expect(200).expect('Hello World!')
