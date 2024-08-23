@@ -7,7 +7,8 @@ export class AppController {
 
 	@Get()
 	getUser() {
-		return this.appService.getUser({ id: 1 })
+		// return this.appService.getUser({ id: 1 })
+		return 'Hello World!'
 	}
 
 	@Post()
