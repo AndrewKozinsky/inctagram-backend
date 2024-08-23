@@ -13,11 +13,10 @@
 		"start:debug": "nest start --debug --watch",
 		"start:prod": "node dist/apps/main/main",
 		"lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-		"test": "jest --config apps/main/test/integration/jest.json",
-		"test:e2e": "jest --config apps/main/test/e2e/jest-e2e.json",
-		"test:watch": "jest --watch",
-		"test:cov": "jest --coverage",
-		"test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
+		"test": "NODE_ENV=TEST jest --config apps/main/test/integration/jest.json --runInBand",
+		"test:e2e": "NODE_ENV=TEST jest --config apps/main/test/e2e/jest-e2e.json --runInBand",
+		"test:watch": "NODE_ENV=TEST jest --watch --runInBand",
+		"test:cov": "NODE_ENV=TEST jest --coverage"
 	},
 	"dependencies": {
 		"@nestjs/common": "^10.0.0",

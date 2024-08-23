@@ -6,7 +6,9 @@ import { ConfigModule } from '@nestjs/config'
 	imports: [
 		ConfigModule.forRoot({
 			isGlobal: true, // Make ConfigModule global in the microservices that import this library
-			envFilePath: '.env', // Specify the path to your .env file
+			ignoreEnvFile:
+				process.env.NODE_ENV !== 'DEVELOPMENT' && process.env.NODE_ENV !== 'TEST',
+			envFilePath: ['.env.test', '.env'],
 		}),
 	],
 	providers: [MainConfigService],
