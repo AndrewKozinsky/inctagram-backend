@@ -4,7 +4,7 @@ import { AppModule } from './features/app.module'
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule)
 	app.setGlobalPrefix('backend-api')
-	await app.listen(3000)
+	await app.listen(process.env.MAIN_MICROSERVICE_PORT)
 }
 
 bootstrap()
