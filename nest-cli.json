@@ -1,22 +1,22 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "apps/inctagram-backend/src",
+  "sourceRoot": "apps/main/src",
   "compilerOptions": {
     "deleteOutDir": true,
     "webpack": true,
-    "tsConfigPath": "apps/inctagram-backend/tsconfig.app.json"
+    "tsConfigPath": "apps/main/tsconfig.app.json"
   },
   "monorepo": true,
-  "root": "apps/inctagram-backend",
+  "root": "apps/main",
   "projects": {
-    "inctagram-backend": {
+    "main": {
       "type": "application",
-      "root": "apps/inctagram-backend",
+      "root": "apps/main",
       "entryFile": "main",
-      "sourceRoot": "apps/inctagram-backend/src",
+      "sourceRoot": "apps/main/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/inctagram-backend/tsconfig.app.json"
+        "tsConfigPath": "apps/main/tsconfig.app.json"
       }
     },
     "second": {
