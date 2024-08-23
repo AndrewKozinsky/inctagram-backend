@@ -21,3 +21,14 @@ spec:
            ports:
              - containerPort: PORT_CONTAINER
 
+           env:
+             - name: MAIN_MICROSERVICE_PORT
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-backend-main-production-config-secret
+                   key: MAIN_MICROSERVICE_PORT
+             - name: DATABASE_URL
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-backend-main-production-config-secret
+                   key: DATABASE_URL
