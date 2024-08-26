@@ -9,7 +9,6 @@ import { HttpExceptionFilter } from '../infrastructure/exceptionFilters/exceptio
 // import { SetReqUserMiddleware } from '../infrastructure/middlewares/setReqUser.middleware'
 
 export function applyAppSettings(app: INestApplication) {
-	console.log({ cookieParser })
 	app.use(cookieParser())
 
 	/*app.use(async (req: Request, res: Response, next: NextFunction) => {
