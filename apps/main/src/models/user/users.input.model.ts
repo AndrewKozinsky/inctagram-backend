@@ -1,34 +1,13 @@
-import { userTable } from '../tableFieldCheckers/userTable'
-
-const { CheckNameField, CheckPasswordField, CheckEmailField } = userTable
+import { CheckByClassValidator } from '../../db/checkByClassValidator'
+import { bdConfig } from '../../db/dbConfig'
 
 export class CreateUserDtoModel {
-	@CheckNameField()
+	@CheckByClassValidator('name', bdConfig.user.dbFields.name)
 	name: string
 
-	@CheckPasswordField()
+	@CheckByClassValidator('password', bdConfig.user.dtoProps.password)
 	password: string
 
-	@CheckEmailField()
+	@CheckByClassValidator('email', bdConfig.user.dbFields.email)
 	email: string
-}
-
-// ---
-
-const bdConfig = {
-	user: {
-		fields: {
-			id: {
-				type: 'index',
-			},
-			name: {
-				type: 'string',
-				minLength: 6,
-				maxLength: 30,
-				match: /^[A-Za-z0-9_-]+$/,
-				matchErrorMessage:
-					'Password must contain only letters, numbers and !"#$%&\'()*+,\\-./:;<=>?@[\\\\\\]^_{|}~ symbols',
-			},
-		},
-	},
 }

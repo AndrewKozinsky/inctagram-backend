@@ -29,7 +29,7 @@ describe('Auth (e2e)', () => {
 	describe('Register user', () => {
 		it.only('should return 400 if dto has incorrect values', async () => {
 			const registrationRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
-				.send({ login: '', password: '', email: 'wrong-email.com' })
+				.send({ name: '', password: '', email: 'wrong-email.com' })
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
 
 			expect({}.toString.call(registrationRes.body.errorsMessages)).toBe('[object Array]')
