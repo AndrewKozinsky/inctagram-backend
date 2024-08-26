@@ -5,27 +5,22 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
-  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+    provider      = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 model User {
-	id    Int     @default(autoincrement()) @id
-	email String  @unique
-	name  String?
-	posts Post[]
-}
-
-model Post {
-	id        Int      @default(autoincrement()) @id
-	title     String
-	content   String?
-	published Boolean? @default(false)
-	author    User?    @relation(fields: [authorId], references: [id])
-	authorId  Int?
+    id                                  Int     @id @default(autoincrement())
+    email                               String  @unique
+    name                                String  @unique
+    hashedPassword                      String
+    emailConfirmationCode               String?
+    emailConfirmationCodeExpirationDate String?
+    isEmailConfirmed                    Boolean @default(false)
+    passwordRecoveryCode                String?
 }

@@ -5,8 +5,7 @@ async function bootstrap() {
 	const app = await NestFactory.create(AppModule)
 	app.setGlobalPrefix('api/v1')
 	await app.listen(process.env.MAIN_MICROSERVICE_PORT)
-	console.log('MAIN_MICROSERVICE_PORT:', process.env.MAIN_MICROSERVICE_PORT)
-	console.log('some 3')
+	console.log('The server has started 🔥')
 }
 
 bootstrap()

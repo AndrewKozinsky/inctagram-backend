@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common'
 import { MainConfigService } from '@app/config'
-import { PrismaService } from '../prisma.service'
+import { PrismaService } from '../../prisma.service'
 import { Prisma, User } from '@prisma/client'
 
 @Injectable()
-export class AppService {
+export class AuthService {
 	constructor(
 		private prisma: PrismaService,
 		private mainConfigService: MainConfigService,
