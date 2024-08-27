@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { INestApplication } from '@nestjs/common'
 import { AppModule } from '../../src/app.module'
 import { describe } from 'node:test'
-import { createTestApp, postRequest } from './utils/common'
+import { createTestApp, postRequest, userEmail, userLogin, userPassword } from './utils/common'
 import RouteNames from '../../src/settings/routeNames'
 import { HTTP_STATUSES } from '../../src/settings/config'
 
@@ -27,13 +27,21 @@ describe('Auth (e2e)', () => {
 	})
 
 	describe('Register user', () => {
-		it.only('should return 400 if dto has incorrect values', async () => {
+		it('should return 400 if dto has incorrect values', async () => {
 			const registrationRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
 				.send({ name: '', password: '', email: 'wrong-email.com' })
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
+			console.log(registrationRes.body)
 
 			expect({}.toString.call(registrationRes.body.errorsMessages)).toBe('[object Array]')
 			expect(registrationRes.body.errorsMessages.length).toBe(3)
+		})
+
+		it.only('should return 201 if dto has correct values', async () => {
+			const registrationRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
+				.send({ name: userLogin, password: userPassword, email: userEmail })
+				.expect(HTTP_STATUSES.CREATED_201)
+			console.log(registrationRes.body)
 		})
 	})
 })

@@ -16,7 +16,8 @@
 		"test:watch": "NODE_ENV=TEST jest --watch --runInBand",
 		"test:cov": "NODE_ENV=TEST jest --coverage",
 		"migrate:dev": "prisma migrate dev",
-		"migrate:generate-types": "prisma generate"
+		"migrate:generate-types": "prisma generate",
+		"generatePrismaFile": "ts-node apps/main/src/db/prismaGenerator/generatePrismaSchemaFile.ts"
 	},
 	"dependencies": {
 		"@nestjs/common": "^10.0.0",

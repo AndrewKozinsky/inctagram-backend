@@ -1,3 +1,9 @@
+import { BdConfig } from './dbConfigType'
+
+/**
+ * Database structure.
+ * With help of this structure, it is formed schema.prisma and class-validator set of decorators to check field in DTO.
+ */
 export const bdConfig = {
 	user: {
 		dtoProps: {
@@ -39,6 +45,7 @@ export const bdConfig = {
 			},
 			isEmailConfirmed: {
 				type: 'boolean',
+				default: false,
 			},
 			passwordRecoveryCode: {
 				type: 'string',
@@ -47,39 +54,3 @@ export const bdConfig = {
 		},
 	},
 } satisfies BdConfig.Root
-
-export namespace BdConfig {
-	export type Root = Record<string, Table>
-
-	export type Table = {
-		dtoProps: Record<string, Field>
-		dbFields: Record<string, Field>
-	}
-
-	export type Field = IndexField | StringField | BooleanField | EmailField
-
-	export type IndexField = {
-		type: 'index'
-	}
-
-	export type StringField = {
-		type: 'string'
-		required?: boolean
-		unique?: boolean
-		minLength?: number
-		maxLength?: number
-		match?: RegExp
-		matchErrorMessage?: string
-	}
-
-	export type BooleanField = {
-		type: 'boolean'
-		required?: boolean
-	}
-
-	export type EmailField = {
-		type: 'email'
-		required?: boolean
-		unique?: boolean
-	}
-}

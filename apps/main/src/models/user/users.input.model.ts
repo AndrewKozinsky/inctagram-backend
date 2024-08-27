@@ -1,5 +1,5 @@
 import { CheckByClassValidator } from '../../db/checkByClassValidator'
-import { bdConfig } from '../../db/dbConfig'
+import { bdConfig } from '../../db/dbConfig/dbConfig'
 
 export class CreateUserDtoModel {
 	@CheckByClassValidator('name', bdConfig.user.dbFields.name)
