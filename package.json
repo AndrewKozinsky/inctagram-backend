@@ -27,12 +27,16 @@
     "@nestjs/platform-express": "^10.0.0",
     "@prisma/client": "5.18.0",
     "@types/bcrypt": "^5.0.2",
+    "@types/express-useragent": "^1.0.5",
+    "@types/jsonwebtoken": "^9.0.6",
     "add": "^2.0.6",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "cookie-parser": "^1.4.6",
     "date-fns": "^3.6.0",
+    "express-useragent": "^1.0.15",
+    "jsonwebtoken": "^9.0.2",
     "prisma": "^5.18.0",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
@@ -88,7 +92,9 @@
       "^@app/config(|/.*)$": "<rootDir>/libs/config/src/$1",
       "^@app/server-helper(|/.*)$": "<rootDir>/libs/server-helper/src/$1",
       "^@app/email-adapter(|/.*)$": "<rootDir>/libs/email-adapter/src/$1",
-      "^@app/hash-adapter(|/.*)$": "<rootDir>/libs/hash-adapter/src/$1"
+      "^@app/hash-adapter(|/.*)$": "<rootDir>/libs/hash-adapter/src/$1",
+      "^@app/browser-service(|/.*)$": "<rootDir>/libs/browser-service/src/$1",
+      "^@app/jwt-adapter(|/.*)$": "<rootDir>/libs/jwt-adapter/src/$1"
     }
   }
 }

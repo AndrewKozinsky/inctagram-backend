@@ -3,6 +3,7 @@ import { CreateUserCommand } from './CreateUser.command'
 import { UserRepository } from '../../repositories/user.repository'
 import { LayerErrorCode } from '../../../../../libs/layerResult'
 import { EmailAdapterService } from '@app/email-adapter'
+import { HashAdapterService } from '@app/hash-adapter'
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {

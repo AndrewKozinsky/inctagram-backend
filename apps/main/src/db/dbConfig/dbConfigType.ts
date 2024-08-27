@@ -7,7 +7,13 @@ export namespace BdConfig {
 		dbFields: Record<string, Field>
 	}
 
-	export type Field = IndexField | StringField | BooleanField | EmailField | NumberField
+	export type Field =
+		| IndexField
+		| StringField
+		| BooleanField
+		| EmailField
+		| NumberField
+		| ManyToOneField
 
 	type FieldCommonProps = {
 		// Default value
@@ -40,5 +46,13 @@ export namespace BdConfig {
 
 	export type NumberField = FieldCommonProps & {
 		type: 'number'
+	}
+
+	export type ManyToOneField = {
+		type: 'manyToOne'
+		relation: {
+			foreignTable: string // Name of the table that this column refers to
+			foreignField: string // Name of the column of foreign table that this column refers to
+		}
 	}
 }

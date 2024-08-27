@@ -42,6 +42,18 @@
       ],
       "@app/hash-adapter/*": [
         "libs/hash-adapter/src/*"
+      ],
+      "@app/browser-service": [
+        "libs/browser-service/src"
+      ],
+      "@app/browser-service/*": [
+        "libs/browser-service/src/*"
+      ],
+      "@app/jwt-adapter": [
+        "libs/jwt-adapter/src"
+      ],
+      "@app/jwt-adapter/*": [
+        "libs/jwt-adapter/src/*"
       ]
     }
   }

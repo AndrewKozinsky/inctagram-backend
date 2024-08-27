@@ -5,6 +5,6 @@ export type UserServiceModel = {
 	hashedPassword: string
 	emailConfirmationCode: string | null
 	confirmationCodeExpirationDate: string | null
-	isConfirmationEmailCodeConfirmed: boolean
+	isEmailConfirmed: boolean
 	passwordRecoveryCode: string | null
 }

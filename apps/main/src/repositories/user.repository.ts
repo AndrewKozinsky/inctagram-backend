@@ -20,9 +20,7 @@ export class UserRepository {
 			where: { email },
 		})
 
-		if (!user) {
-			return null
-		}
+		if (!user) return null
 
 		return this.mapDbUserToServiceUser(user)
 	}
@@ -37,6 +35,31 @@ export class UserRepository {
 		}
 
 		return this.mapDbUserToServiceUser(user)
+	}
+
+	async getUserByEmailAndPassword(email: string, password: string) {
+		const user = await this.prisma.user.findUnique({
+			where: { email },
+		})
+		if (!user) return null
+
+		const isPasswordMath = await this.hashAdapter.compare(password, user.hashedPassword)
+		if (!isPasswordMath) return null
+
+		return this.mapDbUserToServiceUser(user)
+	}
+
+	async getConfirmedUserByEmailAndPassword(loginDto: {
+		email: string
+		password: string
+	}): Promise<null | UserServiceModel> {
+		const user = await this.getUserByEmailAndPassword(loginDto.email, loginDto.password)
+
+		if (!user || !user.isEmailConfirmed) {
+			return null
+		}
+
+		return user
 	}
 
 	async createUser(dto: CreateUserDtoModel, isEmailConfirmed?: boolean) {
@@ -74,7 +97,7 @@ export class UserRepository {
 			hashedPassword: dbUser.hashedPassword,
 			emailConfirmationCode: dbUser.emailConfirmationCode,
 			confirmationCodeExpirationDate: dbUser.emailConfirmationCodeExpirationDate,
-			isConfirmationEmailCodeConfirmed: dbUser.isEmailConfirmed,
+			isEmailConfirmed: dbUser.isEmailConfirmed,
 			passwordRecoveryCode: dbUser.passwordRecoveryCode,
 		}
 	}

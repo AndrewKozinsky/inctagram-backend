@@ -71,6 +71,10 @@ model ${tableName} {
 			columnsArr.push(`\t${dbFieldName}    String` + createColumnAttrs(field))
 		} else if (field.type === 'boolean') {
 			columnsArr.push(`\t${dbFieldName}    Boolean` + createColumnAttrs(field))
+		} else if (field.type === 'number') {
+			columnsArr.push(`\t${dbFieldName}    Int` + createColumnAttrs(field))
+		} else if (field.type === 'manyToOne') {
+			columnsArr.push(...createRelationColumn(dbFieldName, field))
 		}
 	}
 
@@ -90,7 +94,7 @@ model ${tableName} {
 function createColumnAttrs(columnConfig: BdConfig.Field) {
 	const attrStrings: string[] = []
 
-	if (columnConfig.type !== 'index') {
+	if (columnConfig.type !== 'index' && columnConfig.type !== 'manyToOne') {
 		if (columnConfig.required == false) {
 			attrStrings.push('?')
 		}
@@ -106,4 +110,26 @@ function createColumnAttrs(columnConfig: BdConfig.Field) {
 
 	// Add tabulation if a string starts with a '?'
 	return attrsString.startsWith('?') ? attrsString : '\t' + attrsString
+}
+
+/**
+ * The function gets field name, userId for example
+ * and a fieldConfig, like this:
+ * {
+ * 	type: 'manyToOne'
+ * 	relation: {
+ * 		foreignTable: string // Name of the table that this column refers to
+ * 		foreignField: string // Name of the column of foreign table that this column refers to
+ * 	}
+ *
+ * 	and returns an array with 2 strings:
+ * 	['author User @relation(fields: [authorId], references: [id])', userId  Int]
+ * }
+ * @param fieldName
+ * @param fieldConfig
+ */
+function createRelationColumn(fieldName: string, fieldConfig: BdConfig.ManyToOneField) {
+	// 'user    User    @relation(fields: [authorId], references: [id])'
+	// 'userId Int'
+	return ['0', '1']
 }

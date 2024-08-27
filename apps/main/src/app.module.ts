@@ -4,6 +4,7 @@ import { AuthModule } from './routes/auth/auth.module'
 import { ServerHelperModule } from '@app/server-helper'
 import { EmailAdapterModule } from '@app/email-adapter'
 import { HashAdapterModule } from '@app/hash-adapter'
+import { BrowserServiceModule } from '@app/browser-service'
 
 @Module({
 	imports: [
@@ -11,6 +12,7 @@ import { HashAdapterModule } from '@app/hash-adapter'
 		ServerHelperModule,
 		EmailAdapterModule,
 		HashAdapterModule,
+		BrowserServiceModule,
 		AuthModule,
 	],
 	controllers: [],

@@ -63,6 +63,24 @@
       "compilerOptions": {
         "tsConfigPath": "libs/hash-adapter/tsconfig.lib.json"
       }
+    },
+    "browser-service": {
+      "type": "library",
+      "root": "libs/browser-service",
+      "entryFile": "index",
+      "sourceRoot": "libs/browser-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/browser-service/tsconfig.lib.json"
+      }
+    },
+    "jwt-adapter": {
+      "type": "library",
+      "root": "libs/jwt-adapter",
+      "entryFile": "index",
+      "sourceRoot": "libs/jwt-adapter/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/jwt-adapter/tsconfig.lib.json"
+      }
     }
   }
 }

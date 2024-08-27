@@ -11,3 +11,11 @@ export class CreateUserDtoModel {
 	@CheckByClassValidator('email', bdConfig.User.dbFields.email)
 	email: string
 }
+
+export class LoginUserDtoModel {
+	@CheckByClassValidator('password', bdConfig.User.dtoProps.password)
+	password: string
+
+	@CheckByClassValidator('email', bdConfig.User.dbFields.email)
+	email: string
+}

@@ -53,4 +53,39 @@ export const bdConfig = {
 			},
 		},
 	},
+	DeviceToken: {
+		dtoProps: {},
+		dbFields: {
+			id: {
+				type: 'index',
+			},
+			issuedAt: {
+				type: 'string',
+			},
+			expirationDate: {
+				type: 'string',
+			},
+			deviceIP: {
+				type: 'string',
+			},
+			deviceId: {
+				type: 'string',
+			},
+			deviceName: {
+				type: 'string',
+			},
+			userId: {
+				type: 'manyToOne',
+				relation: {
+					foreignTable: 'User',
+					foreignField: 'id',
+				},
+			},
+
+			// @ManyToOne(() => User, (u) => u.id, { onDelete: 'CASCADE' })
+			// user: User
+			// @Column('varchar')
+			// userId: string
+		},
+	},
 } satisfies BdConfig.Root

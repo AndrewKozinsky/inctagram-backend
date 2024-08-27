@@ -1,10 +1,10 @@
 export const RouteNames = {
 	AUTH: {
 		value: 'auth',
-		/*LOGIN: {
+		LOGIN: {
 			value: 'login',
 			full: 'auth/login',
-		},*/
+		},
 		/*REFRESH_TOKEN: {
 			value: 'refresh-token',
 			full: 'auth/refresh-token',
