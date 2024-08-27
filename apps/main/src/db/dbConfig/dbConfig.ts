@@ -5,7 +5,7 @@ import { BdConfig } from './dbConfigType'
  * With help of this structure, it is formed schema.prisma and class-validator set of decorators to check field in DTO.
  */
 export const bdConfig = {
-	user: {
+	User: {
 		dtoProps: {
 			password: {
 				type: 'string',

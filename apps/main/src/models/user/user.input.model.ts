@@ -2,12 +2,12 @@ import { CheckByClassValidator } from '../../db/checkByClassValidator'
 import { bdConfig } from '../../db/dbConfig/dbConfig'
 
 export class CreateUserDtoModel {
-	@CheckByClassValidator('name', bdConfig.user.dbFields.name)
+	@CheckByClassValidator('name', bdConfig.User.dbFields.name)
 	name: string
 
-	@CheckByClassValidator('password', bdConfig.user.dtoProps.password)
+	@CheckByClassValidator('password', bdConfig.User.dtoProps.password)
 	password: string
 
-	@CheckByClassValidator('email', bdConfig.user.dbFields.email)
+	@CheckByClassValidator('email', bdConfig.User.dbFields.email)
 	email: string
 }

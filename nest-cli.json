@@ -36,6 +36,33 @@
       "compilerOptions": {
         "tsConfigPath": "libs/config/tsconfig.lib.json"
       }
+    },
+    "server-helper": {
+      "type": "library",
+      "root": "libs/server-helper",
+      "entryFile": "index",
+      "sourceRoot": "libs/server-helper/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/server-helper/tsconfig.lib.json"
+      }
+    },
+    "email-adapter": {
+      "type": "library",
+      "root": "libs/email-adapter",
+      "entryFile": "index",
+      "sourceRoot": "libs/email-adapter/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/email-adapter/tsconfig.lib.json"
+      }
+    },
+    "hash-adapter": {
+      "type": "library",
+      "root": "libs/hash-adapter",
+      "entryFile": "index",
+      "sourceRoot": "libs/hash-adapter/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/hash-adapter/tsconfig.lib.json"
+      }
     }
   }
 }

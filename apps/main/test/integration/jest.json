@@ -11,6 +11,9 @@
 		"^.+\\.(t|j)s$": "ts-jest"
 	},
 	"moduleNameMapper": {
-		"^@app/config(.*)$": "<rootDir>/../../../../libs/config/src"
+		"^@app/config(.*)$": "<rootDir>/../../../../libs/config/src",
+		"^@app/server-helper(.*)$": "<rootDir>/../../../../libs/server-helper/src",
+		"^@app/email-adapter(.*)$": "<rootDir>/../../../../libs/email-adapter/src",
+		"^@app/hash-adapter(.*)$": "<rootDir>/../../../../libs/hash-adapter/src"
 	}
 }

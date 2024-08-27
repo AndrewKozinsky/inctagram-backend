@@ -67,7 +67,7 @@ model ${tableName} {
 
 		if (field.type === 'index') {
 			columnsArr.push(`\t${dbFieldName}    Int     @id @default(autoincrement())`)
-		} else if (field.type === 'string') {
+		} else if (['string', 'email'].includes(field.type)) {
 			columnsArr.push(`\t${dbFieldName}    String` + createColumnAttrs(field))
 		} else if (field.type === 'boolean') {
 			columnsArr.push(`\t${dbFieldName}    Boolean` + createColumnAttrs(field))
@@ -94,7 +94,7 @@ function createColumnAttrs(columnConfig: BdConfig.Field) {
 		if (columnConfig.required == false) {
 			attrStrings.push('?')
 		}
-		if (columnConfig.default) {
+		if (columnConfig.default !== undefined) {
 			attrStrings.push(`@default(${columnConfig.default})`)
 		}
 		if (columnConfig.unique) {

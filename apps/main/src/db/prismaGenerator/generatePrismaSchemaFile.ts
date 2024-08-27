@@ -7,7 +7,7 @@ export function generatePrismaSchemaFile() {
 	const prismaSchemaContent = createSchemaPrisma(bdConfig)
 
 	const prismaFolderPath = path.resolve(__dirname, '../../../../../prisma')
-	const prismaSchemaName = 'my-file.txt'
+	const prismaSchemaName = 'schema.prisma'
 	const fullPath = prismaFolderPath + '/' + prismaSchemaName
 
 	writeFile(fullPath, prismaSchemaContent)
