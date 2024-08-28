@@ -1,2 +1,2 @@
 export * from './lib/mainConfig.module'
-export * from './lib/mainConfigService'
+export * from './lib/mainConfig.service'

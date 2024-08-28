@@ -14,6 +14,7 @@ export namespace BdConfig {
 		| EmailField
 		| NumberField
 		| ManyToOneField
+		| OneToManyField
 
 	type FieldCommonProps = {
 		// Default value
@@ -46,13 +47,18 @@ export namespace BdConfig {
 
 	export type NumberField = FieldCommonProps & {
 		type: 'number'
+		min?: number
+		max?: number
 	}
 
 	export type ManyToOneField = {
 		type: 'manyToOne'
-		relation: {
-			foreignTable: string // Name of the table that this column refers to
-			foreignField: string // Name of the column of foreign table that this column refers to
-		}
+		thisField: string // Name of the column of this table that refers to another table
+		foreignTable: string // Name of the table that this column refers to
+		foreignField: string // Name of the column of foreign table that this column refers to
+	}
+
+	export type OneToManyField = {
+		type: 'oneToMany'
 	}
 }

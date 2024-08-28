@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common'
 import jwt, { decode } from 'jsonwebtoken'
 import { DeviceTokenOutModel } from '../../../apps/main/src/models/auth/auth.output.model'
-import { PrismaService } from '../../../apps/main/src/prisma.service'
+import { PrismaService } from '../../../apps/main/src/db/prisma.service'
 import { ServerHelperService } from '@app/server-helper'
 import { HashAdapterService } from '@app/hash-adapter'
-import { addMilliseconds } from 'date-fns'
+import { add, addMilliseconds } from 'date-fns'
 import { MainConfigService } from '@app/config'
+import { DeviceTokenServiceModel } from '../../../apps/main/src/models/auth/auth.service.model'
 
 @Injectable()
 export class JwtAdapterService {
@@ -14,36 +15,37 @@ export class JwtAdapterService {
 		private mainConfig: MainConfigService,
 	) {}
 
-	/*createAccessTokenStr(userId: string) {
-		return jwt.sign({ userId }, config.JWT_SECRET, {
-			expiresIn: config.accessToken.lifeDurationInMs / 1000 + 's',
+	createAccessTokenStr(userId: string) {
+		return jwt.sign({ userId }, this.mainConfig.get().jwt.secret, {
+			expiresIn: this.mainConfig.get().accessToken.lifeDurationInMs / 1000 + 's',
 		})
-	}*/
-	/*createRefreshTokenStr(deviceId: string, expirationDate?: Date): string {
+	}
+
+	createRefreshTokenStr(deviceId: string, expirationDate?: Date): string {
 		const defaultExpDate = add(new Date(), {
-			seconds: config.refreshToken.lifeDurationInMs / 1000,
+			seconds: this.mainConfig.get().refreshToken.lifeDurationInMs / 1000,
 		})
 
 		const expDate = expirationDate || defaultExpDate
 
-		return jwt.sign({ deviceId }, config.JWT_SECRET, {
+		return jwt.sign({ deviceId }, this.mainConfig.get().jwt.secret, {
 			expiresIn: (+expDate - +new Date()) / 1000 + 's',
 		})
-	}*/
+	}
 
 	createDeviceRefreshToken(
 		userId: number,
 		deviceIP: string,
 		deviceName: string,
-	): DeviceTokenOutModel {
+	): DeviceTokenServiceModel {
 		const deviceId = this.serverHelper.strUtils().createUniqString()
 
 		return {
-			issuedAt: new Date(),
+			issuedAt: new Date().toISOString(),
 			expirationDate: addMilliseconds(
 				new Date(),
 				this.mainConfig.get().refreshToken.lifeDurationInMs,
-			),
+			).toISOString(),
 			deviceIP,
 			deviceId,
 			deviceName,
@@ -54,34 +56,38 @@ export class JwtAdapterService {
 	/*getPayload(tokenStr: string) {
 		return jwt.decode(tokenStr, { complete: true })!.payload
 	}*/
-	/*getUserIdByAccessTokenStr(accessToken: string): null | string {
+
+	getUserIdByAccessTokenStr(accessToken: string): null | number {
 		try {
-			const result: any = jwt.verify(accessToken, config.JWT_SECRET)
+			const result: any = jwt.verify(accessToken, this.mainConfig.get().jwt.secret)
 			return result.userId
 		} catch (error) {
 			return null
 		}
-	}*/
-	/*getRefreshTokenDataFromTokenStr(refreshTokenStr: string) {
+	}
+
+	getRefreshTokenDataFromTokenStr(refreshTokenStr: string) {
 		try {
-			const payload = jwt.verify(refreshTokenStr, config.JWT_SECRET)
+			const payload = jwt.verify(refreshTokenStr, this.mainConfig.get().jwt.secret)
 			return payload as { deviceId: string }
 		} catch (error) {
 			console.log(error)
 			return null
 		}
-	}*/
+	}
+
 	// Check if token string is valid
-	/*isRefreshTokenStrValid(refreshTokenStr: string = '') {
+	isRefreshTokenStrValid(refreshTokenStr: string = '') {
 		try {
-			const tokenPayload = jwt.verify(refreshTokenStr, config.JWT_SECRET)
+			const tokenPayload = jwt.verify(refreshTokenStr, this.mainConfig.get().jwt.secret)
 			return true
 		} catch (error) {
 			console.log(error)
 			return false
 		}
-	}*/
-	/*getTokenStrExpirationDate(tokenStr: string): null | Date {
+	}
+
+	getTokenStrExpirationDate(tokenStr: string): null | Date {
 		try {
 			const tokenPayload = decode(tokenStr)
 
@@ -95,5 +101,5 @@ export class JwtAdapterService {
 			console.log(error)
 			return null
 		}
-	}*/
+	}
 }

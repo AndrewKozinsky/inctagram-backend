@@ -12,10 +12,10 @@ export class CreateUserDtoModel {
 	email: string
 }
 
-export class LoginUserDtoModel {
+export class SetNewPasswordDtoModel {
 	@CheckByClassValidator('password', bdConfig.User.dtoProps.password)
-	password: string
+	newPassword: string
 
-	@CheckByClassValidator('email', bdConfig.User.dbFields.email)
-	email: string
+	@CheckByClassValidator('password', bdConfig.User.dtoProps.recoveryCode)
+	recoveryCode: string
 }

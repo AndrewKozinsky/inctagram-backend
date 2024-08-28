@@ -3,7 +3,7 @@ import { User } from '@prisma/client'
 import { add } from 'date-fns'
 import { ServerHelperService } from '@app/server-helper'
 import { HashAdapterService } from '@app/hash-adapter'
-import { PrismaService } from '../prisma.service'
+import { PrismaService } from '../db/prisma.service'
 import { CreateUserDtoModel } from '../models/user/user.input.model'
 import { UserServiceModel } from '../models/user/user.service.model'
 
@@ -49,6 +49,16 @@ export class UserRepository {
 		return this.mapDbUserToServiceUser(user)
 	}
 
+	async getUserByConfirmationCode(confirmationCode: string) {
+		const user = await this.prisma.user.findFirst({
+			where: { emailConfirmationCode: confirmationCode },
+		})
+
+		if (!user) return null
+
+		return this.mapDbUserToServiceUser(user)
+	}
+
 	async getConfirmedUserByEmailAndPassword(loginDto: {
 		email: string
 		password: string
@@ -60,6 +70,16 @@ export class UserRepository {
 		}
 
 		return user
+	}
+
+	async getUserByPasswordRecoveryCode(passwordRecoveryCode: string) {
+		const user = await this.prisma.user.findFirst({
+			where: { passwordRecoveryCode },
+		})
+
+		if (!user) return null
+
+		return this.mapDbUserToServiceUser(user)
 	}
 
 	async createUser(dto: CreateUserDtoModel, isEmailConfirmed?: boolean) {
@@ -87,6 +107,13 @@ export class UserRepository {
 		})
 
 		return this.mapDbUserToServiceUser(user)
+	}
+
+	async updateUser(userId: number, data: Partial<User>) {
+		await this.prisma.user.update({
+			where: { id: userId },
+			data,
+		})
 	}
 
 	mapDbUserToServiceUser(dbUser: User): UserServiceModel {

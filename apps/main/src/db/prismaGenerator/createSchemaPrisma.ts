@@ -1,5 +1,4 @@
 import { BdConfig } from '../dbConfig/dbConfigType'
-import { bdConfig } from '../dbConfig/dbConfig'
 
 /**
  * Creates a schema.prisma file content from bdConfig.
@@ -25,7 +24,20 @@ import { bdConfig } from '../dbConfig/dbConfig'
  * @param bdConfig
  */
 export function createSchemaPrisma(bdConfig: BdConfig.Root) {
-	let content = `generator client {
+	const topAndTablesArr = []
+
+	topAndTablesArr.push(getTopPrismaSchema())
+
+	// Creates models
+	for (const tableName in bdConfig) {
+		topAndTablesArr.push(createTableSchema(bdConfig, tableName, bdConfig[tableName]))
+	}
+
+	return topAndTablesArr.join('\n')
+}
+
+function getTopPrismaSchema() {
+	return `generator client {
 	provider      = "prisma-client-js"
 	binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
@@ -33,15 +45,7 @@ export function createSchemaPrisma(bdConfig: BdConfig.Root) {
 datasource db {
 	provider = "postgresql"
 	url      = env("DATABASE_URL")
-}
-	`
-
-	// Creates models
-	for (const tableName in bdConfig) {
-		content += createTableSchema(tableName, bdConfig[tableName])
-	}
-
-	return content
+}`
 }
 
 /**
@@ -53,10 +57,15 @@ datasource db {
  *     emailConfirmationCode               String?
  *     isEmailConfirmed                    Boolean @default(false)
  * }
+ * @param bdConfig
  * @param tableName — name of a table
  * @param tableConfig — config of a table
  */
-function createTableSchema(tableName: string, tableConfig: BdConfig.Table) {
+function createTableSchema(
+	bdConfig: BdConfig.Root,
+	tableName: string,
+	tableConfig: BdConfig.Table,
+) {
 	let content = `
 model ${tableName} {
 `
@@ -66,15 +75,17 @@ model ${tableName} {
 		const field = tableConfig.dbFields[dbFieldName]
 
 		if (field.type === 'index') {
-			columnsArr.push(`\t${dbFieldName}    Int     @id @default(autoincrement())`)
+			columnsArr.push(`\t${dbFieldName}	Int	@id	@default(autoincrement())`)
 		} else if (['string', 'email'].includes(field.type)) {
-			columnsArr.push(`\t${dbFieldName}    String` + createColumnAttrs(field))
+			columnsArr.push(`\t${dbFieldName}	String` + createColumnAttrs(field))
 		} else if (field.type === 'boolean') {
-			columnsArr.push(`\t${dbFieldName}    Boolean` + createColumnAttrs(field))
+			columnsArr.push(`\t${dbFieldName}	Boolean` + createColumnAttrs(field))
 		} else if (field.type === 'number') {
-			columnsArr.push(`\t${dbFieldName}    Int` + createColumnAttrs(field))
+			columnsArr.push(`\t${dbFieldName}	Int` + createColumnAttrs(field))
 		} else if (field.type === 'manyToOne') {
-			columnsArr.push(...createRelationColumn(dbFieldName, field))
+			columnsArr.push(...createManyToOneColumn(bdConfig, dbFieldName, field))
+		} else if (field.type === 'oneToMany') {
+			columnsArr.push(`\t${dbFieldName}	${dbFieldName}[]`)
 		}
 	}
 
@@ -94,7 +105,11 @@ model ${tableName} {
 function createColumnAttrs(columnConfig: BdConfig.Field) {
 	const attrStrings: string[] = []
 
-	if (columnConfig.type !== 'index' && columnConfig.type !== 'manyToOne') {
+	if (
+		columnConfig.type !== 'index' &&
+		columnConfig.type !== 'manyToOne' &&
+		columnConfig.type !== 'oneToMany'
+	) {
 		if (columnConfig.required == false) {
 			attrStrings.push('?')
 		}
@@ -106,7 +121,9 @@ function createColumnAttrs(columnConfig: BdConfig.Field) {
 		}
 	}
 
-	const attrsString = attrStrings.join(' ')
+	if (!attrStrings.length) return ''
+
+	const attrsString = attrStrings.join('\t')
 
 	// Add tabulation if a string starts with a '?'
 	return attrsString.startsWith('?') ? attrsString : '\t' + attrsString
@@ -118,18 +135,34 @@ function createColumnAttrs(columnConfig: BdConfig.Field) {
  * {
  * 	type: 'manyToOne'
  * 	relation: {
- * 		foreignTable: string // Name of the table that this column refers to
- * 		foreignField: string // Name of the column of foreign table that this column refers to
+ * 		thisField: userId
+ * 		foreignTable: User // Name of the table that this column refers to
+ * 		foreignField: id // Name of the column of foreign table that this column refers to
  * 	}
  *
  * 	and returns an array with 2 strings:
  * 	['author User @relation(fields: [authorId], references: [id])', userId  Int]
  * }
+ * @param dbConfig
  * @param fieldName
  * @param fieldConfig
  */
-function createRelationColumn(fieldName: string, fieldConfig: BdConfig.ManyToOneField) {
-	// 'user    User    @relation(fields: [authorId], references: [id])'
-	// 'userId Int'
-	return ['0', '1']
+function createManyToOneColumn(
+	dbConfig: BdConfig.Root,
+	fieldName: string,
+	fieldConfig: BdConfig.ManyToOneField,
+) {
+	// Get first column name from thisField name: userId -> user
+	const firstColumnName = fieldConfig.thisField.slice(0, -2)
+
+	// User, userId, id
+	const { foreignTable, thisField, foreignField } = fieldConfig
+
+	// For example: 'user User @relation(fields: [userId], references: [id])'
+	const firstColumn = `${firstColumnName} ${foreignTable} @relation(fields: [${thisField}], references: [${foreignField}])`
+
+	// For example: 'userId Int'
+	const secondColumn = thisField + ' Int'
+
+	return ['\t' + firstColumn, '\t' + secondColumn]
 }

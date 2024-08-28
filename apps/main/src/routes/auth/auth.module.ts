@@ -1,29 +1,46 @@
 import { Module } from '@nestjs/common'
 import { AuthController } from './auth.controller'
-import { PrismaService } from '../../prisma.service'
+import { PrismaService } from '../../db/prisma.service'
 import { AuthService } from './auth.service'
 import { MainConfigService } from '@app/config'
 import { CqrsModule } from '@nestjs/cqrs'
 import { CreateUserHandler } from '../../features/user/CreateUser.commandHandler'
 import { UserRepository } from '../../repositories/user.repository'
-import { HashAdapterModule, HashAdapterService } from '@app/hash-adapter'
+import { HashAdapterService } from '@app/hash-adapter'
 import { BrowserServiceService } from '@app/browser-service'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { AuthRepository } from '../../repositories/auth.repository'
+import { LogoutHandler } from '../../features/auth/Logout.commandHandler'
+import { ConfirmEmailHandler } from '../../features/auth/ConfirmEmail.commandHandler'
+import { LoginHandler } from '../../features/auth/Login.commandHandler'
+import { ResendConfirmationEmailHandler } from '../../features/auth/ResendConfirmationEmail.commandHandler'
+import { RecoveryPasswordHandler } from '../../features/auth/RecoveryPassword.commandHandler'
+import { SetNewPasswordHandler } from '../../features/auth/SetNewPassword.commandHandler'
+
+const services = [
+	AuthService,
+	PrismaService,
+	MainConfigService,
+	HashAdapterService,
+	BrowserServiceService,
+	JwtAdapterService,
+]
+
+const repositories = [UserRepository, AuthRepository]
+
+const commandHandlers = [
+	CreateUserHandler,
+	ConfirmEmailHandler,
+	LoginHandler,
+	LogoutHandler,
+	ResendConfirmationEmailHandler,
+	RecoveryPasswordHandler,
+	SetNewPasswordHandler,
+]
 
 @Module({
 	imports: [CqrsModule],
 	controllers: [AuthController],
-	providers: [
-		AuthService,
-		PrismaService,
-		MainConfigService,
-		CreateUserHandler,
-		HashAdapterService,
-		BrowserServiceService,
-		JwtAdapterService,
-		UserRepository,
-		AuthRepository,
-	],
+	providers: [...services, ...repositories, ...commandHandlers],
 })
 export class AuthModule {}

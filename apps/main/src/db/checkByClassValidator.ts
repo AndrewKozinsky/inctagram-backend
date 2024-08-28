@@ -1,5 +1,5 @@
 import { applyDecorators } from '@nestjs/common'
-import { IsEmail, IsNumber, IsString, Matches, MaxLength, MinLength } from 'class-validator'
+import { IsEmail, IsNumber, IsString, Matches, MaxLength, Min, MinLength } from 'class-validator'
 import { BdConfig } from './dbConfig/dbConfigType'
 import { Trim } from '../infrastructure/pipes/Trim.decorator'
 import { Type } from 'class-transformer'
@@ -40,11 +40,22 @@ export function CheckByClassValidator(fieldName: string, fieldConf: BdConfig.Fie
 		}
 	} else if (fieldConf.type === 'email') {
 		decorators.push(IsString({ message: name + ' must be a string' }))
-		decorators.push(IsEmail({}, { message: name + ' must be email' }))
+		decorators.push(
+			IsEmail({}, { message: 'The email must match the format example@example.com' }),
+		)
 	} else if (fieldConf.type === 'number') {
 		// @Type(() => Number)
 		decorators.push(IsNumber)
-		// @Min(1)
+		if (fieldConf.min) {
+			decorators.push(
+				Min(fieldConf.min, { message: 'Minimum number of characters ' + fieldConf.min }),
+			)
+		}
+		if (fieldConf.max) {
+			decorators.push(
+				Min(fieldConf.max, { message: 'Maximum number of characters ' + fieldConf.max }),
+			)
+		}
 	} else if (fieldConf.type === 'boolean') {
 		decorators.push(Type(() => Boolean))
 	}
