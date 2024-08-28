@@ -2,19 +2,19 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UserRepository } from '../../repositories/user.repository'
 import { LayerErrorCode } from '../../../../../libs/layerResult'
 import { EmailAdapterService } from '@app/email-adapter'
-import { LoginUserCommand } from './LoginUser.command'
+import { LoginCommand } from './Login.command'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { AuthRepository } from '../../repositories/auth.repository'
 
-@CommandHandler(LoginUserCommand)
-export class LoginUserHandler implements ICommandHandler<LoginUserCommand> {
+@CommandHandler(LoginCommand)
+export class LoginHandler implements ICommandHandler<LoginCommand> {
 	constructor(
 		private userRepository: UserRepository,
 		private authRepository: AuthRepository,
 		private jwtAdapter: JwtAdapterService,
 	) {}
 
-	async execute(command: LoginUserCommand) {
+	async execute(command: LoginCommand) {
 		const { loginUserDto, clientIP, clientName } = command
 
 		const user = await this.userRepository.getConfirmedUserByEmailAndPassword(loginUserDto)

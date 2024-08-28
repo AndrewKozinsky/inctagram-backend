@@ -17,14 +17,14 @@ export const RouteNames = {
 			value: 'registration-email-resending',
 			full: 'auth/registration-email-resending',
 		},*/
-		/*REGISTRATION_CONFIRMATION: {
-			value: 'registration-confirmation',
-			full: 'auth/registration-confirmation',
-		},*/
-		/*LOGOUT: {
+		EMAIL_CONFIRMATION: {
+			value: 'email-confirmation',
+			full: 'auth/email-confirmation',
+		},
+		LOGOUT: {
 			value: 'logout',
 			full: 'auth/logout',
-		},*/
+		},
 		/*PASSWORD_RECOVERY: {
 			value: 'password-recovery',
 			full: 'auth/password-recovery',

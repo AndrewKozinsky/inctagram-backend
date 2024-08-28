@@ -49,6 +49,16 @@ export class UserRepository {
 		return this.mapDbUserToServiceUser(user)
 	}
 
+	async getUserByConfirmationCode(confirmationCode: string) {
+		const user = await this.prisma.user.findFirst({
+			where: { emailConfirmationCode: confirmationCode },
+		})
+
+		if (!user) return null
+
+		return this.mapDbUserToServiceUser(user)
+	}
+
 	async getConfirmedUserByEmailAndPassword(loginDto: {
 		email: string
 		password: string
@@ -87,6 +97,15 @@ export class UserRepository {
 		})
 
 		return this.mapDbUserToServiceUser(user)
+	}
+
+	async makeUserEmailConfirmed(userId: number) {
+		await this.prisma.user.update({
+			where: { id: userId },
+			data: {
+				isEmailConfirmed: true,
+			},
+		})
 	}
 
 	mapDbUserToServiceUser(dbUser: User): UserServiceModel {

@@ -2,10 +2,14 @@ import { Injectable } from '@nestjs/common'
 import { DeviceToken } from '@prisma/client'
 import { PrismaService } from '../db/prisma.service'
 import { DeviceTokenServiceModel } from '../models/auth/auth.service.model'
+import { JwtAdapterService } from '@app/jwt-adapter'
 
 @Injectable()
 export class AuthRepository {
-	constructor(private prisma: PrismaService) {}
+	constructor(
+		private prisma: PrismaService,
+		private jwtAdapter: JwtAdapterService,
+	) {}
 
 	async insertDeviceRefreshToken(
 		deviceRefreshToken: DeviceTokenServiceModel,
@@ -22,6 +26,34 @@ export class AuthRepository {
 		})
 
 		return this.mapDbDeviceTokenToServiceDeviceToken(deviceToken)
+	}
+
+	async getDeviceRefreshTokenByTokenStr(
+		tokenStr: string,
+	): Promise<null | DeviceTokenServiceModel> {
+		try {
+			const refreshTokenPayload = this.jwtAdapter.getRefreshTokenDataFromTokenStr(tokenStr)
+			return this.getDeviceRefreshTokenByDeviceId(refreshTokenPayload!.deviceId)
+		} catch (err: unknown) {
+			return null
+		}
+	}
+
+	async getDeviceRefreshTokenByDeviceId(
+		deviceId: string,
+	): Promise<null | DeviceTokenServiceModel> {
+		const token = await this.prisma.deviceToken.findFirst({
+			where: { deviceId: deviceId },
+		})
+		// const token = await this.dataSource.getRepository(DeviceToken).findOneBy({ deviceId })
+
+		if (!token) return null
+
+		return this.mapDbDeviceTokenToServiceDeviceToken(token)
+	}
+
+	async deleteDeviceRefreshTokenByDeviceId(deviceId: string): Promise<void> {
+		this.prisma.deviceToken.deleteMany({ where: { deviceId: deviceId } })
 	}
 
 	mapDbDeviceTokenToServiceDeviceToken(dbDeviceToken: DeviceToken): DeviceTokenServiceModel {

@@ -14,6 +14,11 @@ export const bdConfig = {
 				match: /[0-9A-Za-z!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/,
 				matchErrorMessage: 'Password must contain letters, numbers and other symbols',
 			},
+			confirmEmailCode: {
+				type: 'string',
+				minLength: 1,
+				maxLength: 100,
+			},
 		},
 		dbFields: {
 			id: {

@@ -58,32 +58,35 @@ export class JwtAdapterService {
 	}*/
 	/*getUserIdByAccessTokenStr(accessToken: string): null | string {
 		try {
-			const result: any = jwt.verify(accessToken, config.JWT_SECRET)
+			const result: any = jwt.verify(accessToken, this.mainConfig.get().jwt.secret)
 			return result.userId
 		} catch (error) {
 			return null
 		}
 	}*/
-	/*getRefreshTokenDataFromTokenStr(refreshTokenStr: string) {
+
+	getRefreshTokenDataFromTokenStr(refreshTokenStr: string) {
 		try {
-			const payload = jwt.verify(refreshTokenStr, config.JWT_SECRET)
+			const payload = jwt.verify(refreshTokenStr, this.mainConfig.get().jwt.secret)
 			return payload as { deviceId: string }
 		} catch (error) {
 			console.log(error)
 			return null
 		}
-	}*/
+	}
+
 	// Check if token string is valid
-	/*isRefreshTokenStrValid(refreshTokenStr: string = '') {
+	isRefreshTokenStrValid(refreshTokenStr: string = '') {
 		try {
-			const tokenPayload = jwt.verify(refreshTokenStr, config.JWT_SECRET)
+			const tokenPayload = jwt.verify(refreshTokenStr, this.mainConfig.get().jwt.secret)
 			return true
 		} catch (error) {
 			console.log(error)
 			return false
 		}
-	}*/
-	/*getTokenStrExpirationDate(tokenStr: string): null | Date {
+	}
+
+	getTokenStrExpirationDate(tokenStr: string): null | Date {
 		try {
 			const tokenPayload = decode(tokenStr)
 
@@ -97,5 +100,5 @@ export class JwtAdapterService {
 			console.log(error)
 			return null
 		}
-	}*/
+	}
 }
