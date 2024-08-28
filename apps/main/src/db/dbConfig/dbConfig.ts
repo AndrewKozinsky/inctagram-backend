@@ -51,6 +51,9 @@ export const bdConfig = {
 				type: 'string',
 				required: false,
 			},
+			DeviceToken: {
+				type: 'oneToMany',
+			},
 		},
 	},
 	DeviceToken: {
@@ -76,10 +79,9 @@ export const bdConfig = {
 			},
 			userId: {
 				type: 'manyToOne',
-				relation: {
-					foreignTable: 'User',
-					foreignField: 'id',
-				},
+				thisField: 'userId',
+				foreignTable: 'User',
+				foreignField: 'id',
 			},
 
 			// @ManyToOne(() => User, (u) => u.id, { onDelete: 'CASCADE' })

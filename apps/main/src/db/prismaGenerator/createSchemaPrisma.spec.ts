@@ -20,6 +20,9 @@ export const bdTestConfig = {
 				type: 'boolean',
 				default: false,
 			},
+			DeviceToken: {
+				type: 'oneToMany',
+			},
 		},
 	},
 	DeviceToken: {
@@ -58,6 +61,7 @@ model User {
 	email	String	@unique
 	name	String	@unique
 	isEmailConfirmed	Boolean	@default(false)
+	DeviceToken	DeviceToken[]
 }
 
 model DeviceToken {

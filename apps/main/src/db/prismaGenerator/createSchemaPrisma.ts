@@ -84,7 +84,9 @@ model ${tableName} {
 		} else if (field.type === 'number') {
 			columnsArr.push(`\t${dbFieldName}	Int` + createColumnAttrs(field))
 		} else if (field.type === 'manyToOne') {
-			columnsArr.push(...createRelationColumn(bdConfig, dbFieldName, field))
+			columnsArr.push(...createManyToOneColumn(bdConfig, dbFieldName, field))
+		} else if (field.type === 'oneToMany') {
+			columnsArr.push(`\t${dbFieldName}	${dbFieldName}[]`)
 		}
 	}
 
@@ -104,7 +106,11 @@ model ${tableName} {
 function createColumnAttrs(columnConfig: BdConfig.Field) {
 	const attrStrings: string[] = []
 
-	if (columnConfig.type !== 'index' && columnConfig.type !== 'manyToOne') {
+	if (
+		columnConfig.type !== 'index' &&
+		columnConfig.type !== 'manyToOne' &&
+		columnConfig.type !== 'oneToMany'
+	) {
 		if (columnConfig.required == false) {
 			attrStrings.push('?')
 		}
@@ -138,10 +144,11 @@ function createColumnAttrs(columnConfig: BdConfig.Field) {
  * 	and returns an array with 2 strings:
  * 	['author User @relation(fields: [authorId], references: [id])', userId  Int]
  * }
+ * @param dbConfig
  * @param fieldName
  * @param fieldConfig
  */
-function createRelationColumn(
+function createManyToOneColumn(
 	dbConfig: BdConfig.Root,
 	fieldName: string,
 	fieldConfig: BdConfig.ManyToOneField,
