@@ -3,11 +3,7 @@ import { CommandBus } from '@nestjs/cqrs'
 import { Request, Response } from 'express'
 import { MainConfigService } from '@app/config'
 import { JwtAdapterService } from '@app/jwt-adapter'
-import {
-	LoginUserDtoModel,
-	CreateUserDtoModel,
-	AuthRegistrationConfirmationDtoModel,
-} from '../../models/user/user.input.model'
+import { CreateUserDtoModel, SetNewPasswordDtoModel } from '../../models/user/user.input.model'
 import RouteNames from '../../settings/routeNames'
 import { CreateUserCommand } from '../../features/user/CreateUser.command'
 import { ServerHelperService } from '@app/server-helper'
@@ -17,6 +13,15 @@ import { CheckDeviceRefreshTokenGuard } from '../../infrastructure/guards/checkD
 import { LayerErrorCode } from '../../../../../libs/layerResult'
 import { LogoutCommand } from '../../features/auth/Logout.command'
 import { ConfirmEmailCommand } from '../../features/auth/ConfirmEmail.command'
+import { ResendConfirmationEmailCommand } from '../../features/auth/ResendConfirmationEmail.command'
+import {
+	ConfirmEmailDtoModel,
+	LoginDtoModel,
+	PasswordRecoveryDtoModel,
+	ResendConfirmationEmailDtoModel,
+} from '../../models/auth/auth.input.model'
+import { RecoveryPasswordCommand } from '../../features/auth/RecoveryPassword.command'
+import { SetNewPasswordCommand } from '../../features/auth/SetNewPassword.command'
 
 @Controller(RouteNames.AUTH.value)
 export class AuthController {
@@ -41,7 +46,7 @@ export class AuthController {
 	// Confirm registration
 	@Post(RouteNames.AUTH.EMAIL_CONFIRMATION.value)
 	@HttpCode(HttpStatus.NO_CONTENT)
-	async registrationConfirmation(@Body() body: AuthRegistrationConfirmationDtoModel) {
+	async registrationConfirmation(@Body() body: ConfirmEmailDtoModel) {
 		try {
 			await this.commandBus.execute(new ConfirmEmailCommand(body.code))
 		} catch (err: unknown) {
@@ -50,7 +55,7 @@ export class AuthController {
 	}
 
 	@Post(RouteNames.AUTH.LOGIN.value)
-	async login(@Req() req: Request, @Res() res: Response, @Body() body: LoginUserDtoModel) {
+	async login(@Req() req: Request, @Res() res: Response, @Body() body: LoginDtoModel) {
 		try {
 			const clientIP = this.browserService.getClientIP(req)
 			const clientName = this.browserService.getClientName(req)
@@ -104,16 +109,11 @@ export class AuthController {
 	}*/
 
 	// Registration email resending.
-	/*@UseGuards(RequestsLimiterGuard)
 	@Post(RouteNames.AUTH.REGISTRATION_EMAIL_RESENDING.value)
 	@HttpCode(HttpStatus.NO_CONTENT)
-	async registrationEmailResending(@Body() body: AuthRegistrationEmailResendingDtoModel) {
-		const resendingStatus = await this.registrationEmailResendingUseCase.execute(body)
-
-		if (resendingStatus.code === LayerErrorCode.BadRequest_400) {
-			throw new BadRequestException()
-		}
-	}*/
+	async resendConfirmationEmail(@Body() body: ResendConfirmationEmailDtoModel) {
+		await this.commandBus.execute(new ResendConfirmationEmailCommand(body.email))
+	}
 
 	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Post(RouteNames.AUTH.LOGOUT.value)
@@ -135,32 +135,23 @@ export class AuthController {
 	}
 
 	// Password recovery via Email confirmation. Email should be sent with RecoveryCode inside
-	/*@UseGuards(RequestsLimiterGuard)
 	@Post(RouteNames.AUTH.PASSWORD_RECOVERY.value)
 	@HttpCode(HttpStatus.NO_CONTENT)
-	async passwordRecovery(@Body() body: AuthPasswordRecoveryDtoModel) {
-		const passwordRecoveryServiceRes = await this.recoveryPasswordUseCase.execute(body.email)
-
-		if (passwordRecoveryServiceRes.code !== LayerSuccessCode.Success) {
-			throw new BadRequestException()
+	async passwordRecovery(@Body() body: PasswordRecoveryDtoModel) {
+		try {
+			await this.commandBus.execute(new RecoveryPasswordCommand(body.email))
+		} catch (err: unknown) {
+			this.serverHelper.convertLayerErrToHttpErr(err)
 		}
 
 		// 204 Even if current email is not registered (for prevent user's email detection)
-	}*/
+	}
 
-	/*@UseGuards(RequestsLimiterGuard)
 	@Post(RouteNames.AUTH.NEW_PASSWORD.value)
 	@HttpCode(HttpStatus.NO_CONTENT)
-	async newPassword(@Body() body: AuthNewPasswordDtoModel) {
-		const passwordRecoveryServiceRes = await this.setNewPasswordUseCase.execute(
-			body.recoveryCode,
-			body.newPassword,
+	async newPassword(@Body() body: SetNewPasswordDtoModel) {
+		await this.commandBus.execute(
+			new SetNewPasswordCommand(body.recoveryCode, body.newPassword),
 		)
-
-		if (passwordRecoveryServiceRes.code !== LayerSuccessCode.Success) {
-			throw new BadRequestException()
-		}
-
-		// 204 Even if current email is not registered (for prevent user's email detection)
-	}*/
+	}
 }

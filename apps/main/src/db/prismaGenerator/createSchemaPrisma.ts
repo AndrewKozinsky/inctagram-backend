@@ -1,5 +1,4 @@
 import { BdConfig } from '../dbConfig/dbConfigType'
-import { bdConfig } from '../dbConfig/dbConfig'
 
 /**
  * Creates a schema.prisma file content from bdConfig.

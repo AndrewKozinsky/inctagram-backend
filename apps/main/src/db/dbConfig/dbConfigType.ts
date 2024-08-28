@@ -47,6 +47,8 @@ export namespace BdConfig {
 
 	export type NumberField = FieldCommonProps & {
 		type: 'number'
+		min?: number
+		max?: number
 	}
 
 	export type ManyToOneField = {

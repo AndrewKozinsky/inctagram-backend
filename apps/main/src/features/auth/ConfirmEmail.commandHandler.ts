@@ -1,10 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UserRepository } from '../../repositories/user.repository'
 import { LayerErrorCode } from '../../../../../libs/layerResult'
-import { EmailAdapterService } from '@app/email-adapter'
-import { LoginCommand } from './Login.command'
-import { JwtAdapterService } from '@app/jwt-adapter'
-import { AuthRepository } from '../../repositories/auth.repository'
 import { ConfirmEmailCommand } from './ConfirmEmail.command'
 
 @CommandHandler(ConfirmEmailCommand)
@@ -26,6 +22,6 @@ export class ConfirmEmailHandler implements ICommandHandler<ConfirmEmailCommand>
 			throw new Error(LayerErrorCode.BadRequest_400)
 		}
 
-		await this.userRepository.makeUserEmailConfirmed(user.id)
+		await this.userRepository.updateUser(user.id, { isEmailConfirmed: true })
 	}
 }

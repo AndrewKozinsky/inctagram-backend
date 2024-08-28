@@ -56,14 +56,15 @@ export class JwtAdapterService {
 	/*getPayload(tokenStr: string) {
 		return jwt.decode(tokenStr, { complete: true })!.payload
 	}*/
-	/*getUserIdByAccessTokenStr(accessToken: string): null | string {
+
+	getUserIdByAccessTokenStr(accessToken: string): null | number {
 		try {
 			const result: any = jwt.verify(accessToken, this.mainConfig.get().jwt.secret)
 			return result.userId
 		} catch (error) {
 			return null
 		}
-	}*/
+	}
 
 	getRefreshTokenDataFromTokenStr(refreshTokenStr: string) {
 		try {

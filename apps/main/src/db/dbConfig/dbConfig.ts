@@ -19,6 +19,11 @@ export const bdConfig = {
 				minLength: 1,
 				maxLength: 100,
 			},
+			recoveryCode: {
+				type: 'string',
+				minLength: 1,
+				maxLength: 100,
+			},
 		},
 		dbFields: {
 			id: {

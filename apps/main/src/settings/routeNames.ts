@@ -13,10 +13,10 @@ export const RouteNames = {
 			value: 'registration',
 			full: 'auth/registration',
 		},
-		/*REGISTRATION_EMAIL_RESENDING: {
+		REGISTRATION_EMAIL_RESENDING: {
 			value: 'registration-email-resending',
 			full: 'auth/registration-email-resending',
-		},*/
+		},
 		EMAIL_CONFIRMATION: {
 			value: 'email-confirmation',
 			full: 'auth/email-confirmation',
@@ -25,14 +25,14 @@ export const RouteNames = {
 			value: 'logout',
 			full: 'auth/logout',
 		},
-		/*PASSWORD_RECOVERY: {
+		PASSWORD_RECOVERY: {
 			value: 'password-recovery',
 			full: 'auth/password-recovery',
-		},*/
-		/*NEW_PASSWORD: {
+		},
+		NEW_PASSWORD: {
 			value: 'new-password',
 			full: 'auth/new-password',
-		},*/
+		},
 	},
 }
 

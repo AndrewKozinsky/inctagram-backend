@@ -1,7 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common'
 import { JwtAdapterService } from '@app/jwt-adapter'
-import { AuthRepository } from '../../repositories/auth.repository'
 import { BrowserServiceService } from '@app/browser-service'
+import { AuthRepository } from '../../repositories/auth.repository'
 
 @Injectable()
 export class CheckDeviceRefreshTokenGuard implements CanActivate {

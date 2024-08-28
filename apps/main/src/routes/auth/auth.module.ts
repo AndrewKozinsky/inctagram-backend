@@ -12,8 +12,10 @@ import { JwtAdapterService } from '@app/jwt-adapter'
 import { AuthRepository } from '../../repositories/auth.repository'
 import { LogoutHandler } from '../../features/auth/Logout.commandHandler'
 import { ConfirmEmailHandler } from '../../features/auth/ConfirmEmail.commandHandler'
-import { LoginCommand } from '../../features/auth/Login.command'
 import { LoginHandler } from '../../features/auth/Login.commandHandler'
+import { ResendConfirmationEmailHandler } from '../../features/auth/ResendConfirmationEmail.commandHandler'
+import { RecoveryPasswordHandler } from '../../features/auth/RecoveryPassword.commandHandler'
+import { SetNewPasswordHandler } from '../../features/auth/SetNewPassword.commandHandler'
 
 const services = [
 	AuthService,
@@ -26,7 +28,15 @@ const services = [
 
 const repositories = [UserRepository, AuthRepository]
 
-const commandHandlers = [CreateUserHandler, ConfirmEmailHandler, LoginHandler, LogoutHandler]
+const commandHandlers = [
+	CreateUserHandler,
+	ConfirmEmailHandler,
+	LoginHandler,
+	LogoutHandler,
+	ResendConfirmationEmailHandler,
+	RecoveryPasswordHandler,
+	SetNewPasswordHandler,
+]
 
 @Module({
 	imports: [CqrsModule],
