@@ -5,10 +5,7 @@ import { Prisma, User } from '@prisma/client'
 
 @Injectable()
 export class AuthService {
-	constructor(
-		private prisma: PrismaService,
-		private mainConfigService: MainConfigService,
-	) {}
+	constructor(private prisma: PrismaService) {}
 
 	async getUser(userWhereUniqueInput: Prisma.UserWhereUniqueInput): Promise<User | null> {
 		return this.prisma.user.findUnique({

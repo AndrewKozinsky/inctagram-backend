@@ -1,12 +1,14 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, Req, Res } from '@nestjs/common'
 import { CommandBus } from '@nestjs/cqrs'
+import { Request, Response } from 'express'
+import { MainConfigService } from '@app/config'
+import { JwtAdapterService } from '@app/jwt-adapter'
 import { LoginUserDtoModel, CreateUserDtoModel } from '../../models/user/user.input.model'
 import RouteNames from '../../settings/routeNames'
 import { CreateUserCommand } from '../../features/user/CreateUser.command'
 import { ServerHelperService } from '@app/server-helper'
 import { LoginUserCommand } from '../../features/user/LoginUser.command'
 import { BrowserServiceService } from '@app/browser-service'
-import { Request } from 'express'
 
 @Controller(RouteNames.AUTH.value)
 export class AuthController {
@@ -14,6 +16,8 @@ export class AuthController {
 		private readonly commandBus: CommandBus,
 		private readonly serverHelper: ServerHelperService,
 		private readonly browserService: BrowserServiceService,
+		private mainConfig: MainConfigService,
+		private jwtAdapter: JwtAdapterService,
 	) {}
 
 	@Post(RouteNames.AUTH.REGISTRATION.value)
@@ -32,28 +36,22 @@ export class AuthController {
 			const clientIP = this.browserService.getClientIP(req)
 			const clientName = this.browserService.getClientName(req)
 
-			return await this.commandBus.execute(new LoginUserCommand(body, clientIP, clientName))
+			const loginRes = await this.commandBus.execute(
+				new LoginUserCommand(body, clientIP, clientName),
+			)
+			const { refreshTokenStr, user } = loginRes
+
+			res.cookie(this.mainConfig.get().refreshToken.name, refreshTokenStr, {
+				maxAge: this.mainConfig.get().refreshToken.lifeDurationInMs,
+				httpOnly: true,
+				secure: true,
+			})
+
+			res.status(HttpStatus.OK).send({
+				accessToken: this.jwtAdapter.createAccessTokenStr(user.id),
+			})
 		} catch (err: unknown) {
 			this.serverHelper.convertLayerErrToHttpErr(err)
 		}
-
-		/*const loginServiceRes = await this.loginUseCase.execute(req, body)
-
-		if (
-			loginServiceRes.code === LayerErrorCode.Unauthorized_401 ||
-			loginServiceRes.code !== LayerSuccessCode.Success
-		) {
-			throw new UnauthorizedException()
-		}
-
-		res.cookie(config.refreshToken.name, loginServiceRes.res.data.refreshTokenStr, {
-			maxAge: config.refreshToken.lifeDurationInMs,
-			httpOnly: true,
-			secure: true,
-		})
-
-		res.status(HttpStatus.OK).send({
-			accessToken: this.jwtService.createAccessTokenStr(loginServiceRes.res.data.user.id),
-		})*/
 	}
 }

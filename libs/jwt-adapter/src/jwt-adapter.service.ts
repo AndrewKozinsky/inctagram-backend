@@ -4,8 +4,9 @@ import { DeviceTokenOutModel } from '../../../apps/main/src/models/auth/auth.out
 import { PrismaService } from '../../../apps/main/src/db/prisma.service'
 import { ServerHelperService } from '@app/server-helper'
 import { HashAdapterService } from '@app/hash-adapter'
-import { addMilliseconds } from 'date-fns'
+import { add, addMilliseconds } from 'date-fns'
 import { MainConfigService } from '@app/config'
+import { DeviceTokenServiceModel } from '../../../apps/main/src/models/auth/auth.service.model'
 
 @Injectable()
 export class JwtAdapterService {
@@ -14,36 +15,37 @@ export class JwtAdapterService {
 		private mainConfig: MainConfigService,
 	) {}
 
-	/*createAccessTokenStr(userId: string) {
-		return jwt.sign({ userId }, config.JWT_SECRET, {
-			expiresIn: config.accessToken.lifeDurationInMs / 1000 + 's',
+	createAccessTokenStr(userId: string) {
+		return jwt.sign({ userId }, this.mainConfig.get().jwt.secret, {
+			expiresIn: this.mainConfig.get().accessToken.lifeDurationInMs / 1000 + 's',
 		})
-	}*/
-	/*createRefreshTokenStr(deviceId: string, expirationDate?: Date): string {
+	}
+
+	createRefreshTokenStr(deviceId: string, expirationDate?: Date): string {
 		const defaultExpDate = add(new Date(), {
-			seconds: config.refreshToken.lifeDurationInMs / 1000,
+			seconds: this.mainConfig.get().refreshToken.lifeDurationInMs / 1000,
 		})
 
 		const expDate = expirationDate || defaultExpDate
 
-		return jwt.sign({ deviceId }, config.JWT_SECRET, {
+		return jwt.sign({ deviceId }, this.mainConfig.get().jwt.secret, {
 			expiresIn: (+expDate - +new Date()) / 1000 + 's',
 		})
-	}*/
+	}
 
 	createDeviceRefreshToken(
 		userId: number,
 		deviceIP: string,
 		deviceName: string,
-	): DeviceTokenOutModel {
+	): DeviceTokenServiceModel {
 		const deviceId = this.serverHelper.strUtils().createUniqString()
 
 		return {
-			issuedAt: new Date(),
+			issuedAt: new Date().toISOString(),
 			expirationDate: addMilliseconds(
 				new Date(),
 				this.mainConfig.get().refreshToken.lifeDurationInMs,
-			),
+			).toISOString(),
 			deviceIP,
 			deviceId,
 			deviceName,

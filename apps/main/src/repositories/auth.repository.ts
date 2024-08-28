@@ -1,29 +1,37 @@
 import { Injectable } from '@nestjs/common'
-import { User } from '@prisma/client'
-import { add } from 'date-fns'
-import { ServerHelperService } from '@app/server-helper'
-import { HashAdapterService } from '@app/hash-adapter'
+import { DeviceToken } from '@prisma/client'
 import { PrismaService } from '../db/prisma.service'
-import { CreateUserDtoModel } from '../models/user/user.input.model'
-import { UserServiceModel } from '../models/user/user.service.model'
-import { DeviceTokenOutModel } from '../models/auth/auth.output.model'
+import { DeviceTokenServiceModel } from '../models/auth/auth.service.model'
 
 @Injectable()
 export class AuthRepository {
-	constructor(
-		private prisma: PrismaService,
-		private serverHelper: ServerHelperService,
-		private hashAdapter: HashAdapterService,
-	) {}
+	constructor(private prisma: PrismaService) {}
 
-	async insertDeviceRefreshToken(deviceRefreshToken: DeviceTokenOutModel) {
-		/*await this.dataSource.getRepository(DeviceToken).insert({
-			issuedAt: new Date(deviceRefreshToken.issuedAt).toISOString(),
-			userId: deviceRefreshToken.userId,
-			expirationDate: new Date(deviceRefreshToken.expirationDate).toISOString(),
-			deviceIP: deviceRefreshToken.deviceIP,
-			deviceId: deviceRefreshToken.deviceId,
-			deviceName: deviceRefreshToken.deviceName,
-		})*/
+	async insertDeviceRefreshToken(
+		deviceRefreshToken: DeviceTokenServiceModel,
+	): Promise<DeviceTokenServiceModel> {
+		const deviceToken = await this.prisma.deviceToken.create({
+			data: {
+				issuedAt: new Date(deviceRefreshToken.issuedAt).toISOString(),
+				userId: deviceRefreshToken.userId,
+				expirationDate: new Date(deviceRefreshToken.expirationDate).toISOString(),
+				deviceIP: deviceRefreshToken.deviceIP,
+				deviceId: deviceRefreshToken.deviceId,
+				deviceName: deviceRefreshToken.deviceName,
+			},
+		})
+
+		return this.mapDbDeviceTokenToServiceDeviceToken(deviceToken)
+	}
+
+	mapDbDeviceTokenToServiceDeviceToken(dbDeviceToken: DeviceToken): DeviceTokenServiceModel {
+		return {
+			issuedAt: dbDeviceToken.issuedAt,
+			expirationDate: dbDeviceToken.expirationDate,
+			deviceIP: dbDeviceToken.deviceId,
+			deviceId: dbDeviceToken.deviceId,
+			deviceName: dbDeviceToken.deviceName,
+			userId: dbDeviceToken.userId,
+		}
 	}
 }

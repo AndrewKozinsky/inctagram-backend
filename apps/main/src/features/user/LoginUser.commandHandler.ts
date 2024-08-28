@@ -31,13 +31,13 @@ export class LoginUserHandler implements ICommandHandler<LoginUserCommand> {
 
 		await this.authRepository.insertDeviceRefreshToken(newDeviceRefreshToken)
 
-		/*const refreshTokenStr = this.jwtService.createRefreshTokenStr(
+		const refreshTokenStr = this.jwtAdapter.createRefreshTokenStr(
 			newDeviceRefreshToken.deviceId,
-		)*/
+		)
 
-		/*return {
+		return {
 			refreshTokenStr,
-			user: user.res.data,
-		}*/
+			user,
+		}
 	}
 }
