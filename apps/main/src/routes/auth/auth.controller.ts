@@ -21,8 +21,8 @@ export class AuthController {
 	async registration(@Body() body: CreateUserDtoModel) {
 		try {
 			return await this.commandBus.execute(new CreateUserCommand(body))
-		} catch (err: any) {
-			this.serverHelper.convertLayerErrToHttpErr(err.message)
+		} catch (err: unknown) {
+			this.serverHelper.convertLayerErrToHttpErr(err)
 		}
 	}
 
@@ -33,8 +33,8 @@ export class AuthController {
 			const clientName = this.browserService.getClientName(req)
 
 			return await this.commandBus.execute(new LoginUserCommand(body, clientIP, clientName))
-		} catch (err: any) {
-			this.serverHelper.convertLayerErrToHttpErr(err.message)
+		} catch (err: unknown) {
+			this.serverHelper.convertLayerErrToHttpErr(err)
 		}
 
 		/*const loginServiceRes = await this.loginUseCase.execute(req, body)

@@ -3,7 +3,6 @@ import { CreateUserCommand } from './CreateUser.command'
 import { UserRepository } from '../../repositories/user.repository'
 import { LayerErrorCode } from '../../../../../libs/layerResult'
 import { EmailAdapterService } from '@app/email-adapter'
-import { HashAdapterService } from '@app/hash-adapter'
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
@@ -21,13 +20,9 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 
 		const createdUser = await this.userRepository.createUser(createUserDto)
 
-		try {
-			await this.emailAdapter.sendEmailConfirmationMessage(
-				createdUser.email,
-				createdUser.emailConfirmationCode!,
-			)
-		} catch (err: unknown) {
-			console.log(err)
-		}
+		this.emailAdapter.sendEmailConfirmationMessage(
+			createdUser.email,
+			createdUser.emailConfirmationCode!,
+		)
 	}
 }
