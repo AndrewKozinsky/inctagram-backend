@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import jwt, { decode } from 'jsonwebtoken'
 import { DeviceTokenOutModel } from '../../../apps/main/src/models/auth/auth.output.model'
-import { PrismaService } from '../../../apps/main/src/prisma.service'
+import { PrismaService } from '../../../apps/main/src/db/prisma.service'
 import { ServerHelperService } from '@app/server-helper'
 import { HashAdapterService } from '@app/hash-adapter'
 import { addMilliseconds } from 'date-fns'

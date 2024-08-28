@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { AppModule } from '../../../src/app.module'
-import { applyAppSettings } from '../../../src/settings/applyAppSettings'
+import { AppModule } from '../../src/app.module'
+import { applyAppSettings } from '../../src/settings/applyAppSettings'
 import { agent as request } from 'supertest'
 import { INestApplication } from '@nestjs/common'
 
