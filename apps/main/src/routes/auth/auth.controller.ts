@@ -10,7 +10,7 @@ import { ServerHelperService } from '@app/server-helper'
 import { LoginCommand } from '../../features/auth/Login.command'
 import { BrowserServiceService } from '@app/browser-service'
 import { CheckDeviceRefreshTokenGuard } from '../../infrastructure/guards/checkDeviceRefreshToken.guard'
-import { ErrorMessage, ErrorCode } from '../../../../../libs/layerResult'
+import { ErrorCode, ErrorMessage } from '../../../../../libs/layerResult'
 import { LogoutCommand } from '../../features/auth/Logout.command'
 import { ConfirmEmailCommand } from '../../features/auth/ConfirmEmail.command'
 import { ResendConfirmationEmailCommand } from '../../features/auth/ResendConfirmationEmail.command'
@@ -22,7 +22,10 @@ import {
 } from '../../models/auth/auth.input.model'
 import { RecoveryPasswordCommand } from '../../features/auth/RecoveryPassword.command'
 import { SetNewPasswordCommand } from '../../features/auth/SetNewPassword.command'
-import { MyError } from '../../utils/misc'
+import { CustomException } from '../../utils/misc'
+import { RouteDecorators } from '../routesConfig/routesDecorators'
+import { routesConfig } from '../routesConfig/routesConfig'
+import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
 
 @Controller(RouteNames.AUTH.value)
 export class AuthController {
@@ -35,18 +38,13 @@ export class AuthController {
 	) {}
 
 	@Post(RouteNames.AUTH.REGISTRATION.value)
-	@HttpCode(HttpStatus.CREATED)
+	@RouteDecorators(routesConfig.registration)
 	async registration(@Body() body: CreateUserDtoModel) {
 		try {
-			return await this.commandBus.execute(new CreateUserCommand(body))
+			const data = await this.commandBus.execute(new CreateUserCommand(body))
+			return createSuccessResp(routesConfig.registration, data)
 		} catch (err: any) {
-			const message: ErrorMessage = err.message
-
-			const errMapper = {
-				[ErrorMessage.EmailOrUsernameIsAlreadyRegistered]: ErrorCode.BadRequest_400,
-			}
-
-			throw MyError(errMapper[message], message)
+			createFailResp(routesConfig.registration, err)
 		}
 	}
 
@@ -129,7 +127,7 @@ export class AuthController {
 		try {
 			const refreshToken = this.browserService.getRefreshTokenStrFromReq(req)
 			if (!refreshToken) {
-				throw MyError(ErrorCode.Unauthorized_401)
+				throw CustomException(ErrorCode.Unauthorized_401)
 			}
 
 			await this.commandBus.execute(new LogoutCommand(refreshToken))

@@ -3,7 +3,7 @@ import { ErrorCode } from '../../../../../libs/layerResult'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { AuthRepository } from '../../repositories/auth.repository'
 import { LogoutCommand } from './Logout.command'
-import { MyError } from '../../utils/misc'
+import { CustomException } from '../../utils/misc'
 
 @CommandHandler(LogoutCommand)
 export class LogoutHandler implements ICommandHandler<LogoutCommand> {
@@ -19,7 +19,7 @@ export class LogoutHandler implements ICommandHandler<LogoutCommand> {
 			await this.authRepository.getDeviceRefreshTokenByTokenStr(refreshToken)
 
 		if (!refreshTokenInDb || !this.jwtAdapter.isRefreshTokenStrValid(refreshToken)) {
-			throw MyError(ErrorCode.Unauthorized_401)
+			throw CustomException(ErrorCode.Unauthorized_401)
 		}
 
 		await this.authRepository.deleteDeviceRefreshTokenByDeviceId(refreshTokenInDb.deviceId)

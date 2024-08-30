@@ -1,3 +1,3 @@
-export function MyError(errCode: string, errMessage: string = '') {
+export function CustomException(errCode: string, errMessage: string = '') {
 	return new Error(JSON.stringify({ code: errCode, message: errMessage }))
 }

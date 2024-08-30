@@ -1,3 +1,8 @@
+export enum SuccessCode {
+	Ok = '200',
+	Created_201 = '201',
+}
+
 export enum ErrorCode {
 	NotFound_404 = '404',
 	Unauthorized_401 = '401',

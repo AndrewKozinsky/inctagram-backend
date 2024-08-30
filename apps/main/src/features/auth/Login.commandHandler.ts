@@ -4,7 +4,7 @@ import { ErrorCode } from '../../../../../libs/layerResult'
 import { LoginCommand } from './Login.command'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { AuthRepository } from '../../repositories/auth.repository'
-import { MyError } from '../../utils/misc'
+import { CustomException } from '../../utils/misc'
 
 @CommandHandler(LoginCommand)
 export class LoginHandler implements ICommandHandler<LoginCommand> {
@@ -20,7 +20,7 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 		const user = await this.userRepository.getConfirmedUserByEmailAndPassword(loginUserDto)
 
 		if (!user) {
-			throw MyError(ErrorCode.BadRequest_400)
+			throw CustomException(ErrorCode.BadRequest_400)
 		}
 
 		const newDeviceRefreshToken = this.jwtAdapter.createDeviceRefreshToken(

@@ -1,4 +1,4 @@
-import { CheckByClassValidator } from '../../db/checkByClassValidator'
+import { DtoFieldDecorators } from '../../db/dtoFieldDecorators'
 import { bdConfig } from '../../db/dbConfig/dbConfig'
 import { Validate, ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator'
 import { BadRequestException, Injectable } from '@nestjs/common'
@@ -27,25 +27,25 @@ export class CodeCustomValidation implements ValidatorConstraintInterface {
 }
 
 export class ConfirmEmailDtoModel {
-	@CheckByClassValidator('password', bdConfig.User.dtoProps.confirmEmailCode)
+	@DtoFieldDecorators('password', bdConfig.User.dbFields.emailConfirmationCode)
 	@Validate(CodeCustomValidation)
 	code: string
 }
 
 export class ResendConfirmationEmailDtoModel {
-	@CheckByClassValidator('password', bdConfig.User.dbFields.email)
+	@DtoFieldDecorators('password', bdConfig.User.dbFields.email)
 	email: string
 }
 
 export class LoginDtoModel {
-	@CheckByClassValidator('password', bdConfig.User.dtoProps.password)
+	@DtoFieldDecorators('password', bdConfig.User.dtoProps.password)
 	password: string
 
-	@CheckByClassValidator('email', bdConfig.User.dbFields.email)
+	@DtoFieldDecorators('email', bdConfig.User.dbFields.email)
 	email: string
 }
 
 export class PasswordRecoveryDtoModel {
-	@CheckByClassValidator('password', bdConfig.User.dbFields.email)
+	@DtoFieldDecorators('password', bdConfig.User.dbFields.email)
 	email: string
 }
