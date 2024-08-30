@@ -16,13 +16,17 @@ export class UserRepository {
 	) {}
 
 	async getUserByEmail(email: string) {
-		const user = await this.prisma.user.findUnique({
-			where: { email },
-		})
+		try {
+			const user = await this.prisma.user.findUnique({
+				where: { email },
+			})
 
-		if (!user) return null
+			if (!user) return null
 
-		return this.mapDbUserToServiceUser(user)
+			return this.mapDbUserToServiceUser(user)
+		} catch (err: unknown) {
+			console.log(err)
+		}
 	}
 
 	async getUserById(id: number) {

@@ -26,10 +26,18 @@ export function CheckByClassValidator(fieldName: string, fieldConf: BdConfig.Fie
 		decorators.push(Trim())
 
 		if (fieldConf.minLength) {
-			decorators.push(MinLength(fieldConf.minLength, { message: name + ' is too short' }))
+			decorators.push(
+				MinLength(fieldConf.minLength, {
+					message: 'Minimum number of characters ' + fieldConf.minLength,
+				}),
+			)
 		}
 		if (fieldConf.maxLength) {
-			decorators.push(MaxLength(fieldConf.maxLength, { message: name + ' is too long' }))
+			decorators.push(
+				MaxLength(fieldConf.maxLength, {
+					message: 'Maximum number of characters ' + fieldConf.maxLength,
+				}),
+			)
 		}
 		if (fieldConf.match) {
 			const errMessage = fieldConf.matchErrorMessage
@@ -47,14 +55,10 @@ export function CheckByClassValidator(fieldName: string, fieldConf: BdConfig.Fie
 		// @Type(() => Number)
 		decorators.push(IsNumber)
 		if (fieldConf.min) {
-			decorators.push(
-				Min(fieldConf.min, { message: 'Minimum number of characters ' + fieldConf.min }),
-			)
+			decorators.push(Min(fieldConf.min, { message: 'Minimum number is ' + fieldConf.min }))
 		}
 		if (fieldConf.max) {
-			decorators.push(
-				Min(fieldConf.max, { message: 'Maximum number of characters ' + fieldConf.max }),
-			)
+			decorators.push(Min(fieldConf.max, { message: 'Maximum number is ' + fieldConf.max }))
 		}
 	} else if (fieldConf.type === 'boolean') {
 		decorators.push(Type(() => Boolean))

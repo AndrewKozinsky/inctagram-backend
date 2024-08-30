@@ -4,6 +4,7 @@ import { LayerErrorCode } from '../../../../../libs/layerResult'
 import { EmailAdapterService } from '@app/email-adapter'
 import { ResendConfirmationEmailCommand } from './ResendConfirmationEmail.command'
 import { ServerHelperService } from '@app/server-helper'
+import { MyError } from '../../utils/misc'
 
 @CommandHandler(ResendConfirmationEmailCommand)
 export class ResendConfirmationEmailHandler
@@ -21,7 +22,7 @@ export class ResendConfirmationEmailHandler
 		const user = await this.userRepository.getUserByEmail(email)
 
 		if (!user || user.isEmailConfirmed) {
-			throw new Error(LayerErrorCode.BadRequest_400)
+			throw MyError(LayerErrorCode.BadRequest_400)
 		}
 
 		const confirmationCode = this.serverHelper.strUtils().createUniqString()

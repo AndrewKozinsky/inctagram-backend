@@ -7,6 +7,7 @@ export class MainConfigService {
 
 	get() {
 		return {
+			mode: this.configService.get<string>('MODE'),
 			db: {
 				host: this.configService.get<string>('DATABASE_URL'),
 			},

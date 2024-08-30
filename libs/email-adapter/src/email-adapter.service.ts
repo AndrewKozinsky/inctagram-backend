@@ -57,7 +57,6 @@ export class EmailAdapterService {
 
 				try {
 					sendpulse.smtpSendMail(() => {
-						console.log('Message was sent')
 						resolve(null)
 					}, emailOptions)
 				} catch (err) {

@@ -22,6 +22,7 @@ import {
 } from '../../models/auth/auth.input.model'
 import { RecoveryPasswordCommand } from '../../features/auth/RecoveryPassword.command'
 import { SetNewPasswordCommand } from '../../features/auth/SetNewPassword.command'
+import { MyError } from '../../utils/misc'
 
 @Controller(RouteNames.AUTH.value)
 export class AuthController {
@@ -122,7 +123,7 @@ export class AuthController {
 		try {
 			const refreshToken = this.browserService.getRefreshTokenStrFromReq(req)
 			if (!refreshToken) {
-				throw new Error(LayerErrorCode.Unauthorized_401)
+				throw MyError(LayerErrorCode.Unauthorized_401)
 			}
 
 			await this.commandBus.execute(new LogoutCommand(refreshToken))

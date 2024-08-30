@@ -3,6 +3,7 @@ import { UserRepository } from '../../repositories/user.repository'
 import { SetNewPasswordCommand } from './SetNewPassword.command'
 import { LayerErrorCode } from '../../../../../libs/layerResult'
 import { HashAdapterService } from '@app/hash-adapter'
+import { MyError } from '../../utils/misc'
 
 @CommandHandler(SetNewPasswordCommand)
 export class SetNewPasswordHandler implements ICommandHandler<SetNewPasswordCommand> {
@@ -17,7 +18,7 @@ export class SetNewPasswordHandler implements ICommandHandler<SetNewPasswordComm
 		const user = await this.userRepository.getUserByPasswordRecoveryCode(recoveryCode)
 
 		if (!user) {
-			throw new Error(LayerErrorCode.BadRequest_400)
+			throw MyError(LayerErrorCode.BadRequest_400)
 		}
 
 		const newHashedPassword = await this.hashAdapter.hashString(newPassword)

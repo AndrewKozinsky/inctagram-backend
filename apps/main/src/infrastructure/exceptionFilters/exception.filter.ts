@@ -9,19 +9,25 @@ export class HttpExceptionFilter implements ExceptionFilter {
 		const request = ctx.getRequest<Request>()
 		const status = exception.getStatus()
 
-		if (status === 400) {
-			const errorResponse = {
-				// @ts-ignore
-				errorsMessages: exception.getResponse().message,
-			}
-
-			response.status(status).json(errorResponse)
-		} else {
-			response.status(status).json({
-				statusCode: status,
-				timestamp: new Date().toISOString(),
-				path: request.url,
-			})
+		const errorObj: ErrorResult = {
+			status: 'error',
+			code: status,
+			message: '',
 		}
+
+		if (status === 400) {
+			// @ts-ignore
+			errorObj.wrongFields = exception.getResponse().message
+			errorObj.message = 'Wrong body'
+		}
+
+		response.status(status).json(errorObj)
 	}
+}
+
+type ErrorResult = {
+	status: 'error'
+	code: number
+	message: string
+	wrongFields?: { field: string; message: string }[]
 }
