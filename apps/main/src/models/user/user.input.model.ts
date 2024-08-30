@@ -1,6 +1,5 @@
 import { DtoFieldDecorators } from '../../db/dtoFieldDecorators'
 import { bdConfig } from '../../db/dbConfig/dbConfig'
-import { ApiProperty } from '@nestjs/swagger'
 
 export class CreateUserDtoModel {
 	@DtoFieldDecorators('name', bdConfig.User.dbFields.name)

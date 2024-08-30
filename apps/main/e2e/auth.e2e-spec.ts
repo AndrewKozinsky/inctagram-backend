@@ -38,7 +38,7 @@ describe('Auth (e2e)', () => {
 	})
 
 	describe('Register user', () => {
-		it.only('should return 400 if dto has incorrect values', async () => {
+		it('should return 400 if dto has incorrect values', async () => {
 			await postRequest(app, RouteNames.AUTH.REGISTRATION.full).expect(
 				HTTP_STATUSES.BAD_REQUEST_400,
 			)
@@ -63,7 +63,7 @@ describe('Auth (e2e)', () => {
 			expect(emailFieldErrText).toBe('The email must match the format example@example.com')
 		})
 
-		it('should return an error if the entered email is registered already', async () => {
+		it.only('should return an error if the entered email is registered already', async () => {
 			const firstRegRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
 				.send({
 					name: userName,

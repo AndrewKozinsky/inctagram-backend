@@ -1,11 +1,19 @@
 import { applyDecorators } from '@nestjs/common'
-import { IsEmail, IsNumber, IsString, Matches, MaxLength, Min, MinLength } from 'class-validator'
+import {
+	IsEmail,
+	IsNumber,
+	IsOptional,
+	IsString,
+	Matches,
+	MaxLength,
+	Min,
+	MinLength,
+} from 'class-validator'
 import { BdConfig } from './dbConfig/dbConfigType'
 import { Trim } from '../infrastructure/pipes/Trim.decorator'
 import { Type } from 'class-transformer'
 import { ApiProperty, ApiPropertyOptions } from '@nestjs/swagger'
 
-// @IsOptional()
 // @IsIn(['desc', 'asc'])
 // @IsEnum(LikeStatuses)
 // @IsArray({ message: 'CorrectAnswers must be an array of strings' })
@@ -55,11 +63,18 @@ export function DtoFieldDecorators(fieldName: string, fieldConf: BdConfig.Field)
 
 			decorators.push(Matches(fieldConf.match, { message: errMessage }))
 		}
+
+		if (fieldConf.required === false) {
+			decorators.push(IsOptional())
+		}
 	} else if (fieldConf.type === 'email') {
 		decorators.push(IsString({ message: name + ' must be a string' }))
 		decorators.push(
 			IsEmail({}, { message: 'The email must match the format example@example.com' }),
 		)
+		if (fieldConf.required === false) {
+			decorators.push(IsOptional())
+		}
 	} else if (fieldConf.type === 'number') {
 		// @Type(() => Number)
 		decorators.push(IsNumber)
@@ -74,8 +89,14 @@ export function DtoFieldDecorators(fieldName: string, fieldConf: BdConfig.Field)
 
 			apiPropertyOptions.maximum = fieldConf.max
 		}
+		if (fieldConf.required === false) {
+			decorators.push(IsOptional())
+		}
 	} else if (fieldConf.type === 'boolean') {
 		decorators.push(Type(() => Boolean))
+		if (fieldConf.required === false) {
+			decorators.push(IsOptional())
+		}
 	}
 
 	decorators.push(ApiProperty(apiPropertyOptions))

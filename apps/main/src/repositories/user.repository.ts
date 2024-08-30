@@ -29,6 +29,22 @@ export class UserRepository {
 		}
 	}
 
+	async getUserByEmailOrName(email: string, name: string) {
+		try {
+			const user = await this.prisma.user.findFirst({
+				where: {
+					OR: [{ email }, { name }],
+				},
+			})
+
+			if (!user) return null
+
+			return this.mapDbUserToServiceUser(user)
+		} catch (err: unknown) {
+			console.log(err)
+		}
+	}
+
 	async getUserById(id: number) {
 		const user = await this.prisma.user.findUnique({
 			where: { id },

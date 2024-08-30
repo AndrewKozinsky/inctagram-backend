@@ -2,9 +2,11 @@ import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { INestApplication } from '@nestjs/common'
+import { applyAppSettings } from './settings/applyAppSettings'
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule)
+	await applyAppSettings(app)
 	app.setGlobalPrefix('api/v1')
 	addSwagger(app)
 
