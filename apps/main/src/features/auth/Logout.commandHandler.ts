@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
-import { LayerErrorCode } from '../../../../../libs/layerResult'
+import { ErrorCode } from '../../../../../libs/layerResult'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { AuthRepository } from '../../repositories/auth.repository'
 import { LogoutCommand } from './Logout.command'
@@ -19,7 +19,7 @@ export class LogoutHandler implements ICommandHandler<LogoutCommand> {
 			await this.authRepository.getDeviceRefreshTokenByTokenStr(refreshToken)
 
 		if (!refreshTokenInDb || !this.jwtAdapter.isRefreshTokenStrValid(refreshToken)) {
-			throw MyError(LayerErrorCode.Unauthorized_401)
+			throw MyError(ErrorCode.Unauthorized_401)
 		}
 
 		await this.authRepository.deleteDeviceRefreshTokenByDeviceId(refreshTokenInDb.deviceId)

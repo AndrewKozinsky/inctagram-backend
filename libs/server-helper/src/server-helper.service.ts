@@ -7,19 +7,19 @@ import {
 	UnauthorizedException,
 } from '@nestjs/common'
 import { v4 as uuid } from 'uuid'
-import { LayerErrorCode } from '../../layerResult'
+import { ErrorCode } from '../../layerResult'
 
 @Injectable()
 export class ServerHelperService {
 	convertLayerErrToHttpErr(err: unknown) {
 		if (err instanceof Error) {
-			const errorStatus = err.message as LayerErrorCode
+			const errorStatus = err.message as ErrorCode
 
 			const httpErrorsMapper = {
-				[LayerErrorCode.NotFound_404]: NotFoundException,
-				[LayerErrorCode.Unauthorized_401]: UnauthorizedException,
-				[LayerErrorCode.BadRequest_400]: BadRequestException,
-				[LayerErrorCode.Forbidden_403]: ForbiddenException,
+				[ErrorCode.NotFound_404]: NotFoundException,
+				[ErrorCode.Unauthorized_401]: UnauthorizedException,
+				[ErrorCode.BadRequest_400]: BadRequestException,
+				[ErrorCode.Forbidden_403]: ForbiddenException,
 			}
 
 			if (httpErrorsMapper[errorStatus]) {

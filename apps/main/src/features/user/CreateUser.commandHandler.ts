@@ -2,8 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { EmailAdapterService } from '@app/email-adapter'
 import { CreateUserCommand } from './CreateUser.command'
 import { UserRepository } from '../../repositories/user.repository'
-import { LayerErrorCode } from '../../../../../libs/layerResult'
-import { MyError } from '../../utils/misc'
+import { ErrorMessage } from '../../../../../libs/layerResult'
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
@@ -16,7 +15,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 		const { createUserDto } = command
 
 		if (await this.userRepository.getUserByEmail(createUserDto.email)) {
-			throw MyError(LayerErrorCode.BadRequest_400)
+			throw new Error(ErrorMessage.EmailOrUsernameIsAlreadyRegistered)
 		}
 
 		const createdUser = await this.userRepository.createUser(createUserDto)

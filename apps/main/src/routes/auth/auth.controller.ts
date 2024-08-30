@@ -10,7 +10,7 @@ import { ServerHelperService } from '@app/server-helper'
 import { LoginCommand } from '../../features/auth/Login.command'
 import { BrowserServiceService } from '@app/browser-service'
 import { CheckDeviceRefreshTokenGuard } from '../../infrastructure/guards/checkDeviceRefreshToken.guard'
-import { LayerErrorCode } from '../../../../../libs/layerResult'
+import { ErrorMessage, ErrorCode } from '../../../../../libs/layerResult'
 import { LogoutCommand } from '../../features/auth/Logout.command'
 import { ConfirmEmailCommand } from '../../features/auth/ConfirmEmail.command'
 import { ResendConfirmationEmailCommand } from '../../features/auth/ResendConfirmationEmail.command'
@@ -39,8 +39,14 @@ export class AuthController {
 	async registration(@Body() body: CreateUserDtoModel) {
 		try {
 			return await this.commandBus.execute(new CreateUserCommand(body))
-		} catch (err: unknown) {
-			this.serverHelper.convertLayerErrToHttpErr(err)
+		} catch (err: any) {
+			const message: ErrorMessage = err.message
+
+			const errMapper = {
+				[ErrorMessage.EmailOrUsernameIsAlreadyRegistered]: ErrorCode.BadRequest_400,
+			}
+
+			throw MyError(errMapper[message], message)
 		}
 	}
 
@@ -123,7 +129,7 @@ export class AuthController {
 		try {
 			const refreshToken = this.browserService.getRefreshTokenStrFromReq(req)
 			if (!refreshToken) {
-				throw MyError(LayerErrorCode.Unauthorized_401)
+				throw MyError(ErrorCode.Unauthorized_401)
 			}
 
 			await this.commandBus.execute(new LogoutCommand(refreshToken))

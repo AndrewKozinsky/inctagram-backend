@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UserRepository } from '../../repositories/user.repository'
-import { LayerErrorCode } from '../../../../../libs/layerResult'
+import { ErrorCode } from '../../../../../libs/layerResult'
 import { LoginCommand } from './Login.command'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { AuthRepository } from '../../repositories/auth.repository'
@@ -20,7 +20,7 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 		const user = await this.userRepository.getConfirmedUserByEmailAndPassword(loginUserDto)
 
 		if (!user) {
-			throw MyError(LayerErrorCode.BadRequest_400)
+			throw MyError(ErrorCode.BadRequest_400)
 		}
 
 		const newDeviceRefreshToken = this.jwtAdapter.createDeviceRefreshToken(

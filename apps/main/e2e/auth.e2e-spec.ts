@@ -1,13 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing'
 import { INestApplication } from '@nestjs/common'
-import { AppModule } from '../src/app.module'
-import { describe } from 'node:test'
 import {
+	checkErrorResponse,
 	createTestApp,
 	getFieldInErrorObject,
 	postRequest,
 	userEmail,
-	userLogin,
+	userName,
 	userPassword,
 } from './utils/common'
 import RouteNames from '../src/settings/routeNames'
@@ -61,10 +59,23 @@ describe('Auth (e2e)', () => {
 			expect(emailFieldErrText).toBe('The email must match the format example@example.com')
 		})
 
-		it.only('should return 201 if dto has correct values', async () => {
+		it.only('should return an error if the entered email is registered already', async () => {
+			const firstRegRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
+				.send({ name: userName, password: userPassword, email: userEmail })
+				.expect(HTTP_STATUSES.CREATED_201)
+
+			const secondRegRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
+				.send({ name: userName, password: userPassword, email: userEmail })
+				.expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+			const secondReg = secondRegRes.body
+			checkErrorResponse(secondReg, 400, 'Email or username is already registered')
+		})
+
+		it('should return 201 if dto has correct values', async () => {
 			// EmailAdapterService.
 			const registrationRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
-				.send({ name: userLogin, password: userPassword, email: userEmail })
+				.send({ name: userName, password: userPassword, email: userEmail })
 				.expect(HTTP_STATUSES.CREATED_201)
 
 			expect(emailAdapter.sendEmailConfirmationMessage).toBeCalled()

@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UserRepository } from '../../repositories/user.repository'
-import { LayerErrorCode } from '../../../../../libs/layerResult'
+import { ErrorCode } from '../../../../../libs/layerResult'
 import { EmailAdapterService } from '@app/email-adapter'
 import { ResendConfirmationEmailCommand } from './ResendConfirmationEmail.command'
 import { ServerHelperService } from '@app/server-helper'
@@ -22,7 +22,7 @@ export class ResendConfirmationEmailHandler
 		const user = await this.userRepository.getUserByEmail(email)
 
 		if (!user || user.isEmailConfirmed) {
-			throw MyError(LayerErrorCode.BadRequest_400)
+			throw MyError(ErrorCode.BadRequest_400)
 		}
 
 		const confirmationCode = this.serverHelper.strUtils().createUniqString()
