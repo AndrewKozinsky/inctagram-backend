@@ -1,8 +1,6 @@
 import { RoutesConfig } from './routesConfigTypes'
 import { ErrorMessage } from '../../../../../libs/layerResult'
 import { CustomException } from '../../utils/misc'
-import { CreateUserCommand } from '../../features/user/CreateUser.command'
-import { routesConfig } from './routesConfig'
 
 export async function createSuccessResp(routeConfig: RoutesConfig.Route, data: any) {
 	const successAnswerConfig = routeConfig.find((conf) => conf.code.startsWith('2'))
@@ -26,10 +24,10 @@ export function createFailResp(routeConfig: RoutesConfig.Route, err: any) {
 	const message: ErrorMessage = err.message
 
 	const errorAnswerConfig = errorAnswerConfigs.find((conf) => conf.errors.includes(message))
-	// throw new Error('{"message":"message","code":"404"}')
 	throw CustomException(errorAnswerConfig?.code || '420', message)
 }
 
+// DELETE
 /*export async function createHttpRouteBody(routeConfig: RoutesConfig.Route, executor: any) {
 	try {
 		const data = await executor

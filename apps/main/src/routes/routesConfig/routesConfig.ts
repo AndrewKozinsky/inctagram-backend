@@ -28,7 +28,7 @@ export const routesConfig: RoutesConfig.Root = {
 			errors: [ErrorMessage.EmailOrUsernameIsAlreadyRegistered],
 		},
 	],
-	registrationConfirmation: [],
+	emailConfirmation: [],
 	resendConfirmationEmail: [],
 	login: [],
 	logout: [],

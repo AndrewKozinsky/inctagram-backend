@@ -51,7 +51,7 @@ export class AuthController {
 	// Confirm registration
 	@Post(RouteNames.AUTH.EMAIL_CONFIRMATION.value)
 	@HttpCode(HttpStatus.NO_CONTENT)
-	async registrationConfirmation(@Body() body: ConfirmEmailDtoModel) {
+	async emailConfirmation(@Body() body: ConfirmEmailDtoModel) {
 		try {
 			await this.commandBus.execute(new ConfirmEmailCommand(body.code))
 		} catch (err: unknown) {
