@@ -18,6 +18,7 @@ export async function createTestApp(emailAdapter: EmailAdapterService) {
 		.useValue({
 			sendEmailConfirmationMessage: jest.fn().mockResolvedValue('Mocked Email Response'),
 			sendEmail: jest.fn().mockResolvedValue('Mocked Email Response'),
+			sendPasswordRecoveryMessage: jest.fn().mockResolvedValue('Mocked Email Response'),
 			// You can mock other methods if needed
 		})
 		.compile()

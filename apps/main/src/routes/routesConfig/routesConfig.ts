@@ -103,10 +103,26 @@ export const routesConfig: RoutesConfig.Root = {
 			},
 		],
 	},
-	/*passwordRecovery: {
-		response: [],
-	},*/
-	/*newPassword: {
-		response: [],
-	},*/
+	passwordRecovery: {
+		response: [
+			{
+				code: SuccessCode.Ok,
+				description: 'Recovery password email was sent',
+				dataClass: null,
+			},
+		],
+	},
+	newPassword: {
+		response: [
+			{
+				code: SuccessCode.Ok,
+				description: 'New password was set',
+				dataClass: null,
+			},
+			{
+				code: ErrorCode.BadRequest_400,
+				errors: [ErrorMessage.UserNotFound],
+			},
+		],
+	},
 }

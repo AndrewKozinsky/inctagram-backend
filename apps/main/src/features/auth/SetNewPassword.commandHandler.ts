@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UserRepository } from '../../repositories/user.repository'
 import { SetNewPasswordCommand } from './SetNewPassword.command'
-import { ErrorCode } from '../../infrastructure/exceptionFilters/layerResult'
+import { ErrorCode, ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { HashAdapterService } from '@app/hash-adapter'
 
 @CommandHandler(SetNewPasswordCommand)
@@ -17,8 +17,7 @@ export class SetNewPasswordHandler implements ICommandHandler<SetNewPasswordComm
 		const user = await this.userRepository.getUserByPasswordRecoveryCode(recoveryCode)
 
 		if (!user) {
-			// !!!!!!
-			throw new Error(ErrorCode.BadRequest_400)
+			throw new Error(ErrorMessage.UserNotFound)
 		}
 
 		const newHashedPassword = await this.hashAdapter.hashString(newPassword)

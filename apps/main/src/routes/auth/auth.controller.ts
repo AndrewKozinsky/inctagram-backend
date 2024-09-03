@@ -126,27 +126,29 @@ export class AuthController {
 	}
 
 	// Password recovery via Email confirmation. Email should be sent with RecoveryCode inside
-	/*@Post(RouteNames.AUTH.PASSWORD_RECOVERY.value)
+	@Post(RouteNames.AUTH.PASSWORD_RECOVERY.value)
 	@RouteDecorators(routesConfig.passwordRecovery)
 	async passwordRecovery(@Body() body: PasswordRecoveryDtoModel) {
 		try {
-			await this.commandBus.execute(new RecoveryPasswordCommand(body.email))
-		} catch (err: unknown) {
-			this.serverHelper.convertLayerErrToHttpErr(err)
+			const res = await this.commandBus.execute(new RecoveryPasswordCommand(body.email))
+			return createSuccessResp<null>(routesConfig.passwordRecovery, res)
+		} catch (err: any) {
+			createFailResp(routesConfig.passwordRecovery, err)
 		}
+	}
 
-		// 204 Even if current email is not registered (for prevent user's email detection)
-	}*/
-
-	/*@Post(RouteNames.AUTH.NEW_PASSWORD.value)
+	@Post(RouteNames.AUTH.NEW_PASSWORD.value)
 	@RouteDecorators(routesConfig.newPassword)
 	async newPassword(@Body() body: SetNewPasswordDtoModel) {
-		await this.commandBus.execute(
-			new SetNewPasswordCommand(body.recoveryCode, body.newPassword),
-		)
-	}*/
-
-	// ---
+		try {
+			await this.commandBus.execute(
+				new SetNewPasswordCommand(body.recoveryCode, body.newPassword),
+			)
+			return createSuccessResp<null>(routesConfig.newPassword, null)
+		} catch (err: any) {
+			createFailResp(routesConfig.newPassword, err)
+		}
+	}
 
 	// Generate the new pair of access and refresh tokens
 	// (in cookie client must send correct refreshToken that will be revoked after refreshing)

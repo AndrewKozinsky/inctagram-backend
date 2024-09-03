@@ -13,7 +13,7 @@ export class CreateUserDtoModel {
 }
 
 export class SetNewPasswordDtoModel {
-	@DtoFieldDecorators('password', bdConfig.User.dtoProps.password)
+	@DtoFieldDecorators('newPassword', bdConfig.User.dtoProps.password)
 	newPassword: string
 
 	@DtoFieldDecorators('recoveryCode', bdConfig.User.dtoProps.recovery_code)

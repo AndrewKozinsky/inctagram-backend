@@ -22,7 +22,7 @@ import { AuthRepository } from '../src/repositories/auth.repository'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { MainConfigService } from '@app/config'
 
-it('123', async () => {
+it.only('123', async () => {
 	expect(2).toBe(2)
 })
 
@@ -329,25 +329,6 @@ describe('Auth (e2e)', () => {
 	})
 
 	describe('User log out', () => {
-		/*it('should return 200 if user is authorized', async () => {
-			const [accessToken] = await userUtils.createUserAndLogin(
-				app,
-				userRepository,
-				userEmail,
-				userPassword,
-			)
-
-			const logoutRes = await postRequest(app, RouteNames.AUTH.LOGOUT.full)
-				.set('authorization', 'Bearer ' + accessToken)
-				.expect(HTTP_STATUSES.OK_200)
-
-			const logout = logoutRes.body
-			console.log(logout)
-			checkSuccessResponse(logout, 200)
-		})*/
-
-		// ---
-
 		it('should return 401 if there is not cookies', async () => {
 			const logoutRes = await postRequest(app, RouteNames.AUTH.LOGOUT.full).expect(
 				HTTP_STATUSES.UNAUTHORIZED_401,
@@ -386,7 +367,7 @@ describe('Auth (e2e)', () => {
 				.expect(HTTP_STATUSES.UNAUTHORIZED_401)
 		})
 
-		it.only('should return 200 if the JWT refreshToken inside cookie is valid', async () => {
+		it('should return 200 if the JWT refreshToken inside cookie is valid', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
 				app,
 				userRepository,
@@ -398,6 +379,102 @@ describe('Auth (e2e)', () => {
 
 			const logoutRes = await postRequest(app, RouteNames.AUTH.LOGOUT.full)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
+				.expect(HTTP_STATUSES.OK_200)
+		})
+	})
+
+	describe('Reset password log out', () => {
+		it('should return 400 if email in body is not exist or has wrong format', async () => {
+			const recoverRes = await postRequest(
+				app,
+				RouteNames.AUTH.PASSWORD_RECOVERY.full,
+			).expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+			const recover = recoverRes.body
+			checkErrorResponse(recover, 400, 'Wrong body')
+
+			expect({}.toString.call(recover.wrongFields)).toBe('[object Array]')
+			expect(recover.wrongFields.length).toBe(1)
+			const [emailFieldErrText] = getFieldInErrorObject(recover, ['email'])
+
+			expect(emailFieldErrText).toBe('Email must be a string')
+		})
+
+		it('should return 200 if email is not registered and email is not be sent', async () => {
+			const recoverRes = await postRequest(app, RouteNames.AUTH.PASSWORD_RECOVERY.full)
+				.send({ email: userEmail })
+				.expect(HTTP_STATUSES.OK_200)
+
+			const recover = recoverRes.body
+			checkSuccessResponse(recover, 200)
+			expect(emailAdapter.sendPasswordRecoveryMessage).toBeCalledTimes(0)
+		})
+
+		it('should return 200 if email is registered and email is sent', async () => {
+			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
+
+			const recoverRes = await postRequest(app, RouteNames.AUTH.PASSWORD_RECOVERY.full)
+				.send({ email: user!.email })
+				.expect(HTTP_STATUSES.OK_200)
+
+			const recover = recoverRes.body
+			checkSuccessResponse(recover, 200)
+			expect(typeof recover.data.recoveryCode).toBe('string')
+
+			expect(emailAdapter.sendPasswordRecoveryMessage).toBeCalledTimes(1)
+		})
+	})
+
+	describe('Set new password', () => {
+		it('should return 400 if email in body is not exist or has wrong format', async () => {
+			const newPasswordRes = await postRequest(app, RouteNames.AUTH.NEW_PASSWORD.full).expect(
+				HTTP_STATUSES.BAD_REQUEST_400,
+			)
+
+			const newPassword = newPasswordRes.body
+			checkErrorResponse(newPassword, 400, 'Wrong body')
+			console.log(newPassword)
+
+			expect({}.toString.call(newPassword.wrongFields)).toBe('[object Array]')
+			expect(newPassword.wrongFields.length).toBe(2)
+			const [newPasswordFieldErrText, recoveryCodeFieldErrText] = getFieldInErrorObject(
+				newPassword,
+				['newPassword', 'recoveryCode'],
+			)
+
+			expect(newPasswordFieldErrText).toBe('NewPassword must be a string')
+			expect(recoveryCodeFieldErrText).toBe('RecoveryCode must be a string')
+		})
+
+		it('should return 400 if user, who made request to reset password is not found', async () => {
+			const newPasswordRes = await postRequest(app, RouteNames.AUTH.NEW_PASSWORD.full)
+				.send({ newPassword: 'my-new-password', recoveryCode: 'asdfghjkl' })
+				.expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+			const newPassword = newPasswordRes.body
+			checkErrorResponse(newPassword, 400, 'User not found')
+		})
+
+		it('should return 200 if user is really made request to reset password', async () => {
+			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
+
+			const recoverRes = await postRequest(app, RouteNames.AUTH.PASSWORD_RECOVERY.full)
+				.send({ email: user!.email })
+				.expect(HTTP_STATUSES.OK_200)
+
+			const recover = recoverRes.body
+
+			const myNewPassword = 'my-new-password'
+			const newPasswordRes = await postRequest(app, RouteNames.AUTH.NEW_PASSWORD.full)
+				.send({ newPassword: myNewPassword, recoveryCode: recover.data.recoveryCode })
+				.expect(HTTP_STATUSES.OK_200)
+
+			const newPassword = newPasswordRes.body
+			checkSuccessResponse(newPassword, 200)
+
+			// Try login with the new password
+			await postRequest(app, RouteNames.AUTH.LOGIN.full)
+				.send({ password: myNewPassword, email: userEmail })
 				.expect(HTTP_STATUSES.OK_200)
 		})
 	})

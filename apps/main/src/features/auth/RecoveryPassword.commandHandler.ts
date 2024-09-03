@@ -25,6 +25,8 @@ export class RecoveryPasswordHandler implements ICommandHandler<RecoveryPassword
 
 		await this.userRepository.updateUser(user.id, { password_recovery_code: recoveryCode })
 
-		await this.emailAdapter.sendPasswordRecoveryMessage(email, recoveryCode)
+		this.emailAdapter.sendPasswordRecoveryMessage(email, recoveryCode)
+
+		return { recoveryCode }
 	}
 }
