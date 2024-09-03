@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UserRepository } from '../../repositories/user.repository'
 import { SetNewPasswordCommand } from './SetNewPassword.command'
-import { ErrorCode } from '../../../../../libs/layerResult'
+import { ErrorCode } from '../../infrastructure/exceptionFilters/layerResult'
 import { HashAdapterService } from '@app/hash-adapter'
 
 @CommandHandler(SetNewPasswordCommand)

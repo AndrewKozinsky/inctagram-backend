@@ -1,4 +1,4 @@
-import { ErrorCode, SuccessCode } from '../../../../../libs/layerResult'
+import { ErrorCode, SuccessCode } from '../../infrastructure/exceptionFilters/layerResult'
 import { applyDecorators, HttpCode, HttpStatus } from '@nestjs/common'
 import {
 	ApiBadRequestResponse,

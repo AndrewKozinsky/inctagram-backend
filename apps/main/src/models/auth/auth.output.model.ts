@@ -1,6 +1,6 @@
 export type DeviceTokenOutModel = {
-	issuedAt: Date
-	expirationDate: Date
+	issuedAt: string
+	expirationDate: string
 	deviceIP: string
 	deviceId: string
 	deviceName: string

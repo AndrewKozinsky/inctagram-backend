@@ -13,7 +13,7 @@ export const RouteNames = {
 			value: 'registration',
 			full: 'auth/registration',
 		},
-		REGISTRATION_EMAIL_RESENDING: {
+		CONFIRM_EMAIL_RESENDING: {
 			value: 'registration-email-resending',
 			full: 'auth/registration-email-resending',
 		},

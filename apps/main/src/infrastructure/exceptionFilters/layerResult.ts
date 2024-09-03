@@ -16,4 +16,6 @@ export enum ErrorMessage {
 	EmailConfirmationCodeNotFound = 'Email confirmation code not found',
 	EmailOrPasswordDoNotMatch = 'Email or passwords do not match',
 	EmailIsNotConfirmed = 'Email is not confirmed',
+	EmailNotFound = 'User not found',
+	RefreshTokenIsNotValid = 'Refresh token is not valid',
 }

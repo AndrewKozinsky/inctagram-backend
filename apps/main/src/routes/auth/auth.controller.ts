@@ -1,15 +1,4 @@
-import {
-	Body,
-	Controller,
-	Get,
-	HttpCode,
-	HttpStatus,
-	Post,
-	Query,
-	Req,
-	Res,
-	UseGuards,
-} from '@nestjs/common'
+import { Body, Controller, Get, HttpStatus, Post, Query, Req, Res, UseGuards } from '@nestjs/common'
 import { CommandBus } from '@nestjs/cqrs'
 import { Request, Response } from 'express'
 import { MainConfigService } from '@app/config'
@@ -21,7 +10,6 @@ import { ServerHelperService } from '@app/server-helper'
 import { LoginCommand } from '../../features/auth/Login.command'
 import { BrowserServiceService } from '@app/browser-service'
 import { CheckDeviceRefreshTokenGuard } from '../../infrastructure/guards/checkDeviceRefreshToken.guard'
-import { ErrorCode } from '../../../../../libs/layerResult'
 import { LogoutCommand } from '../../features/auth/Logout.command'
 import { ConfirmEmailCommand } from '../../features/auth/ConfirmEmail.command'
 import { ResendConfirmationEmailCommand } from '../../features/auth/ResendConfirmationEmail.command'
@@ -39,7 +27,7 @@ import { routesConfig } from '../routesConfig/routesConfig'
 import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
 import { UserOutModel } from '../../models/user/user.out.model'
 import { SuccessResponse } from '../../types/commonTypes'
-import { HTTP_STATUSES } from '../../settings/config'
+import { HTTP_STATUSES } from '../../utils/httpStatuses'
 
 @Controller(RouteNames.AUTH.value)
 export class AuthController {
@@ -77,6 +65,7 @@ export class AuthController {
 	}
 
 	@Post(RouteNames.AUTH.LOGIN.value)
+	@RouteDecorators(routesConfig.login)
 	async login(@Req() req: Request, @Res() res: Response, @Body() body: LoginDtoModel) {
 		try {
 			const clientIP = this.browserService.getClientIP(req)
@@ -107,11 +96,16 @@ export class AuthController {
 		}
 	}
 
-	// Registration email resending.
-	@Post(RouteNames.AUTH.REGISTRATION_EMAIL_RESENDING.value)
+	// Confirmation email resending
+	@Post(RouteNames.AUTH.CONFIRM_EMAIL_RESENDING.value)
 	@RouteDecorators(routesConfig.resendConfirmationEmail)
 	async resendConfirmationEmail(@Body() body: ResendConfirmationEmailDtoModel) {
-		await this.commandBus.execute(new ResendConfirmationEmailCommand(body.email))
+		try {
+			await this.commandBus.execute(new ResendConfirmationEmailCommand(body.email))
+			return createSuccessResp<null>(routesConfig.resendConfirmationEmail, null)
+		} catch (err: any) {
+			createFailResp(routesConfig.resendConfirmationEmail, err)
+		}
 	}
 
 	@UseGuards(CheckDeviceRefreshTokenGuard)
@@ -120,22 +114,19 @@ export class AuthController {
 	async logout(@Req() req: Request, @Res() res: Response) {
 		try {
 			const refreshToken = this.browserService.getRefreshTokenStrFromReq(req)
-			if (!refreshToken) {
-				// !!!!!!
-				throw new Error(ErrorCode.Unauthorized_401)
-			}
 
 			await this.commandBus.execute(new LogoutCommand(refreshToken))
 
 			res.clearCookie(this.mainConfig.get().refreshToken.name)
-			res.sendStatus(HttpStatus.NO_CONTENT)
+			res.status(HttpStatus.OK)
+			res.send(createSuccessResp<null>(routesConfig.logout, null))
 		} catch (err: unknown) {
 			this.serverHelper.convertLayerErrToHttpErr(err)
 		}
 	}
 
 	// Password recovery via Email confirmation. Email should be sent with RecoveryCode inside
-	@Post(RouteNames.AUTH.PASSWORD_RECOVERY.value)
+	/*@Post(RouteNames.AUTH.PASSWORD_RECOVERY.value)
 	@RouteDecorators(routesConfig.passwordRecovery)
 	async passwordRecovery(@Body() body: PasswordRecoveryDtoModel) {
 		try {
@@ -145,21 +136,23 @@ export class AuthController {
 		}
 
 		// 204 Even if current email is not registered (for prevent user's email detection)
-	}
+	}*/
 
-	@Post(RouteNames.AUTH.NEW_PASSWORD.value)
+	/*@Post(RouteNames.AUTH.NEW_PASSWORD.value)
 	@RouteDecorators(routesConfig.newPassword)
 	async newPassword(@Body() body: SetNewPasswordDtoModel) {
 		await this.commandBus.execute(
 			new SetNewPasswordCommand(body.recoveryCode, body.newPassword),
 		)
-	}
+	}*/
+
+	// ---
 
 	// Generate the new pair of access and refresh tokens
 	// (in cookie client must send correct refreshToken that will be revoked after refreshing)
 	/*@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Post(RouteNames.AUTH.REFRESH_TOKEN.value)
-	@RouteDecorators(routesConfig.emailConfirmation)
+	@RouteDecorators(routesConfig.refreshToken)
 	async refreshToken(@Req() req: Request, @Res() res: Response) {
 		const generateTokensRes = await this.generateAccessAndRefreshTokensUseCase.execute(
 			req.deviceRefreshToken,

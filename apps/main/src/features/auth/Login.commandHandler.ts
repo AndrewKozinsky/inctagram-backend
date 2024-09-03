@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UserRepository } from '../../repositories/user.repository'
-import { ErrorMessage } from '../../../../../libs/layerResult'
+import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { LoginCommand } from './Login.command'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { AuthRepository } from '../../repositories/auth.repository'

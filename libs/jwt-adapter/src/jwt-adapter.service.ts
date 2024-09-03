@@ -7,6 +7,7 @@ import { HashAdapterService } from '@app/hash-adapter'
 import { add, addMilliseconds } from 'date-fns'
 import { MainConfigService } from '@app/config'
 import { DeviceTokenServiceModel } from '../../../apps/main/src/models/auth/auth.service.model'
+import { createUniqString } from '../../../apps/main/src/utils/stringUtils'
 
 @Injectable()
 export class JwtAdapterService {
@@ -21,7 +22,7 @@ export class JwtAdapterService {
 		})
 	}
 
-	createRefreshTokenStr(deviceId: string, expirationDate?: Date): string {
+	createRefreshTokenStr(deviceId: string, expirationDate?: string): string {
 		const defaultExpDate = add(new Date(), {
 			seconds: this.mainConfig.get().refreshToken.lifeDurationInMs / 1000,
 		})
@@ -29,7 +30,7 @@ export class JwtAdapterService {
 		const expDate = expirationDate || defaultExpDate
 
 		return jwt.sign({ deviceId }, this.mainConfig.get().jwt.secret, {
-			expiresIn: (+expDate - +new Date()) / 1000 + 's',
+			expiresIn: (+new Date(expDate) - +new Date()) / 1000 + 's',
 		})
 	}
 
@@ -38,24 +39,23 @@ export class JwtAdapterService {
 		deviceIP: string,
 		deviceName: string,
 	): DeviceTokenServiceModel {
-		const deviceId = this.serverHelper.strUtils().createUniqString()
+		const deviceId = createUniqString()
+
+		const expirationDate = addMilliseconds(
+			new Date(),
+			this.mainConfig.get().refreshToken.lifeDurationInMs,
+		)
+		expirationDate.setMilliseconds(0)
 
 		return {
 			issuedAt: new Date().toISOString(),
-			expirationDate: addMilliseconds(
-				new Date(),
-				this.mainConfig.get().refreshToken.lifeDurationInMs,
-			).toISOString(),
+			expirationDate: expirationDate.toISOString(),
 			deviceIP,
 			deviceId,
 			deviceName,
 			userId,
 		}
 	}
-
-	/*getPayload(tokenStr: string) {
-		return jwt.decode(tokenStr, { complete: true })!.payload
-	}*/
 
 	getUserIdByAccessTokenStr(accessToken: string): null | number {
 		try {

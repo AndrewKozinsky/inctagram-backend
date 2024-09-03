@@ -1,4 +1,8 @@
-import { ErrorCode, ErrorMessage, SuccessCode } from '../../../../../libs/layerResult'
+import {
+	ErrorCode,
+	ErrorMessage,
+	SuccessCode,
+} from '../../infrastructure/exceptionFilters/layerResult'
 import { AuthController } from '../auth/auth.controller'
 import { BdConfig } from '../../db/dbConfig/dbConfigType'
 

@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { EmailAdapterService } from '@app/email-adapter'
 import { CreateUserCommand } from './CreateUser.command'
 import { UserRepository } from '../../repositories/user.repository'
-import { ErrorMessage } from '../../../../../libs/layerResult'
+import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { UserQueryRepository } from '../../repositories/user.queryRepository'
 
 @CommandHandler(CreateUserCommand)

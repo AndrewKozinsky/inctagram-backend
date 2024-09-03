@@ -1,7 +1,7 @@
+import { INestApplication } from '@nestjs/common'
 import { getRequest, postRequest, userEmail, userName, userPassword } from './common'
 import RouteNames from '../../src/routes/routesConfig/routeNames'
-import { HTTP_STATUSES } from '../../src/settings/config'
-import { INestApplication } from '@nestjs/common'
+import { HTTP_STATUSES } from '../../src/utils/httpStatuses'
 import { UserRepository } from '../../src/repositories/user.repository'
 
 export const userUtils = {
@@ -18,8 +18,8 @@ export const userUtils = {
 			.send({ name: userName, email: fixedEmail, password: fixedPassword })
 			.expect(HTTP_STATUSES.CREATED_201)
 
-		/*const userId = firstRegRes.body.data.id
-		return await userRepository.getUserById(userId)*/
+		const userId = firstRegRes.body.data.id
+		return await userRepository.getUserById(userId)
 	},
 
 	async createUserWithConfirmedEmail(
@@ -31,11 +31,29 @@ export const userUtils = {
 		const user = await this.createUserWithUnconfirmedEmail(app, userRepository, email, password)
 
 		// Confirm email
-		/*await getRequest(
+		await getRequest(
 			app,
 			RouteNames.AUTH.EMAIL_CONFIRMATION.full + '?code=' + user!.emailConfirmationCode,
 		).expect(HTTP_STATUSES.OK_200)
 
-		return user*/
+		return user
+	},
+
+	async createUserAndLogin(
+		app: INestApplication,
+		userRepository: UserRepository,
+		email: string,
+		password: string,
+	) {
+		const user = await this.createUserWithConfirmedEmail(app, userRepository, email, password)
+
+		const loginRes = await postRequest(app, RouteNames.AUTH.LOGIN.full)
+			.send({ password, email: user.email })
+			.expect(HTTP_STATUSES.OK_200)
+
+		const { accessToken } = loginRes.body.data
+		const refreshTokenStr = loginRes.headers['set-cookie'][0]
+
+		return [accessToken, refreshTokenStr]
 	},
 }

@@ -45,7 +45,6 @@ export class AuthRepository {
 		const token = await this.prisma.deviceToken.findFirst({
 			where: { device_id: deviceId },
 		})
-		// const token = await this.dataSource.getRepository(DeviceToken).findOneBy({ deviceId })
 
 		if (!token) return null
 

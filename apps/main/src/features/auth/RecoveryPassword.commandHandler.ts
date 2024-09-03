@@ -3,6 +3,7 @@ import { UserRepository } from '../../repositories/user.repository'
 import { EmailAdapterService } from '@app/email-adapter'
 import { RecoveryPasswordCommand } from './RecoveryPassword.command'
 import { ServerHelperService } from '@app/server-helper'
+import { createUniqString } from '../../utils/stringUtils'
 
 @CommandHandler(RecoveryPasswordCommand)
 export class RecoveryPasswordHandler implements ICommandHandler<RecoveryPasswordCommand> {
@@ -20,7 +21,7 @@ export class RecoveryPasswordHandler implements ICommandHandler<RecoveryPassword
 		// Send success status even if current email is not registered (for prevent user's email detection)
 		if (!user) return null
 
-		const recoveryCode = this.serverHelper.strUtils().createUniqString()
+		const recoveryCode = createUniqString()
 
 		await this.userRepository.updateUser(user.id, { password_recovery_code: recoveryCode })
 

@@ -1,6 +1,6 @@
 import { RoutesConfig } from './routesConfigTypes'
-import { ErrorMessage } from '../../../../../libs/layerResult'
-import { CustomException } from '../../utils/misc'
+import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
+import { CustomException } from '../../infrastructure/exceptionFilters/customException'
 import { SuccessResponse } from '../../types/commonTypes'
 
 export async function createSuccessResp<T>(

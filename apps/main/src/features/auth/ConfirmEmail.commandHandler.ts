@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UserRepository } from '../../repositories/user.repository'
-import { ErrorMessage } from '../../../../../libs/layerResult'
+import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { ConfirmEmailCommand } from './ConfirmEmail.command'
 
 @CommandHandler(ConfirmEmailCommand)

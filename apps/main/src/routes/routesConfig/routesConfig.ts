@@ -1,4 +1,8 @@
-import { ErrorCode, ErrorMessage, SuccessCode } from '../../../../../libs/layerResult'
+import {
+	ErrorCode,
+	ErrorMessage,
+	SuccessCode,
+} from '../../infrastructure/exceptionFilters/layerResult'
 import { RoutesConfig } from './routesConfigTypes'
 import { bdConfig } from '../../db/dbConfig/dbConfig'
 import { UserOutModel } from '../../models/user/user.out.model'
@@ -69,16 +73,40 @@ export const routesConfig: RoutesConfig.Root = {
 		],
 	},
 	resendConfirmationEmail: {
-		response: [],
+		response: [
+			{
+				code: SuccessCode.Ok,
+				description: 'Confirmation email was sent',
+				dataClass: null,
+			},
+			{
+				code: ErrorCode.BadRequest_400,
+				errors: [ErrorMessage.EmailNotFound],
+			},
+			{
+				code: ErrorCode.Forbidden_403,
+				errors: [ErrorMessage.EmailIsNotConfirmed],
+			},
+		],
 	},
 
 	logout: {
-		response: [],
+		response: [
+			{
+				code: SuccessCode.Ok,
+				description: 'User was logged out',
+				dataClass: null,
+			},
+			{
+				code: ErrorCode.Unauthorized_401,
+				errors: [ErrorMessage.RefreshTokenIsNotValid],
+			},
+		],
 	},
-	passwordRecovery: {
+	/*passwordRecovery: {
 		response: [],
-	},
-	newPassword: {
+	},*/
+	/*newPassword: {
 		response: [],
-	},
+	},*/
 }

@@ -6,6 +6,7 @@ import { HashAdapterService } from '@app/hash-adapter'
 import { PrismaService } from '../db/prisma.service'
 import { CreateUserDtoModel } from '../models/user/user.input.model'
 import { UserServiceModel } from '../models/user/user.service.model'
+import { createUniqString } from '../utils/stringUtils'
 
 @Injectable()
 export class UserRepository {
@@ -113,7 +114,7 @@ export class UserRepository {
 		}
 
 		if (!isEmailConfirmed) {
-			newUserParams.email_confirmation_code = this.serverHelper.strUtils().createUniqString()
+			newUserParams.email_confirmation_code = createUniqString()
 			newUserParams.email_confirmation_code_expiration_date = add(new Date(), {
 				hours: 0,
 				minutes: 5,
