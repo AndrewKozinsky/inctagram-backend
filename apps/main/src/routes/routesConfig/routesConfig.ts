@@ -1,37 +1,69 @@
 import { ErrorCode, ErrorMessage, SuccessCode } from '../../../../../libs/layerResult'
-import { ApiProperty } from '@nestjs/swagger'
 import { RoutesConfig } from './routesConfigTypes'
-
-export class Cat {
-	@ApiProperty()
-	id: number[]
-
-	@ApiProperty()
-	name: string
-
-	@ApiProperty()
-	age: number
-
-	@ApiProperty()
-	breed: string
-}
+import { bdConfig } from '../../db/dbConfig/dbConfig'
+import { UserOutModel } from '../../models/user/user.out.model'
 
 export const routesConfig: RoutesConfig.Root = {
-	registration: [
-		{
-			code: SuccessCode.Created_201,
-			description: 'Create new user',
-			dataClass: Cat,
+	registration: {
+		body: {
+			className: 'CreateUserDtoModel',
+			filePath: 'auth/CreateUserDtoModel',
+			fields: {
+				name: {
+					type: 'string',
+					config: bdConfig.User.dbFields.name,
+				},
+				password: {
+					type: 'string',
+					config: bdConfig.User.dtoProps.password,
+				},
+				email: {
+					type: 'string',
+					config: bdConfig.User.dbFields.email,
+				},
+			},
 		},
-		{
-			code: ErrorCode.BadRequest_400,
-			errors: [ErrorMessage.EmailOrUsernameIsAlreadyRegistered],
-		},
-	],
-	emailConfirmation: [],
-	resendConfirmationEmail: [],
-	login: [],
-	logout: [],
-	passwordRecovery: [],
-	newPassword: [],
+		response: [
+			{
+				code: SuccessCode.Created_201,
+				description: 'Create new user',
+				dataClass: UserOutModel,
+			},
+			{
+				code: ErrorCode.BadRequest_400,
+				errors: [ErrorMessage.EmailOrUsernameIsAlreadyRegistered],
+			},
+		],
+	},
+	emailConfirmation: {
+		response: [
+			{
+				code: SuccessCode.Ok,
+				description: "User's email was confirmed",
+				dataClass: null,
+			},
+			{
+				code: ErrorCode.BadRequest_400,
+				errors: [
+					ErrorMessage.EmailConfirmationCodeIsExpired,
+					ErrorMessage.EmailConfirmationCodeNotFound,
+				],
+			},
+		],
+	},
+	resendConfirmationEmail: {
+		response: [],
+	},
+	login: {
+		response: [],
+	},
+	logout: {
+		response: [],
+	},
+	passwordRecovery: {
+		response: [],
+	},
+	newPassword: {
+		response: [],
+	},
 }

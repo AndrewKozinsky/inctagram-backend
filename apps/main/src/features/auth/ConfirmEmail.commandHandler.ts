@@ -1,8 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UserRepository } from '../../repositories/user.repository'
-import { ErrorCode } from '../../../../../libs/layerResult'
+import { ErrorMessage } from '../../../../../libs/layerResult'
 import { ConfirmEmailCommand } from './ConfirmEmail.command'
-import { CustomException } from '../../utils/misc'
 
 @CommandHandler(ConfirmEmailCommand)
 export class ConfirmEmailHandler implements ICommandHandler<ConfirmEmailCommand> {
@@ -12,17 +11,14 @@ export class ConfirmEmailHandler implements ICommandHandler<ConfirmEmailCommand>
 		const { confirmationCode } = command
 
 		const user = await this.userRepository.getUserByConfirmationCode(confirmationCode)
-		if (!user || user.isEmailConfirmed) {
-			throw CustomException(ErrorCode.BadRequest_400)
+		if (!user) {
+			throw new Error(ErrorMessage.EmailConfirmationCodeNotFound)
 		}
 
-		if (
-			user.emailConfirmationCode !== confirmationCode ||
-			new Date(user.confirmationCodeExpirationDate!) < new Date()
-		) {
-			throw CustomException(ErrorCode.BadRequest_400)
+		if (new Date(user.confirmationCodeExpirationDate!) < new Date()) {
+			throw new Error(ErrorMessage.EmailConfirmationCodeIsExpired)
 		}
 
-		await this.userRepository.updateUser(user.id, { isEmailConfirmed: true })
+		await this.userRepository.makeEmailVerified(user.id)
 	}
 }

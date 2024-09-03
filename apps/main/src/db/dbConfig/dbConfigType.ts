@@ -20,7 +20,7 @@ export namespace BdConfig {
 		// Default value
 		default?: string | number | boolean
 		// Is the field required? True by default
-		required?: boolean
+		required: boolean
 		// Is the field value must be unique?
 		unique?: boolean
 		// Field description

@@ -18,15 +18,16 @@ export class SetNewPasswordHandler implements ICommandHandler<SetNewPasswordComm
 		const user = await this.userRepository.getUserByPasswordRecoveryCode(recoveryCode)
 
 		if (!user) {
-			throw CustomException(ErrorCode.BadRequest_400)
+			// !!!!!!
+			throw new Error(ErrorCode.BadRequest_400)
 		}
 
 		const newHashedPassword = await this.hashAdapter.hashString(newPassword)
 		await this.userRepository.updateUser(user.id, {
-			passwordRecoveryCode: null,
-			hashedPassword: newHashedPassword,
+			password_recovery_code: null,
+			hashed_password: newHashedPassword,
 		})
 
-		await this.userRepository.updateUser(user.id, { hashedPassword: newHashedPassword })
+		await this.userRepository.updateUser(user.id, { hashed_password: newHashedPassword })
 	}
 }

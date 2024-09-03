@@ -35,6 +35,10 @@ export function postRequest(app: INestApplication, url: string) {
 	return request(app.getHttpServer()).post('/' + url)
 }
 
+export function getRequest(app: INestApplication, url: string) {
+	return request(app.getHttpServer()).get('/' + url)
+}
+
 /**
  * Get an object like
  * {
@@ -69,4 +73,10 @@ export function checkErrorResponse(errObj: any, code: number, message: string) {
 	expect(errObj.status).toBe('error')
 	expect(errObj.code).toBe(code)
 	expect(errObj.message).toBe(message)
+}
+
+export function checkSuccessResponse(resObj: any, code: number, data: any) {
+	expect(resObj.status).toBe('success')
+	expect(resObj.code).toBe(code)
+	expect(resObj.data).toBe(data)
 }

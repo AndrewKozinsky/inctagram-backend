@@ -19,7 +19,8 @@ export class LogoutHandler implements ICommandHandler<LogoutCommand> {
 			await this.authRepository.getDeviceRefreshTokenByTokenStr(refreshToken)
 
 		if (!refreshTokenInDb || !this.jwtAdapter.isRefreshTokenStrValid(refreshToken)) {
-			throw CustomException(ErrorCode.Unauthorized_401)
+			// !!!!!!
+			throw new Error(ErrorCode.Unauthorized_401)
 		}
 
 		await this.authRepository.deleteDeviceRefreshTokenByDeviceId(refreshTokenInDb.deviceId)

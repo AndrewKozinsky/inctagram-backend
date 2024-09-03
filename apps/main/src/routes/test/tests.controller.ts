@@ -1,6 +1,6 @@
 import { BadRequestException, Controller, Delete, HttpStatus, Res } from '@nestjs/common'
 import { Response } from 'express'
-import RouteNames from '../../settings/routeNames'
+import RouteNames from '../routesConfig/routeNames'
 import { DbService } from '../../db/dbService'
 import { MainConfigService } from '@app/config'
 

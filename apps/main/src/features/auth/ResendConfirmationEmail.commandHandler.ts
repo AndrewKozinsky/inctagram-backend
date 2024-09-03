@@ -22,12 +22,13 @@ export class ResendConfirmationEmailHandler
 		const user = await this.userRepository.getUserByEmail(email)
 
 		if (!user || user.isEmailConfirmed) {
-			throw CustomException(ErrorCode.BadRequest_400)
+			// !!!!!!
+			throw new Error(ErrorCode.BadRequest_400)
 		}
 
 		const confirmationCode = this.serverHelper.strUtils().createUniqString()
 		const newConfirmationCode = await this.userRepository.updateUser(user.id, {
-			emailConfirmationCode: confirmationCode,
+			email_confirmation_code: confirmationCode,
 		})
 
 		this.emailAdapter.sendEmailConfirmationMessage(email, confirmationCode)

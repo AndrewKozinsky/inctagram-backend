@@ -20,7 +20,8 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 		const user = await this.userRepository.getConfirmedUserByEmailAndPassword(loginUserDto)
 
 		if (!user) {
-			throw CustomException(ErrorCode.BadRequest_400)
+			// !!!!!!
+			throw new Error(ErrorCode.BadRequest_400)
 		}
 
 		const newDeviceRefreshToken = this.jwtAdapter.createDeviceRefreshToken(

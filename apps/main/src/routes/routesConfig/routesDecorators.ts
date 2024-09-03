@@ -13,7 +13,7 @@ import { RoutesConfig } from './routesConfigTypes'
 export function RouteDecorators(routeConfig: RoutesConfig.Route) {
 	const decorators: any[] = []
 
-	routeConfig.forEach((codeObj) => {
+	routeConfig.response.forEach((codeObj) => {
 		switch (codeObj.code) {
 			case SuccessCode.Ok: {
 				decorators.push(HttpCode(HttpStatus.OK))

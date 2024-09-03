@@ -23,78 +23,89 @@ import { ApiProperty, ApiPropertyOptions } from '@nestjs/swagger'
  * Creates universal decorator to check property in DTO for compliance with fieldConf
  * @param fieldName
  * @param fieldConf
+ * @param rewrittenConfigFields
  */
-export function DtoFieldDecorators(fieldName: string, fieldConf: BdConfig.Field) {
+export function DtoFieldDecorators(
+	fieldName: string,
+	fieldConf: BdConfig.Field,
+	rewrittenConfigFields: Partial<BdConfig.Field> = {},
+) {
+	const updatedFieldConf = Object.assign(fieldConf, rewrittenConfigFields)
+
 	// 'password' -> 'Password'
 	const name = fieldName.charAt(0).toUpperCase() + fieldName.slice(1)
 
-	const apiPropertyOptions = createApiPropertyOptions(fieldConf)
+	const apiPropertyOptions = createApiPropertyOptions(updatedFieldConf)
 
 	const decorators: any[] = []
 
-	if (fieldConf.type === 'string') {
+	if (updatedFieldConf.type === 'string') {
 		decorators.push(IsString({ message: name + ' must be a string' }))
 		decorators.push(Trim())
 
-		if (fieldConf.minLength) {
+		if (updatedFieldConf.minLength) {
 			decorators.push(
-				MinLength(fieldConf.minLength, {
-					message: 'Minimum number of characters ' + fieldConf.minLength,
+				MinLength(updatedFieldConf.minLength, {
+					message: 'Minimum number of characters ' + updatedFieldConf.minLength,
 				}),
 			)
 
-			apiPropertyOptions.minLength = fieldConf.minLength
+			apiPropertyOptions.minLength = updatedFieldConf.minLength
 		}
 
-		if (fieldConf.maxLength) {
+		if (updatedFieldConf.maxLength) {
 			decorators.push(
-				MaxLength(fieldConf.maxLength, {
-					message: 'Maximum number of characters ' + fieldConf.maxLength,
+				MaxLength(updatedFieldConf.maxLength, {
+					message: 'Maximum number of characters ' + updatedFieldConf.maxLength,
 				}),
 			)
 
-			apiPropertyOptions.maxLength = fieldConf.maxLength
+			apiPropertyOptions.maxLength = updatedFieldConf.maxLength
 		}
 
-		if (fieldConf.match) {
-			const errMessage = fieldConf.matchErrorMessage
-				? fieldConf.matchErrorMessage
+		if (updatedFieldConf.match) {
+			const errMessage = updatedFieldConf.matchErrorMessage
+				? updatedFieldConf.matchErrorMessage
 				: name + ' does not match'
 
-			decorators.push(Matches(fieldConf.match, { message: errMessage }))
+			decorators.push(Matches(updatedFieldConf.match, { message: errMessage }))
 		}
 
-		if (fieldConf.required === false) {
+		if (!updatedFieldConf.required) {
 			decorators.push(IsOptional())
 		}
-	} else if (fieldConf.type === 'email') {
+	} else if (updatedFieldConf.type === 'email') {
 		decorators.push(IsString({ message: name + ' must be a string' }))
 		decorators.push(
 			IsEmail({}, { message: 'The email must match the format example@example.com' }),
 		)
-		if (fieldConf.required === false) {
+		if (!updatedFieldConf.required) {
 			decorators.push(IsOptional())
 		}
-	} else if (fieldConf.type === 'number') {
+	} else if (updatedFieldConf.type === 'number') {
 		// @Type(() => Number)
 		decorators.push(IsNumber)
 
-		if (fieldConf.min) {
-			decorators.push(Min(fieldConf.min, { message: 'Minimum number is ' + fieldConf.min }))
+		if (updatedFieldConf.min) {
+			decorators.push(
+				Min(updatedFieldConf.min, { message: 'Minimum number is ' + updatedFieldConf.min }),
+			)
 
-			apiPropertyOptions.minimum = fieldConf.min
+			apiPropertyOptions.minimum = updatedFieldConf.min
 		}
-		if (fieldConf.max) {
-			decorators.push(Min(fieldConf.max, { message: 'Maximum number is ' + fieldConf.max }))
+		if (updatedFieldConf.max) {
+			decorators.push(
+				Min(updatedFieldConf.max, { message: 'Maximum number is ' + updatedFieldConf.max }),
+			)
 
-			apiPropertyOptions.maximum = fieldConf.max
+			apiPropertyOptions.maximum = updatedFieldConf.max
 		}
-		if (fieldConf.required === false) {
+		if (!updatedFieldConf.required) {
 			decorators.push(IsOptional())
 		}
-	} else if (fieldConf.type === 'boolean') {
+	} else if (updatedFieldConf.type === 'boolean') {
 		decorators.push(Type(() => Boolean))
-		if (fieldConf.required === false) {
+		if (!updatedFieldConf.required) {
 			decorators.push(IsOptional())
 		}
 	}

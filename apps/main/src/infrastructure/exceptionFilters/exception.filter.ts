@@ -1,5 +1,6 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpStatus } from '@nestjs/common'
 import { Request, Response } from 'express'
+import { FailResponse } from '../../types/commonTypes'
 
 type HTTPErrorResponse = {
 	response: {
@@ -31,7 +32,9 @@ export class ErrorExceptionFilter implements ExceptionFilter {
 	 * {status: 'error', code: 400, message: 'My error', wrongFields: [...]}
 	 * @param errObj
 	 */
-	extractErrorCodeAndMessageFromStr(errObj: PlainErrorResponse | HTTPErrorResponse): ErrorResult {
+	extractErrorCodeAndMessageFromStr(
+		errObj: PlainErrorResponse | HTTPErrorResponse,
+	): FailResponse {
 		let code = 0
 		let message = ''
 		let wrongFields: undefined | { field: string; message: string }[] = undefined
@@ -58,11 +61,4 @@ export class ErrorExceptionFilter implements ExceptionFilter {
 			wrongFields,
 		}
 	}
-}
-
-type ErrorResult = {
-	status: 'error'
-	code: number
-	message: string
-	wrongFields?: { field: string; message: string }[]
 }
