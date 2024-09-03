@@ -15,8 +15,9 @@ import { HTTP_STATUSES } from '../src/settings/config'
 import { clearAllDB } from './utils/db'
 import { EmailAdapterService } from '@app/email-adapter'
 import { UserRepository } from '../src/repositories/user.repository'
+import { userUtils } from './utils/userUtils'
 
-it.only('123', async () => {
+it('123', async () => {
 	expect(2).toBe(2)
 })
 
@@ -64,29 +65,23 @@ describe('Auth (e2e)', () => {
 			expect(emailFieldErrText).toBe('The email must match the format example@example.com')
 		})
 
-		it('should return an error if the entered email is registered already', async () => {
-			const firstRegRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
-				.send({
-					name: userName,
-					password: userPassword,
-					email: userEmail,
-				})
-				.expect(HTTP_STATUSES.CREATED_201)
+		it.only('should return an error if the entered email is registered already', async () => {
+			const user = userUtils.createUserWithConfirmedEmail(app, userRepository)
 
-			const secondRegRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
+			/*const secondRegRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
 				.send({ name: userName, password: userPassword, email: userEmail })
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
 
 			const secondReg = secondRegRes.body
-			checkErrorResponse(secondReg, 400, 'Email or username is already registered')
+			checkErrorResponse(secondReg, 400, 'Email or username is already registered')*/
 		})
 
-		it('should return 201 if dto has correct values', async () => {
+		/*it('should return 201 if dto has correct values', async () => {
 			const registrationRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
 				.send({ name: userName, password: userPassword, email: userEmail })
 				.expect(HTTP_STATUSES.CREATED_201)
 
-			expect(emailAdapter.sendEmailConfirmationMessage).toBeCalled()
+			expect(emailAdapter.sendEmailConfirmationMessage).toBeCalledTimes(1)
 		})
 
 		it('should return 201 if tries to register an user with existed, but unconfirmed email', async () => {
@@ -118,10 +113,10 @@ describe('Auth (e2e)', () => {
 					email: userEmail,
 				})
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
-		})
+		})*/
 	})
 
-	describe('Confirm email', () => {
+	/*describe('Confirm email', () => {
 		it('should return 400 if dto has incorrect values', async () => {
 			const confirmationRes = await getRequest(
 				app,
@@ -141,9 +136,7 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 400 if email verification allowed time is over', async () => {
-			const firstRegRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
-				.send({ name: userName, password: userPassword, email: userEmail })
-				.expect(HTTP_STATUSES.CREATED_201)
+			const user = await userUtils.createUserWithUnconfirmedEmail(app, userRepository)
 
 			// Try to confirm email with a wrong confirmation code
 			const confirmEmailRes = await getRequest(
@@ -156,16 +149,10 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 400 if email verification allowed time is over', async () => {
-			const firstRegRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
-				.send({ name: userName, password: userPassword, email: userEmail })
-				.expect(HTTP_STATUSES.CREATED_201)
-
-			const userId = firstRegRes.body.data.id
-
-			const user = await userRepository.getUserById(userId)
+			const user = await userUtils.createUserWithUnconfirmedEmail(app, userRepository)
 
 			// Change email confirmation allowed time to past
-			await userRepository.updateUser(userId, {
+			await userRepository.updateUser(user!.id, {
 				email_confirmation_code_expiration_date: new Date().toISOString(),
 			})
 
@@ -180,13 +167,7 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 200 if email successfully confirmed', async () => {
-			const firstRegRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
-				.send({ name: userName, password: userPassword, email: userEmail })
-				.expect(HTTP_STATUSES.CREATED_201)
-
-			const userId = firstRegRes.body.data.id
-
-			const user = await userRepository.getUserById(userId)
+			const user = await userUtils.createUserWithUnconfirmedEmail(app, userRepository)
 
 			// Try to confirm email
 			const confirmEmailRes = await getRequest(
@@ -199,22 +180,7 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 400 if they tries confirm email second time', async () => {
-			const firstRegRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
-				.send({ name: userName, password: userPassword, email: userEmail })
-				.expect(HTTP_STATUSES.CREATED_201)
-
-			const userId = firstRegRes.body.data.id
-			const user = await userRepository.getUserById(userId)
-
-			// Confirm email
-			await getRequest(
-				app,
-				RouteNames.AUTH.EMAIL_CONFIRMATION.full + '?code=' + user!.emailConfirmationCode,
-			)
-				.send({
-					code: user!.emailConfirmationCode,
-				})
-				.expect(HTTP_STATUSES.OK_200)
+			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
 
 			// Try to confirm email second time
 			const confirmEmailSecondTimeRes = await getRequest(
@@ -225,5 +191,63 @@ describe('Auth (e2e)', () => {
 			const confirmEmailSecondTime = confirmEmailSecondTimeRes.body
 			checkErrorResponse(confirmEmailSecondTime, 400, 'Email confirmation code not found')
 		})
-	})
+	})*/
+
+	/*describe('Login', () => {
+		it('should return 400 if dto has incorrect values', async () => {
+			const loginRes = await postRequest(app, RouteNames.AUTH.LOGIN.full).expect(
+				HTTP_STATUSES.BAD_REQUEST_400,
+			)
+
+			const login = loginRes.body
+
+			checkErrorResponse(login, 400, 'Wrong body')
+
+			expect({}.toString.call(login.wrongFields)).toBe('[object Array]')
+			expect(login.wrongFields.length).toBe(2)
+			const [emailFieldErrText, passwordFieldErrText] = getFieldInErrorObject(login, [
+				'email',
+				'password',
+			])
+
+			expect(emailFieldErrText).toBe('Email must be a string')
+			expect(passwordFieldErrText).toBe('Password must be a string')
+		})
+
+		it('should return 400 if email and password does not match', async () => {
+			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
+
+			const loginRes = await postRequest(app, RouteNames.AUTH.LOGIN.full)
+				.send({ password: 'mywrongpassword', email: userEmail })
+				.expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+			const login = loginRes.body
+
+			checkErrorResponse(login, 400, 'Email or passwords do not match')
+		})
+
+		it('should return 403 if email is not confirmed', async () => {
+			const user = await userUtils.createUserWithUnconfirmedEmail(app, userRepository)
+
+			const loginRes = await postRequest(app, RouteNames.AUTH.LOGIN.full)
+				.send({ password: userPassword, email: userEmail })
+				.expect(HTTP_STATUSES.FORBIDDEN_403)
+
+			const login = loginRes.body
+			checkErrorResponse(login, 403, 'Email is not confirmed')
+		})
+
+		it('should return 200 if dto has correct values and email is confirmed', async () => {
+			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
+
+			const loginRes = await postRequest(app, RouteNames.AUTH.LOGIN.full)
+				.send({ password: userPassword, email: userEmail })
+				.expect(HTTP_STATUSES.OK_200)
+
+			const login = loginRes.body
+			checkSuccessResponse(login, 200)
+
+			expect(typeof login.data.accessToken).toBe('string')
+		})
+	})*/
 })

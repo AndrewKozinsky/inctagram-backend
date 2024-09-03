@@ -34,12 +34,12 @@ import {
 } from '../../models/auth/auth.input.model'
 import { RecoveryPasswordCommand } from '../../features/auth/RecoveryPassword.command'
 import { SetNewPasswordCommand } from '../../features/auth/SetNewPassword.command'
-import { CustomException } from '../../utils/misc'
 import { RouteDecorators } from '../routesConfig/routesDecorators'
 import { routesConfig } from '../routesConfig/routesConfig'
 import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
 import { UserOutModel } from '../../models/user/user.out.model'
 import { SuccessResponse } from '../../types/commonTypes'
+import { HTTP_STATUSES } from '../../settings/config'
 
 @Controller(RouteNames.AUTH.value)
 export class AuthController {
@@ -93,43 +93,19 @@ export class AuthController {
 				secure: true,
 			})
 
-			res.status(HttpStatus.OK).send({
-				accessToken: this.jwtAdapter.createAccessTokenStr(user.id),
-			})
+			const resp: SuccessResponse<{ accessToken: string }> = {
+				status: 'success',
+				code: HTTP_STATUSES.OK_200,
+				data: {
+					accessToken: this.jwtAdapter.createAccessTokenStr(user.id),
+				},
+			}
+
+			res.status(HttpStatus.OK).send(resp)
 		} catch (err: unknown) {
-			this.serverHelper.convertLayerErrToHttpErr(err)
+			createFailResp(routesConfig.login, err)
 		}
 	}
-
-	// Generate the new pair of access and refresh tokens
-	// (in cookie client must send correct refreshToken that will be revoked after refreshing)
-	/*@UseGuards(CheckDeviceRefreshTokenGuard)
-	@Post(RouteNames.AUTH.REFRESH_TOKEN.value)
-	@RouteDecorators(routesConfig.emailConfirmation)
-	async refreshToken(@Req() req: Request, @Res() res: Response) {
-		const generateTokensRes = await this.generateAccessAndRefreshTokensUseCase.execute(
-			req.deviceRefreshToken,
-		)
-
-		if (
-			generateTokensRes.code === LayerErrorCode.Unauthorized_401 ||
-			generateTokensRes.code !== LayerSuccessCode.Success
-		) {
-			throw new UnauthorizedException()
-		}
-
-		const { newAccessToken, newRefreshToken } = generateTokensRes.res.data!
-
-		res.cookie(config.refreshToken.name, newRefreshToken, {
-			maxAge: config.refreshToken.lifeDurationInMs,
-			httpOnly: true,
-			secure: true,
-		})
-
-		res.status(HttpStatus.OK).send({
-			accessToken: newAccessToken,
-		})
-	}*/
 
 	// Registration email resending.
 	@Post(RouteNames.AUTH.REGISTRATION_EMAIL_RESENDING.value)
@@ -178,4 +154,34 @@ export class AuthController {
 			new SetNewPasswordCommand(body.recoveryCode, body.newPassword),
 		)
 	}
+
+	// Generate the new pair of access and refresh tokens
+	// (in cookie client must send correct refreshToken that will be revoked after refreshing)
+	/*@UseGuards(CheckDeviceRefreshTokenGuard)
+	@Post(RouteNames.AUTH.REFRESH_TOKEN.value)
+	@RouteDecorators(routesConfig.emailConfirmation)
+	async refreshToken(@Req() req: Request, @Res() res: Response) {
+		const generateTokensRes = await this.generateAccessAndRefreshTokensUseCase.execute(
+			req.deviceRefreshToken,
+		)
+
+		if (
+			generateTokensRes.code === LayerErrorCode.Unauthorized_401 ||
+			generateTokensRes.code !== LayerSuccessCode.Success
+		) {
+			throw new UnauthorizedException()
+		}
+
+		const { newAccessToken, newRefreshToken } = generateTokensRes.res.data!
+
+		res.cookie(config.refreshToken.name, newRefreshToken, {
+			maxAge: config.refreshToken.lifeDurationInMs,
+			httpOnly: true,
+			secure: true,
+		})
+
+		res.status(HttpStatus.OK).send({
+			accessToken: newAccessToken,
+		})
+	}*/
 }

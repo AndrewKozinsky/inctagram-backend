@@ -4,7 +4,6 @@ import { ErrorCode } from '../../../../../libs/layerResult'
 import { EmailAdapterService } from '@app/email-adapter'
 import { ResendConfirmationEmailCommand } from './ResendConfirmationEmail.command'
 import { ServerHelperService } from '@app/server-helper'
-import { CustomException } from '../../utils/misc'
 
 @CommandHandler(ResendConfirmationEmailCommand)
 export class ResendConfirmationEmailHandler

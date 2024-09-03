@@ -55,7 +55,7 @@ export class EmailAdapterService {
 					subject: subject,
 					from: {
 						name: 'Andrew Kozinsky',
-						email: 'mail@' + domainName,
+						email: 'mail@andrewkozinsky.ru',
 					},
 					to: [
 						{

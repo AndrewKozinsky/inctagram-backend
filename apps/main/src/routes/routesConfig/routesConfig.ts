@@ -51,12 +51,27 @@ export const routesConfig: RoutesConfig.Root = {
 			},
 		],
 	},
+	login: {
+		response: [
+			{
+				code: SuccessCode.Ok,
+				description: 'User is authorized',
+				dataClass: null,
+			},
+			{
+				code: ErrorCode.BadRequest_400,
+				errors: [ErrorMessage.EmailOrPasswordDoNotMatch],
+			},
+			{
+				code: ErrorCode.Forbidden_403,
+				errors: [ErrorMessage.EmailIsNotConfirmed],
+			},
+		],
+	},
 	resendConfirmationEmail: {
 		response: [],
 	},
-	login: {
-		response: [],
-	},
+
 	logout: {
 		response: [],
 	},

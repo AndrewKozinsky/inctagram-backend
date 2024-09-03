@@ -3,7 +3,6 @@ import { UserRepository } from '../../repositories/user.repository'
 import { SetNewPasswordCommand } from './SetNewPassword.command'
 import { ErrorCode } from '../../../../../libs/layerResult'
 import { HashAdapterService } from '@app/hash-adapter'
-import { CustomException } from '../../utils/misc'
 
 @CommandHandler(SetNewPasswordCommand)
 export class SetNewPasswordHandler implements ICommandHandler<SetNewPasswordCommand> {

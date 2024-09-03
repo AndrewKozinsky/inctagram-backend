@@ -79,11 +79,11 @@ export class UserRepository {
 		return this.mapDbUserToServiceUser(user)
 	}
 
-	async getConfirmedUserByEmailAndPassword(loginDto: {
-		email: string
-		password: string
-	}): Promise<null | UserServiceModel> {
-		const user = await this.getUserByEmailAndPassword(loginDto.email, loginDto.password)
+	async getConfirmedUserByEmailAndPassword(
+		email: string,
+		password: string,
+	): Promise<null | UserServiceModel> {
+		const user = await this.getUserByEmailAndPassword(email, password)
 
 		if (!user || !user.isEmailConfirmed) {
 			return null

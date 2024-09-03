@@ -14,4 +14,6 @@ export enum ErrorMessage {
 	EmailOrUsernameIsAlreadyRegistered = 'Email or username is already registered',
 	EmailConfirmationCodeIsExpired = 'Email confirmation code is expired',
 	EmailConfirmationCodeNotFound = 'Email confirmation code not found',
+	EmailOrPasswordDoNotMatch = 'Email or passwords do not match',
+	EmailIsNotConfirmed = 'Email is not confirmed',
 }

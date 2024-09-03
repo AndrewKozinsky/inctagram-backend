@@ -3,7 +3,6 @@ import { ErrorCode } from '../../../../../libs/layerResult'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { AuthRepository } from '../../repositories/auth.repository'
 import { LogoutCommand } from './Logout.command'
-import { CustomException } from '../../utils/misc'
 
 @CommandHandler(LogoutCommand)
 export class LogoutHandler implements ICommandHandler<LogoutCommand> {
