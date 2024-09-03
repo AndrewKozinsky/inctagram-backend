@@ -1,27 +1,45 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common'
+import {
+	Body,
+	Controller,
+	Get,
+	HttpCode,
+	HttpStatus,
+	Post,
+	Query,
+	Req,
+	Res,
+	UseGuards,
+} from '@nestjs/common'
 import { CommandBus } from '@nestjs/cqrs'
 import { Request, Response } from 'express'
 import { MainConfigService } from '@app/config'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { CreateUserDtoModel, SetNewPasswordDtoModel } from '../../models/user/user.input.model'
-import RouteNames from '../../settings/routeNames'
+import RouteNames from '../routesConfig/routeNames'
 import { CreateUserCommand } from '../../features/user/CreateUser.command'
 import { ServerHelperService } from '@app/server-helper'
 import { LoginCommand } from '../../features/auth/Login.command'
 import { BrowserServiceService } from '@app/browser-service'
 import { CheckDeviceRefreshTokenGuard } from '../../infrastructure/guards/checkDeviceRefreshToken.guard'
-import { LayerErrorCode } from '../../../../../libs/layerResult'
+import { ErrorCode } from '../../../../../libs/layerResult'
 import { LogoutCommand } from '../../features/auth/Logout.command'
 import { ConfirmEmailCommand } from '../../features/auth/ConfirmEmail.command'
 import { ResendConfirmationEmailCommand } from '../../features/auth/ResendConfirmationEmail.command'
 import {
-	ConfirmEmailDtoModel,
+	ConfirmEmailQueries,
+	GetBlogsQueriesPipe,
 	LoginDtoModel,
 	PasswordRecoveryDtoModel,
 	ResendConfirmationEmailDtoModel,
 } from '../../models/auth/auth.input.model'
 import { RecoveryPasswordCommand } from '../../features/auth/RecoveryPassword.command'
 import { SetNewPasswordCommand } from '../../features/auth/SetNewPassword.command'
+import { CustomException } from '../../utils/misc'
+import { RouteDecorators } from '../routesConfig/routesDecorators'
+import { routesConfig } from '../routesConfig/routesConfig'
+import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
+import { UserOutModel } from '../../models/user/user.out.model'
+import { SuccessResponse } from '../../types/commonTypes'
 
 @Controller(RouteNames.AUTH.value)
 export class AuthController {
@@ -34,23 +52,27 @@ export class AuthController {
 	) {}
 
 	@Post(RouteNames.AUTH.REGISTRATION.value)
-	@HttpCode(HttpStatus.CREATED)
-	async registration(@Body() body: CreateUserDtoModel) {
+	@RouteDecorators(routesConfig.registration)
+	async registration(
+		@Body() body: CreateUserDtoModel,
+	): Promise<SuccessResponse<UserOutModel> | undefined> {
 		try {
-			return await this.commandBus.execute(new CreateUserCommand(body))
-		} catch (err: unknown) {
-			this.serverHelper.convertLayerErrToHttpErr(err)
+			const data = await this.commandBus.execute(new CreateUserCommand(body))
+			return createSuccessResp<UserOutModel>(routesConfig.registration, data)
+		} catch (err: any) {
+			createFailResp(routesConfig.registration, err)
 		}
 	}
 
 	// Confirm registration
-	@Post(RouteNames.AUTH.EMAIL_CONFIRMATION.value)
-	@HttpCode(HttpStatus.NO_CONTENT)
-	async registrationConfirmation(@Body() body: ConfirmEmailDtoModel) {
+	@Get(RouteNames.AUTH.EMAIL_CONFIRMATION.value)
+	@RouteDecorators(routesConfig.emailConfirmation)
+	async emailConfirmation(@Query(new GetBlogsQueriesPipe()) query: ConfirmEmailQueries) {
 		try {
-			await this.commandBus.execute(new ConfirmEmailCommand(body.code))
-		} catch (err: unknown) {
-			this.serverHelper.convertLayerErrToHttpErr(err)
+			await this.commandBus.execute(new ConfirmEmailCommand(query.code))
+			return createSuccessResp<null>(routesConfig.emailConfirmation, null)
+		} catch (err: any) {
+			createFailResp(routesConfig.emailConfirmation, err)
 		}
 	}
 
@@ -83,6 +105,7 @@ export class AuthController {
 	// (in cookie client must send correct refreshToken that will be revoked after refreshing)
 	/*@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Post(RouteNames.AUTH.REFRESH_TOKEN.value)
+	@RouteDecorators(routesConfig.emailConfirmation)
 	async refreshToken(@Req() req: Request, @Res() res: Response) {
 		const generateTokensRes = await this.generateAccessAndRefreshTokensUseCase.execute(
 			req.deviceRefreshToken,
@@ -110,19 +133,20 @@ export class AuthController {
 
 	// Registration email resending.
 	@Post(RouteNames.AUTH.REGISTRATION_EMAIL_RESENDING.value)
-	@HttpCode(HttpStatus.NO_CONTENT)
+	@RouteDecorators(routesConfig.resendConfirmationEmail)
 	async resendConfirmationEmail(@Body() body: ResendConfirmationEmailDtoModel) {
 		await this.commandBus.execute(new ResendConfirmationEmailCommand(body.email))
 	}
 
 	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Post(RouteNames.AUTH.LOGOUT.value)
-	@HttpCode(HttpStatus.NO_CONTENT)
+	@RouteDecorators(routesConfig.logout)
 	async logout(@Req() req: Request, @Res() res: Response) {
 		try {
 			const refreshToken = this.browserService.getRefreshTokenStrFromReq(req)
 			if (!refreshToken) {
-				throw new Error(LayerErrorCode.Unauthorized_401)
+				// !!!!!!
+				throw new Error(ErrorCode.Unauthorized_401)
 			}
 
 			await this.commandBus.execute(new LogoutCommand(refreshToken))
@@ -136,7 +160,7 @@ export class AuthController {
 
 	// Password recovery via Email confirmation. Email should be sent with RecoveryCode inside
 	@Post(RouteNames.AUTH.PASSWORD_RECOVERY.value)
-	@HttpCode(HttpStatus.NO_CONTENT)
+	@RouteDecorators(routesConfig.passwordRecovery)
 	async passwordRecovery(@Body() body: PasswordRecoveryDtoModel) {
 		try {
 			await this.commandBus.execute(new RecoveryPasswordCommand(body.email))
@@ -148,7 +172,7 @@ export class AuthController {
 	}
 
 	@Post(RouteNames.AUTH.NEW_PASSWORD.value)
-	@HttpCode(HttpStatus.NO_CONTENT)
+	@RouteDecorators(routesConfig.newPassword)
 	async newPassword(@Body() body: SetNewPasswordDtoModel) {
 		await this.commandBus.execute(
 			new SetNewPasswordCommand(body.recoveryCode, body.newPassword),

@@ -110,7 +110,7 @@ function createColumnAttrs(columnConfig: BdConfig.Field) {
 		columnConfig.type !== 'manyToOne' &&
 		columnConfig.type !== 'oneToMany'
 	) {
-		if (columnConfig.required == false) {
+		if (!columnConfig.required) {
 			attrStrings.push('?')
 		}
 		if (columnConfig.default !== undefined) {

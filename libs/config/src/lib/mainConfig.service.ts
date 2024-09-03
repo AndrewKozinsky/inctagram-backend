@@ -7,6 +7,11 @@ export class MainConfigService {
 
 	get() {
 		return {
+			mode: this.configService.get<string>('MODE'),
+			site: {
+				name: 'Inctagram',
+				domain: 'sociable-people.com',
+			},
 			db: {
 				host: this.configService.get<string>('DATABASE_URL'),
 			},

@@ -16,13 +16,33 @@ export class UserRepository {
 	) {}
 
 	async getUserByEmail(email: string) {
-		const user = await this.prisma.user.findUnique({
-			where: { email },
-		})
+		try {
+			const user = await this.prisma.user.findUnique({
+				where: { email },
+			})
 
-		if (!user) return null
+			if (!user) return null
 
-		return this.mapDbUserToServiceUser(user)
+			return this.mapDbUserToServiceUser(user)
+		} catch (err: unknown) {
+			console.log(err)
+		}
+	}
+
+	async getUserByEmailOrName(email: string, name: string) {
+		try {
+			const user = await this.prisma.user.findFirst({
+				where: {
+					OR: [{ email }, { name }],
+				},
+			})
+
+			if (!user) return null
+
+			return this.mapDbUserToServiceUser(user)
+		} catch (err: unknown) {
+			console.log(err)
+		}
 	}
 
 	async getUserById(id: number) {
@@ -43,7 +63,7 @@ export class UserRepository {
 		})
 		if (!user) return null
 
-		const isPasswordMath = await this.hashAdapter.compare(password, user.hashedPassword)
+		const isPasswordMath = await this.hashAdapter.compare(password, user.hashed_password)
 		if (!isPasswordMath) return null
 
 		return this.mapDbUserToServiceUser(user)
@@ -51,7 +71,7 @@ export class UserRepository {
 
 	async getUserByConfirmationCode(confirmationCode: string) {
 		const user = await this.prisma.user.findFirst({
-			where: { emailConfirmationCode: confirmationCode },
+			where: { email_confirmation_code: confirmationCode },
 		})
 
 		if (!user) return null
@@ -72,9 +92,9 @@ export class UserRepository {
 		return user
 	}
 
-	async getUserByPasswordRecoveryCode(passwordRecoveryCode: string) {
+	async getUserByPasswordRecoveryCode(password_recovery_code: string) {
 		const user = await this.prisma.user.findFirst({
-			where: { passwordRecoveryCode },
+			where: { password_recovery_code },
 		})
 
 		if (!user) return null
@@ -86,20 +106,21 @@ export class UserRepository {
 		const newUserParams = {
 			email: dto.email,
 			name: dto.name,
-			hashedPassword: '',
-			emailConfirmationCode: '',
-			emailConfirmationCodeExpirationDate: '',
-			isEmailConfirmed: true,
+			hashed_password: '',
+			email_confirmation_code: '',
+			email_confirmation_code_expiration_date: '',
+			is_email_confirmed: true,
 		}
 
 		if (!isEmailConfirmed) {
-			newUserParams.emailConfirmationCode = this.serverHelper.strUtils().createUniqString()
-			newUserParams.emailConfirmationCodeExpirationDate = add(new Date(), {
+			newUserParams.email_confirmation_code = this.serverHelper.strUtils().createUniqString()
+			newUserParams.email_confirmation_code_expiration_date = add(new Date(), {
 				hours: 0,
 				minutes: 5,
 			}).toISOString()
-			const passwordHash = await this.hashAdapter.hashString(dto.password)
-			newUserParams.isEmailConfirmed = true
+
+			newUserParams.hashed_password = await this.hashAdapter.hashString(dto.password)
+			newUserParams.is_email_confirmed = false
 		}
 
 		const user = await this.prisma.user.create({
@@ -116,16 +137,30 @@ export class UserRepository {
 		})
 	}
 
+	async makeEmailVerified(userId: number) {
+		await this.updateUser(userId, {
+			email_confirmation_code: null,
+			is_email_confirmed: true,
+			email_confirmation_code_expiration_date: null,
+		})
+	}
+
+	async deleteUser(userId: number) {
+		await this.prisma.user.delete({
+			where: { id: userId },
+		})
+	}
+
 	mapDbUserToServiceUser(dbUser: User): UserServiceModel {
 		return {
 			id: dbUser.id,
 			email: dbUser.email,
 			name: dbUser.name,
-			hashedPassword: dbUser.hashedPassword,
-			emailConfirmationCode: dbUser.emailConfirmationCode,
-			confirmationCodeExpirationDate: dbUser.emailConfirmationCodeExpirationDate,
-			isEmailConfirmed: dbUser.isEmailConfirmed,
-			passwordRecoveryCode: dbUser.passwordRecoveryCode,
+			hashedPassword: dbUser.hashed_password,
+			emailConfirmationCode: dbUser.email_confirmation_code,
+			confirmationCodeExpirationDate: dbUser.email_confirmation_code_expiration_date,
+			isEmailConfirmed: dbUser.is_email_confirmed,
+			passwordRecoveryCode: dbUser.password_recovery_code,
 		}
 	}
 }

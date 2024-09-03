@@ -16,6 +16,7 @@ import { LoginHandler } from '../../features/auth/Login.commandHandler'
 import { ResendConfirmationEmailHandler } from '../../features/auth/ResendConfirmationEmail.commandHandler'
 import { RecoveryPasswordHandler } from '../../features/auth/RecoveryPassword.commandHandler'
 import { SetNewPasswordHandler } from '../../features/auth/SetNewPassword.commandHandler'
+import { UserQueryRepository } from '../../repositories/user.queryRepository'
 
 const services = [
 	AuthService,
@@ -26,7 +27,7 @@ const services = [
 	JwtAdapterService,
 ]
 
-const repositories = [UserRepository, AuthRepository]
+const repositories = [UserRepository, UserQueryRepository, AuthRepository]
 
 const commandHandlers = [
 	CreateUserHandler,

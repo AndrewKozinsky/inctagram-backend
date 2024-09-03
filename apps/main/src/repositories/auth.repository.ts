@@ -16,12 +16,12 @@ export class AuthRepository {
 	): Promise<DeviceTokenServiceModel> {
 		const deviceToken = await this.prisma.deviceToken.create({
 			data: {
-				issuedAt: new Date(deviceRefreshToken.issuedAt).toISOString(),
+				issued_at: new Date(deviceRefreshToken.issuedAt).toISOString(),
 				userId: deviceRefreshToken.userId,
-				expirationDate: new Date(deviceRefreshToken.expirationDate).toISOString(),
-				deviceIP: deviceRefreshToken.deviceIP,
-				deviceId: deviceRefreshToken.deviceId,
-				deviceName: deviceRefreshToken.deviceName,
+				expiration_date: new Date(deviceRefreshToken.expirationDate).toISOString(),
+				device_ip: deviceRefreshToken.deviceIP,
+				device_id: deviceRefreshToken.deviceId,
+				device_name: deviceRefreshToken.deviceName,
 			},
 		})
 
@@ -43,7 +43,7 @@ export class AuthRepository {
 		deviceId: string,
 	): Promise<null | DeviceTokenServiceModel> {
 		const token = await this.prisma.deviceToken.findFirst({
-			where: { deviceId: deviceId },
+			where: { device_id: deviceId },
 		})
 		// const token = await this.dataSource.getRepository(DeviceToken).findOneBy({ deviceId })
 
@@ -53,16 +53,16 @@ export class AuthRepository {
 	}
 
 	async deleteDeviceRefreshTokenByDeviceId(deviceId: string): Promise<void> {
-		this.prisma.deviceToken.deleteMany({ where: { deviceId: deviceId } })
+		this.prisma.deviceToken.deleteMany({ where: { device_id: deviceId } })
 	}
 
 	mapDbDeviceTokenToServiceDeviceToken(dbDeviceToken: DeviceToken): DeviceTokenServiceModel {
 		return {
-			issuedAt: dbDeviceToken.issuedAt,
-			expirationDate: dbDeviceToken.expirationDate,
-			deviceIP: dbDeviceToken.deviceId,
-			deviceId: dbDeviceToken.deviceId,
-			deviceName: dbDeviceToken.deviceName,
+			issuedAt: dbDeviceToken.issued_at,
+			expirationDate: dbDeviceToken.expiration_date,
+			deviceIP: dbDeviceToken.device_ip,
+			deviceId: dbDeviceToken.device_id,
+			deviceName: dbDeviceToken.device_name,
 			userId: dbDeviceToken.userId,
 		}
 	}

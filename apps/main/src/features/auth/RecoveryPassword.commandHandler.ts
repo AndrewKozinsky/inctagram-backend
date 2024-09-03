@@ -22,7 +22,7 @@ export class RecoveryPasswordHandler implements ICommandHandler<RecoveryPassword
 
 		const recoveryCode = this.serverHelper.strUtils().createUniqString()
 
-		await this.userRepository.updateUser(user.id, { passwordRecoveryCode: recoveryCode })
+		await this.userRepository.updateUser(user.id, { password_recovery_code: recoveryCode })
 
 		await this.emailAdapter.sendPasswordRecoveryMessage(email, recoveryCode)
 	}

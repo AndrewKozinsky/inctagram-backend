@@ -11,14 +11,17 @@ export const bdTestConfig = {
 			email: {
 				type: 'email',
 				unique: true,
+				required: true,
 			},
 			name: {
 				type: 'string',
 				unique: true,
+				required: true,
 			},
 			isEmailConfirmed: {
 				type: 'boolean',
 				default: false,
+				required: true,
 			},
 			DeviceToken: {
 				type: 'oneToMany',
@@ -33,6 +36,7 @@ export const bdTestConfig = {
 			},
 			deviceIP: {
 				type: 'string',
+				required: true,
 			},
 			userId: {
 				type: 'manyToOne',

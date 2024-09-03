@@ -3,10 +3,10 @@ import cookieParser from 'cookie-parser'
 import { useContainer } from 'class-validator'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { AppModule } from '../app.module'
-import { HttpExceptionFilter } from '../infrastructure/exceptionFilters/exception.filter'
 import { NextFunction, Request, Response } from 'express'
 import { SetReqUserMiddleware } from '../middlewares/setReqUser.middleware'
 import { UserRepository } from '../repositories/user.repository'
+import { ErrorExceptionFilter } from '../infrastructure/exceptionFilters/exception.filter'
 
 export function applyAppSettings(app: INestApplication) {
 	app.use(cookieParser())
@@ -46,5 +46,5 @@ export function applyAppSettings(app: INestApplication) {
 	// https://medium.com/yavar/custom-validation-with-database-in-nestjs-ac008f96abe2
 	useContainer(app.select(AppModule), { fallbackOnErrors: true })
 
-	app.useGlobalFilters(new HttpExceptionFilter())
+	app.useGlobalFilters(new ErrorExceptionFilter())
 }

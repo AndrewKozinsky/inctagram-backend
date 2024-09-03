@@ -19,10 +19,14 @@ export namespace BdConfig {
 	type FieldCommonProps = {
 		// Default value
 		default?: string | number | boolean
-		// Is the field required? False by default
-		required?: boolean
+		// Is the field required? True by default
+		required: boolean
 		// Is the field value must be unique?
 		unique?: boolean
+		// Field description
+		description?: string
+		// Field example value
+		example?: string | number | boolean
 	}
 
 	export type IndexField = {

@@ -34,6 +34,13 @@ export const RouteNames = {
 			full: 'auth/new-password',
 		},
 	},
+	TESTING: {
+		value: 'testing',
+		ALL_DATA: {
+			value: 'all-data',
+			full: 'testing/all-data',
+		},
+	},
 }
 
 export default RouteNames
