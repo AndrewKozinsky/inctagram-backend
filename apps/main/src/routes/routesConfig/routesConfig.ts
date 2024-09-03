@@ -125,4 +125,17 @@ export const routesConfig: RoutesConfig.Root = {
 			},
 		],
 	},
+	refreshToken: {
+		response: [
+			{
+				code: SuccessCode.Ok,
+				description: 'Access and refresh tokens were updated',
+				dataClass: null,
+			},
+			{
+				code: ErrorCode.Unauthorized_401,
+				errors: [ErrorMessage.RefreshTokenIsNotValid, ErrorMessage.UserNotFound],
+			},
+		],
+	},
 }

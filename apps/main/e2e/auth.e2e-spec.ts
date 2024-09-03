@@ -21,6 +21,7 @@ import { DeviceTokenOutModel } from '../src/models/auth/auth.output.model'
 import { AuthRepository } from '../src/repositories/auth.repository'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { MainConfigService } from '@app/config'
+import { add } from 'date-fns'
 
 it.only('123', async () => {
 	expect(2).toBe(2)
@@ -383,7 +384,7 @@ describe('Auth (e2e)', () => {
 		})
 	})
 
-	describe('Reset password log out', () => {
+	describe('Reset password', () => {
 		it('should return 400 if email in body is not exist or has wrong format', async () => {
 			const recoverRes = await postRequest(
 				app,
@@ -476,6 +477,61 @@ describe('Auth (e2e)', () => {
 			await postRequest(app, RouteNames.AUTH.LOGIN.full)
 				.send({ password: myNewPassword, email: userEmail })
 				.expect(HTTP_STATUSES.OK_200)
+		})
+	})
+
+	describe('Get new refresh and access token', () => {
+		it.only('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
+			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
+
+			// Create expired token
+			const deviceId = createUniqString()
+
+			const expiredRefreshToken: DeviceTokenOutModel = {
+				issuedAt: new Date().toISOString(),
+				expirationDate: add(new Date(), { days: -6 }).toISOString(),
+				deviceIP: '123',
+				deviceId,
+				deviceName: 'Unknown',
+				userId: user.id,
+			}
+
+			await authRepository.insertDeviceRefreshToken(expiredRefreshToken)
+
+			// Get created expired token
+			const refreshToken = await authRepository.getDeviceRefreshTokenByDeviceId(deviceId)
+			const refreshTokenStr = jwtService.createRefreshTokenStr(
+				refreshToken!.deviceId,
+				refreshToken!.expirationDate,
+			)
+
+			const refreshRes = await postRequest(app, RouteNames.AUTH.REFRESH_TOKEN.full)
+				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
+				.expect(HTTP_STATUSES.UNAUTHORIZED_401)
+		})
+
+		it('should return 200 if the JWT refreshToken inside cookie is valid', async () => {
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+				app,
+				userRepository,
+				userEmail,
+				userPassword,
+			)
+
+			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
+
+			const refreshRes = await postRequest(app, RouteNames.AUTH.REFRESH_TOKEN.full)
+				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
+				.expect(HTTP_STATUSES.OK_200)
+
+			const newRefreshTokenStr = refreshRes.headers['set-cookie'][0]
+			const newRefreshTokenObj = parseCookieStringToObj(newRefreshTokenStr)
+			expect(newRefreshTokenObj['Max-Age']).toBe(60 * 60 * 24 * 30)
+			expect(newRefreshTokenObj.Secure).toBe(true)
+			expect(newRefreshTokenObj.HttpOnly).toBe(true)
+
+			const newAccessToken = refreshRes.body.data.accessToken
+			expect(typeof newAccessToken).toBe('string')
 		})
 	})
 })

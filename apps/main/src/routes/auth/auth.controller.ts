@@ -28,6 +28,7 @@ import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRou
 import { UserOutModel } from '../../models/user/user.out.model'
 import { SuccessResponse } from '../../types/commonTypes'
 import { HTTP_STATUSES } from '../../utils/httpStatuses'
+import { GenerateAccessAndRefreshTokensCommand } from '../../features/auth/GenerateAccessAndRefreshTokens.command'
 
 @Controller(RouteNames.AUTH.value)
 export class AuthController {
@@ -152,31 +153,28 @@ export class AuthController {
 
 	// Generate the new pair of access and refresh tokens
 	// (in cookie client must send correct refreshToken that will be revoked after refreshing)
-	/*@UseGuards(CheckDeviceRefreshTokenGuard)
+	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Post(RouteNames.AUTH.REFRESH_TOKEN.value)
 	@RouteDecorators(routesConfig.refreshToken)
 	async refreshToken(@Req() req: Request, @Res() res: Response) {
-		const generateTokensRes = await this.generateAccessAndRefreshTokensUseCase.execute(
-			req.deviceRefreshToken,
-		)
+		try {
+			const { newAccessToken, newRefreshToken } = await this.commandBus.execute(
+				new GenerateAccessAndRefreshTokensCommand(req.deviceRefreshToken!),
+			)
 
-		if (
-			generateTokensRes.code === LayerErrorCode.Unauthorized_401 ||
-			generateTokensRes.code !== LayerSuccessCode.Success
-		) {
-			throw new UnauthorizedException()
+			const respData = createSuccessResp(routesConfig.refreshToken, {
+				accessToken: newAccessToken,
+			})
+
+			res.cookie(this.mainConfig.get().refreshToken.name, newRefreshToken, {
+				maxAge: this.mainConfig.get().refreshToken.lifeDurationInMs,
+				httpOnly: true,
+				secure: true,
+			})
+
+			res.status(HttpStatus.OK).send(respData)
+		} catch (err: unknown) {
+			createFailResp(routesConfig.refreshToken, err)
 		}
-
-		const { newAccessToken, newRefreshToken } = generateTokensRes.res.data!
-
-		res.cookie(config.refreshToken.name, newRefreshToken, {
-			maxAge: config.refreshToken.lifeDurationInMs,
-			httpOnly: true,
-			secure: true,
-		})
-
-		res.status(HttpStatus.OK).send({
-			accessToken: newAccessToken,
-		})
-	}*/
+	}
 }

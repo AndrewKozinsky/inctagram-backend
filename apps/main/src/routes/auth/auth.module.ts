@@ -17,6 +17,7 @@ import { ResendConfirmationEmailHandler } from '../../features/auth/ResendConfir
 import { RecoveryPasswordHandler } from '../../features/auth/RecoveryPassword.commandHandler'
 import { SetNewPasswordHandler } from '../../features/auth/SetNewPassword.commandHandler'
 import { UserQueryRepository } from '../../repositories/user.queryRepository'
+import { GenerateAccessAndRefreshTokensHandler } from '../../features/auth/GenerateAccessAndRefreshTokens.commandHandler'
 
 const services = [
 	AuthService,
@@ -37,6 +38,7 @@ const commandHandlers = [
 	ResendConfirmationEmailHandler,
 	RecoveryPasswordHandler,
 	SetNewPasswordHandler,
+	GenerateAccessAndRefreshTokensHandler,
 ]
 
 @Module({

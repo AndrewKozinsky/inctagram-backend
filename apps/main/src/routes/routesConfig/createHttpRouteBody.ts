@@ -3,10 +3,7 @@ import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { CustomException } from '../../infrastructure/exceptionFilters/customException'
 import { SuccessResponse } from '../../types/commonTypes'
 
-export async function createSuccessResp<T>(
-	routeConfig: RoutesConfig.Route,
-	data: T,
-): Promise<SuccessResponse<T>> {
+export function createSuccessResp<T>(routeConfig: RoutesConfig.Route, data: T): SuccessResponse<T> {
 	const successAnswerConfig = routeConfig.response.find((conf) => conf.code.startsWith('2'))
 
 	return {
