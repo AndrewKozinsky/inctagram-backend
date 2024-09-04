@@ -6,6 +6,11 @@ import {
 import { RoutesConfig } from './routesConfigTypes'
 import { bdConfig } from '../../db/dbConfig/dbConfig'
 import { UserOutModel } from '../../models/user/user.out.model'
+import {
+	LoginOutModel,
+	RecoveryPasswordOutModel,
+	RefreshTokenOutModel,
+} from '../../models/auth/auth.output.model'
 
 export const routesConfig: RoutesConfig.Root = {
 	registration: {
@@ -59,8 +64,9 @@ export const routesConfig: RoutesConfig.Root = {
 		response: [
 			{
 				code: SuccessCode.Ok,
-				description: 'User is authorized',
-				dataClass: null,
+				description:
+					'User is authorized. Returns JWT accessToken (expired after 30 minutes) in body and JWT refreshToken in cookie (expired after 30 days).',
+				dataClass: LoginOutModel,
 			},
 			{
 				code: ErrorCode.BadRequest_400,
@@ -108,7 +114,11 @@ export const routesConfig: RoutesConfig.Root = {
 			{
 				code: SuccessCode.Ok,
 				description: 'Recovery password email was sent',
-				dataClass: null,
+				dataClass: RecoveryPasswordOutModel,
+			},
+			{
+				code: ErrorCode.BadRequest_400,
+				errors: [ErrorMessage.UserNotFound],
 			},
 		],
 	},
@@ -129,8 +139,9 @@ export const routesConfig: RoutesConfig.Root = {
 		response: [
 			{
 				code: SuccessCode.Ok,
-				description: 'Access and refresh tokens were updated',
-				dataClass: null,
+				description:
+					'Returns new JWT accessToken (expired after 30 minutes) in body and JWT refreshToken in cookie (expired after 30 days).',
+				dataClass: RefreshTokenOutModel,
 			},
 			{
 				code: ErrorCode.Unauthorized_401,

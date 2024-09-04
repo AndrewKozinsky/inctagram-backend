@@ -24,12 +24,17 @@ import { RecoveryPasswordCommand } from '../../features/auth/RecoveryPassword.co
 import { SetNewPasswordCommand } from '../../features/auth/SetNewPassword.command'
 import { RouteDecorators } from '../routesConfig/routesDecorators'
 import { routesConfig } from '../routesConfig/routesConfig'
-import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
+import {
+	createFailResp,
+	createSuccessResp,
+	SuccessResponse,
+} from '../routesConfig/createHttpRouteBody'
 import { UserOutModel } from '../../models/user/user.out.model'
-import { SuccessResponse } from '../../types/commonTypes'
-import { HTTP_STATUSES } from '../../utils/httpStatuses'
 import { GenerateAccessAndRefreshTokensCommand } from '../../features/auth/GenerateAccessAndRefreshTokens.command'
+import { LoginOutModel } from '../../models/auth/auth.output.model'
+import { ApiBearerAuth, ApiCookieAuth, ApiSecurity, ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Auth')
 @Controller(RouteNames.AUTH.value)
 export class AuthController {
 	constructor(
@@ -56,10 +61,12 @@ export class AuthController {
 	// Confirm registration
 	@Get(RouteNames.AUTH.EMAIL_CONFIRMATION.value)
 	@RouteDecorators(routesConfig.emailConfirmation)
-	async emailConfirmation(@Query(new GetBlogsQueriesPipe()) query: ConfirmEmailQueries) {
+	async emailConfirmation(
+		@Query(new GetBlogsQueriesPipe()) query: ConfirmEmailQueries,
+	): Promise<SuccessResponse<null> | undefined> {
 		try {
 			await this.commandBus.execute(new ConfirmEmailCommand(query.code))
-			return createSuccessResp<null>(routesConfig.emailConfirmation, null)
+			return createSuccessResp(routesConfig.emailConfirmation, null)
 		} catch (err: any) {
 			createFailResp(routesConfig.emailConfirmation, err)
 		}
@@ -78,20 +85,16 @@ export class AuthController {
 			const { refreshTokenStr, user } = loginRes
 
 			res.cookie(this.mainConfig.get().refreshToken.name, refreshTokenStr, {
-				maxAge: this.mainConfig.get().refreshToken.lifeDurationInMs,
+				maxAge: this.mainConfig.get().refreshToken.lifeDurationInMs / 1000,
 				httpOnly: true,
 				secure: true,
 			})
 
-			const resp: SuccessResponse<{ accessToken: string }> = {
-				status: 'success',
-				code: HTTP_STATUSES.OK_200,
-				data: {
-					accessToken: this.jwtAdapter.createAccessTokenStr(user.id),
-				},
-			}
+			const respData = createSuccessResp<LoginOutModel>(routesConfig.login, {
+				accessToken: this.jwtAdapter.createAccessTokenStr(user.id),
+			})
 
-			res.status(HttpStatus.OK).send(resp)
+			res.status(HttpStatus.OK).send(respData)
 		} catch (err: unknown) {
 			createFailResp(routesConfig.login, err)
 		}
@@ -103,12 +106,13 @@ export class AuthController {
 	async resendConfirmationEmail(@Body() body: ResendConfirmationEmailDtoModel) {
 		try {
 			await this.commandBus.execute(new ResendConfirmationEmailCommand(body.email))
-			return createSuccessResp<null>(routesConfig.resendConfirmationEmail, null)
+			return createSuccessResp(routesConfig.resendConfirmationEmail, null)
 		} catch (err: any) {
 			createFailResp(routesConfig.resendConfirmationEmail, err)
 		}
 	}
 
+	@ApiBearerAuth()
 	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Post(RouteNames.AUTH.LOGOUT.value)
 	@RouteDecorators(routesConfig.logout)
@@ -120,7 +124,7 @@ export class AuthController {
 
 			res.clearCookie(this.mainConfig.get().refreshToken.name)
 			res.status(HttpStatus.OK)
-			res.send(createSuccessResp<null>(routesConfig.logout, null))
+			res.send(createSuccessResp(routesConfig.logout, null))
 		} catch (err: unknown) {
 			this.serverHelper.convertLayerErrToHttpErr(err)
 		}
@@ -132,7 +136,7 @@ export class AuthController {
 	async passwordRecovery(@Body() body: PasswordRecoveryDtoModel) {
 		try {
 			const res = await this.commandBus.execute(new RecoveryPasswordCommand(body.email))
-			return createSuccessResp<null>(routesConfig.passwordRecovery, res)
+			return createSuccessResp(routesConfig.passwordRecovery, res)
 		} catch (err: any) {
 			createFailResp(routesConfig.passwordRecovery, err)
 		}
@@ -145,7 +149,7 @@ export class AuthController {
 			await this.commandBus.execute(
 				new SetNewPasswordCommand(body.recoveryCode, body.newPassword),
 			)
-			return createSuccessResp<null>(routesConfig.newPassword, null)
+			return createSuccessResp(routesConfig.newPassword, null)
 		} catch (err: any) {
 			createFailResp(routesConfig.newPassword, err)
 		}
@@ -167,7 +171,7 @@ export class AuthController {
 			})
 
 			res.cookie(this.mainConfig.get().refreshToken.name, newRefreshToken, {
-				maxAge: this.mainConfig.get().refreshToken.lifeDurationInMs,
+				maxAge: this.mainConfig.get().refreshToken.lifeDurationInMs / 1000,
 				httpOnly: true,
 				secure: true,
 			})

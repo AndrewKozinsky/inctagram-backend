@@ -1,6 +1,6 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpStatus } from '@nestjs/common'
 import { Request, Response } from 'express'
-import { FailResponse } from '../../types/commonTypes'
+import { FailResponse } from '../../routes/routesConfig/createHttpRouteBody'
 
 type HTTPErrorResponse = {
 	response: {

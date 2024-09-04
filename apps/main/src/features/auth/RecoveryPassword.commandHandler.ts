@@ -4,9 +4,12 @@ import { EmailAdapterService } from '@app/email-adapter'
 import { RecoveryPasswordCommand } from './RecoveryPassword.command'
 import { ServerHelperService } from '@app/server-helper'
 import { createUniqString } from '../../utils/stringUtils'
+import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 
 @CommandHandler(RecoveryPasswordCommand)
-export class RecoveryPasswordHandler implements ICommandHandler<RecoveryPasswordCommand> {
+export class RecoveryPasswordHandler
+	implements ICommandHandler<RecoveryPasswordCommand, null | { recoveryCode: string }>
+{
 	constructor(
 		private serverHelper: ServerHelperService,
 		private userRepository: UserRepository,
@@ -19,7 +22,9 @@ export class RecoveryPasswordHandler implements ICommandHandler<RecoveryPassword
 		const user = await this.userRepository.getUserByEmail(email)
 
 		// Send success status even if current email is not registered (for prevent user's email detection)
-		if (!user) return null
+		if (!user) {
+			throw new Error(ErrorMessage.UserNotFound)
+		}
 
 		const recoveryCode = createUniqString()
 

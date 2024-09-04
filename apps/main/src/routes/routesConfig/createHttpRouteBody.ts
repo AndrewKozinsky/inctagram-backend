@@ -1,7 +1,19 @@
 import { RoutesConfig } from './routesConfigTypes'
 import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { CustomException } from '../../infrastructure/exceptionFilters/customException'
-import { SuccessResponse } from '../../types/commonTypes'
+
+export type SuccessResponse<T> = {
+	status: 'success'
+	code: number
+	data: T
+}
+
+export type FailResponse = {
+	status: 'error'
+	code: number
+	message: string
+	wrongFields?: { field: string; message: string }[]
+}
 
 export function createSuccessResp<T>(routeConfig: RoutesConfig.Route, data: T): SuccessResponse<T> {
 	const successAnswerConfig = routeConfig.response.find((conf) => conf.code.startsWith('2'))

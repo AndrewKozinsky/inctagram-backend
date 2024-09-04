@@ -9,7 +9,6 @@ export class DbService {
 	constructor(private prisma: PrismaService) {}
 
 	async drop() {
-		// Recipe 2
 		try {
 			await this.prisma.$queryRaw`DO
 $$
