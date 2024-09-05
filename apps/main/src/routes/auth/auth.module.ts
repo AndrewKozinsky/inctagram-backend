@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common'
 import { AuthController } from './auth.controller'
 import { PrismaService } from '../../db/prisma.service'
-import { AuthService } from './auth.service'
+import { GitHubService } from './gitHubService'
 import { MainConfigService } from '@app/config'
 import { CqrsModule } from '@nestjs/cqrs'
 import { CreateUserHandler } from '../../features/user/CreateUser.commandHandler'
@@ -18,9 +18,11 @@ import { RecoveryPasswordHandler } from '../../features/auth/RecoveryPassword.co
 import { SetNewPasswordHandler } from '../../features/auth/SetNewPassword.commandHandler'
 import { UserQueryRepository } from '../../repositories/user.queryRepository'
 import { GenerateAccessAndRefreshTokensHandler } from '../../features/auth/GenerateAccessAndRefreshTokens.commandHandler'
+import { GoogleService } from './googleService'
 
 const services = [
-	AuthService,
+	GitHubService,
+	GoogleService,
 	PrismaService,
 	MainConfigService,
 	HashAdapterService,

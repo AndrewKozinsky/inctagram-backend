@@ -33,6 +33,8 @@ import { UserOutModel } from '../../models/user/user.out.model'
 import { GenerateAccessAndRefreshTokensCommand } from '../../features/auth/GenerateAccessAndRefreshTokens.command'
 import { LoginOutModel } from '../../models/auth/auth.output.model'
 import { ApiBearerAuth, ApiCookieAuth, ApiSecurity, ApiTags } from '@nestjs/swagger'
+import { GitHubService } from './gitHubService'
+import { GoogleService } from './googleService'
 
 @ApiTags('Auth')
 @Controller(RouteNames.AUTH.value)
@@ -43,6 +45,8 @@ export class AuthController {
 		private readonly browserService: BrowserServiceService,
 		private mainConfig: MainConfigService,
 		private jwtAdapter: JwtAdapterService,
+		private gitHubService: GitHubService,
+		private googleService: GoogleService,
 	) {}
 
 	@Post(RouteNames.AUTH.REGISTRATION.value)
@@ -180,5 +184,19 @@ export class AuthController {
 		} catch (err: unknown) {
 			createFailResp(routesConfig.refreshToken, err)
 		}
+	}
+
+	@Get('registration/github')
+	@RouteDecorators(routesConfig.refreshToken)
+	async github(@Query('code') code: string, @Query('code') state: string) {
+		const userInfo = await this.gitHubService.getUserDataByOAuthCode(code)
+		console.log(userInfo)
+	}
+
+	@Get('registration/google')
+	@RouteDecorators(routesConfig.refreshToken)
+	async google(@Query('code') code: string, @Query('code') state: string) {
+		const userInfo = await this.googleService.getUserDataByOAuthCode(code)
+		console.log(userInfo)
 	}
 }
