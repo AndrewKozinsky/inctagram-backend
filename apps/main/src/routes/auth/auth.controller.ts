@@ -3,7 +3,11 @@ import { CommandBus } from '@nestjs/cqrs'
 import { Request, Response } from 'express'
 import { MainConfigService } from '@app/config'
 import { JwtAdapterService } from '@app/jwt-adapter'
-import { CreateUserDtoModel, SetNewPasswordDtoModel } from '../../models/user/user.input.model'
+import {
+	CreateUserDtoModel,
+	ProviderNameQueryModel,
+	SetNewPasswordDtoModel,
+} from '../../models/user/user.input.model'
 import RouteNames from '../routesConfig/routeNames'
 import { CreateUserCommand } from '../../features/user/CreateUser.command'
 import { ServerHelperService } from '@app/server-helper'
@@ -26,7 +30,7 @@ import {
 import { UserOutModel } from '../../models/user/user.out.model'
 import { LoginOutModel } from '../../models/auth/auth.output.model'
 import { ApiBearerAuth, ApiCookieAuth, ApiSecurity, ApiTags } from '@nestjs/swagger'
-import { RegByProviderAndGetTokensCommand } from '../../features/user/RegByGithubAndGetTokens.commandHandler'
+import { RegByProviderAndLoginCommand } from '../../features/user/RegByGithubAndGetTokens.commandHandler'
 import { AuthService } from './auth.service'
 import { GenerateAccessAndRefreshTokensCommand } from '../../features/auth/GenerateAccessAndRefreshTokens.commandHandler'
 import { ConfirmEmailCommand } from '../../features/auth/ConfirmEmail.commandHandler'
@@ -62,11 +66,13 @@ export class AuthController {
 		}
 	}
 
-	@Get(RouteNames.AUTH.REGISTRATION.value + '/' + RouteNames.AUTH.REGISTRATION.BY_GITHUB.value)
-	@RouteDecorators(routesConfig.refreshToken)
-	async regByGithubAndGetTokens(
+	// Register by GitHub or Google and get access and refresh tokens
+	@Get(RouteNames.AUTH.REGISTRATION.value + '/' + RouteNames.AUTH.REGISTRATION.BY_PROVIDER.value)
+	@RouteDecorators(routesConfig.authorizeByProvider)
+	async authorizeByProvider(
 		@Req() req: Request,
 		@Res() res: Response,
+		@Query() query: ProviderNameQueryModel,
 		@Query('code') providerCode: string,
 	) {
 		try {
@@ -74,55 +80,23 @@ export class AuthController {
 			const clientName = this.browserService.getClientName(req)
 
 			const { refreshTokenStr, user } = await this.commandBus.execute(
-				new RegByProviderAndGetTokensCommand({
+				new RegByProviderAndLoginCommand({
 					clientIP,
 					clientName,
 					providerCode,
-					providerName: 'github',
+					providerName: query.provider,
 				}),
 			)
 
 			this.authService.setRefreshTokenInCookie(res, refreshTokenStr)
 
-			const respData = createSuccessResp<LoginOutModel>(routesConfig.login, {
+			const respData = createSuccessResp<LoginOutModel>(routesConfig.authorizeByProvider, {
 				accessToken: this.jwtAdapter.createAccessTokenStr(user.id),
 			})
 
 			res.status(HttpStatus.OK).send(respData)
 		} catch (err: any) {
-			createFailResp(routesConfig.regByGithubAndGetTokens, err)
-		}
-	}
-
-	@Get(RouteNames.AUTH.REGISTRATION.value + '/' + RouteNames.AUTH.REGISTRATION.BY_GOOGLE.value)
-	@RouteDecorators(routesConfig.refreshToken)
-	async regByGoogleAndGetTokens(
-		@Req() req: Request,
-		@Res() res: Response,
-		@Query('code') providerCode: string,
-	) {
-		try {
-			const clientIP = this.browserService.getClientIP(req)
-			const clientName = this.browserService.getClientName(req)
-
-			const { refreshTokenStr, user } = await this.commandBus.execute(
-				new RegByProviderAndGetTokensCommand({
-					clientIP,
-					clientName,
-					providerCode,
-					providerName: 'google',
-				}),
-			)
-
-			this.authService.setRefreshTokenInCookie(res, refreshTokenStr)
-
-			const respData = createSuccessResp<LoginOutModel>(routesConfig.login, {
-				accessToken: this.jwtAdapter.createAccessTokenStr(user.id),
-			})
-
-			res.status(HttpStatus.OK).send(respData)
-		} catch (err: any) {
-			createFailResp(routesConfig.regByGithubAndGetTokens, err)
+			createFailResp(routesConfig.authorizeByProvider, err)
 		}
 	}
 

@@ -1,28 +1,27 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 const { randomBytes } = require('node:crypto')
 import { GitHubService } from '../../routes/auth/gitHubService'
-import { CreateUserDtoModel } from '../../models/user/user.input.model'
+import { CreateUserDtoModel, OAuthProviderName } from '../../models/user/user.input.model'
 import { UserRepository } from '../../repositories/user.repository'
 import { CreateRefreshTokenCommand } from '../auth/CreateRefreshToken.commandHandler'
 import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { GoogleService } from '../../routes/auth/googleService'
 import { FunctionFirstArgument } from '../../types/common'
+import { isLogLevelEnabled } from '@nestjs/common/services/utils'
 
-export class RegByProviderAndGetTokensCommand {
+export class RegByProviderAndLoginCommand {
 	constructor(
 		public args: {
 			clientIP: string
 			clientName: string
 			providerCode: string
-			providerName: 'github' | 'google'
+			providerName: OAuthProviderName
 		},
 	) {}
 }
 
-@CommandHandler(RegByProviderAndGetTokensCommand)
-export class RegByProviderAndGetTokensHandler
-	implements ICommandHandler<RegByProviderAndGetTokensCommand>
-{
+@CommandHandler(RegByProviderAndLoginCommand)
+export class RegByProviderAndLoginHandler implements ICommandHandler<RegByProviderAndLoginCommand> {
 	constructor(
 		private userRepository: UserRepository,
 		private readonly commandBus: CommandBus,
@@ -30,7 +29,7 @@ export class RegByProviderAndGetTokensHandler
 		private googleService: GoogleService,
 	) {}
 
-	async execute(command: RegByProviderAndGetTokensCommand) {
+	async execute(command: RegByProviderAndLoginCommand) {
 		const { providerCode, providerName, clientIP, clientName } = command.args
 
 		let userInfo
@@ -50,20 +49,17 @@ export class RegByProviderAndGetTokensHandler
 		let userId = userWithThisEmail?.id || 0
 
 		// Add existing user a new provider id
-		if (userWithThisEmail) {
-			if (providerName === 'github') {
-				await this.addProviderIdToExistingUser(userWithThisEmail.id, {
-					github_id: userInfo.providerId,
-				})
-			}
-			if (providerName === 'google') {
-				await this.addProviderIdToExistingUser(userWithThisEmail.id, {
-					google_id: userInfo.providerId,
-				})
-			}
+		if (userWithThisEmail && providerName === 'github' && !userWithThisEmail.githubId) {
+			await this.addProviderIdToExistingUser(userWithThisEmail.id, {
+				github_id: userInfo.providerId,
+			})
+		} else if (userWithThisEmail && providerName === 'google' && !userWithThisEmail.googleId) {
+			await this.addProviderIdToExistingUser(userWithThisEmail.id, {
+				google_id: userInfo.providerId,
+			})
 		}
 		// Or create a new user
-		else {
+		else if (!userWithThisEmail) {
 			const args: FunctionFirstArgument<typeof this.createNewUser> = {
 				email: userInfo.email,
 				name: userInfo.name,
@@ -84,9 +80,11 @@ export class RegByProviderAndGetTokensHandler
 			new CreateRefreshTokenCommand(userId, clientIP, clientName),
 		)
 
+		const user = await this.userRepository.getUserById(userId)
+
 		return {
 			refreshTokenStr,
-			user: userWithThisEmail,
+			user,
 		}
 	}
 
@@ -99,10 +97,17 @@ export class RegByProviderAndGetTokensHandler
 		const uniqueName = await this.chooseUniqueName(arg.name)
 		const password = randomBytes(4).toString('hex')
 
-		const createUserDto: CreateUserDtoModel = {
+		const createUserDto: CreateUserDtoModel & { githubId?: number; googleId?: number } = {
 			email: arg.email,
 			name: uniqueName,
 			password,
+		}
+
+		if (arg.githubId) {
+			createUserDto.githubId = arg.githubId
+		}
+		if (arg.googleId) {
+			createUserDto.googleId = arg.googleId
 		}
 
 		return await this.userRepository.createUser(createUserDto, true)
@@ -130,6 +135,18 @@ export class RegByProviderAndGetTokensHandler
 			google_id?: number
 		},
 	) {
-		await this.userRepository.updateUser(userId, provider)
+		const updater: any = {
+			email_confirmation_code: null,
+			is_email_confirmed: true,
+			email_confirmation_code_expiration_date: null,
+		}
+		if (provider.github_id) {
+			updater.github_id = provider.github_id
+		}
+		if (provider.google_id) {
+			updater.google_id = provider.google_id
+		}
+
+		await this.userRepository.updateUser(userId, updater)
 	}
 }

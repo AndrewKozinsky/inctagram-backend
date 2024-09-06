@@ -10,6 +10,12 @@ type UserEmailInfo = {
 	email: string // 'andkozinskiy@yandex.ru'
 }
 
+export type UserInfoFromProvider = {
+	providerId: number
+	name: null | string
+	email: string
+}
+
 @Injectable()
 export class GitHubService {
 	constructor() {}
@@ -42,7 +48,7 @@ export class GitHubService {
 		})
 	}
 
-	async getUserByAccessCode(accessToken: string) {
+	async getUserByAccessCode(accessToken: string): Promise<UserInfoFromProvider> {
 		const myHeaders = new Headers()
 		myHeaders.append('Authorization', 'Bearer ' + accessToken)
 

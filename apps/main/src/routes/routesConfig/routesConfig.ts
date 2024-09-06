@@ -149,6 +149,13 @@ export const routesConfig: RoutesConfig.Root = {
 			},
 		],
 	},
-	regByGithubAndGetTokens: { response: [] },
-	regByGoogleAndGetTokens: { response: [] },
+	authorizeByProvider: {
+		response: [
+			{
+				code: SuccessCode.Ok,
+				description: 'Registration and login by GitHub',
+				dataClass: RefreshTokenOutModel,
+			},
+		],
+	},
 }

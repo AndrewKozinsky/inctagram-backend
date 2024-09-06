@@ -19,8 +19,9 @@ import { SetNewPasswordHandler } from '../../features/auth/SetNewPassword.comman
 import { UserQueryRepository } from '../../repositories/user.queryRepository'
 import { GenerateAccessAndRefreshTokensHandler } from '../../features/auth/GenerateAccessAndRefreshTokens.commandHandler'
 import { GoogleService } from './googleService'
-import { RegByProviderAndGetTokensHandler } from '../../features/user/RegByGithubAndGetTokens.commandHandler'
+import { RegByProviderAndLoginHandler } from '../../features/user/RegByGithubAndGetTokens.commandHandler'
 import { CreateRefreshTokenHandler } from '../../features/auth/CreateRefreshToken.commandHandler'
+import { AuthService } from './auth.service'
 
 const services = [
 	GitHubService,
@@ -30,6 +31,7 @@ const services = [
 	HashAdapterService,
 	BrowserServiceService,
 	JwtAdapterService,
+	AuthService,
 ]
 
 const repositories = [UserRepository, UserQueryRepository, AuthRepository]
@@ -43,7 +45,7 @@ const commandHandlers = [
 	RecoveryPasswordHandler,
 	SetNewPasswordHandler,
 	GenerateAccessAndRefreshTokensHandler,
-	RegByProviderAndGetTokensHandler,
+	RegByProviderAndLoginHandler,
 	CreateRefreshTokenHandler,
 ]
 

@@ -1,4 +1,7 @@
 import { INestApplication } from '@nestjs/common'
+import { add } from 'date-fns'
+import { JwtAdapterService } from '@app/jwt-adapter'
+import { MainConfigService } from '@app/config'
 import {
 	checkErrorResponse,
 	checkSuccessResponse,
@@ -19,17 +22,18 @@ import { userUtils } from './utils/userUtils'
 import { createUniqString, parseCookieStringToObj } from '../src/utils/stringUtils'
 import { DeviceTokenOutModel } from '../src/models/auth/auth.output.model'
 import { AuthRepository } from '../src/repositories/auth.repository'
-import { JwtAdapterService } from '@app/jwt-adapter'
-import { MainConfigService } from '@app/config'
-import { add } from 'date-fns'
+import { GitHubService } from '../src/routes/auth/gitHubService'
+import { GoogleService } from '../src/routes/auth/googleService'
 
-it.only('123', async () => {
+it('123', async () => {
 	expect(2).toBe(2)
 })
 
 describe('Auth (e2e)', () => {
 	let app: INestApplication
 	let emailAdapter: EmailAdapterService
+	let gitHubService: GitHubService
+	let googleService: GoogleService
 
 	let userRepository: UserRepository
 	let authRepository: AuthRepository
@@ -37,9 +41,13 @@ describe('Auth (e2e)', () => {
 	let mainConfig: MainConfigService
 
 	beforeAll(async () => {
-		const createAppRes = await createTestApp(emailAdapter)
+		const createAppRes = await createTestApp(emailAdapter, gitHubService, googleService)
 		app = createAppRes.app
+
 		emailAdapter = createAppRes.emailAdapter
+		gitHubService = createAppRes.gitHubService
+		googleService = createAppRes.googleService
+
 		userRepository = await app.resolve(UserRepository)
 		authRepository = await app.resolve(AuthRepository)
 		jwtService = await app.resolve(JwtAdapterService)
@@ -434,7 +442,6 @@ describe('Auth (e2e)', () => {
 
 			const newPassword = newPasswordRes.body
 			checkErrorResponse(newPassword, 400, 'Wrong body')
-			console.log(newPassword)
 
 			expect({}.toString.call(newPassword.wrongFields)).toBe('[object Array]')
 			expect(newPassword.wrongFields.length).toBe(2)
@@ -481,7 +488,7 @@ describe('Auth (e2e)', () => {
 	})
 
 	describe('Get new refresh and access token', () => {
-		it.only('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
+		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
 			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
 
 			// Create expired token
@@ -532,6 +539,73 @@ describe('Auth (e2e)', () => {
 
 			const newAccessToken = refreshRes.body.data.accessToken
 			expect(typeof newAccessToken).toBe('string')
+		})
+	})
+
+	describe('Sign up with Github or Google', () => {
+		it('return 400 if provider name is wrong', async () => {
+			const registerRes = await getRequest(
+				app,
+				RouteNames.AUTH.REGISTRATION.BY_PROVIDER.full + '?provider=wrong&code=123',
+			).expect(HTTP_STATUSES.BAD_REQUEST_400)
+		})
+
+		it('register a new user by Github and Google', async () => {
+			const providerNames = ['github', 'google']
+
+			for (const providerName of providerNames) {
+				const registerRes = await getRequest(
+					app,
+					RouteNames.AUTH.REGISTRATION.BY_PROVIDER.full +
+						`?provider=${providerName}&code=123`,
+				).expect(HTTP_STATUSES.OK_200)
+
+				const cookies = registerRes.headers['set-cookie']
+				expect(cookies[0].startsWith('refreshToken')).toBe(true)
+				const refreshToken = cookies[0].split('=')[1]
+
+				const register = registerRes.body
+				checkSuccessResponse(register, 200)
+
+				expect(typeof register.data.accessToken).toBe('string')
+
+				// Try to log out with this refreshToken
+				const logoutRes = await postRequest(app, RouteNames.AUTH.LOGOUT.full)
+					.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshToken)
+					.expect(HTTP_STATUSES.OK_200)
+			}
+		})
+
+		it.only('register an existing user by Github', async () => {
+			const user = await userUtils.createUserWithUnconfirmedEmail(app, userRepository)
+
+			const registerRes = await getRequest(
+				app,
+				RouteNames.AUTH.REGISTRATION.BY_PROVIDER.full + '?provider=github&code=123',
+			).expect(HTTP_STATUSES.OK_200)
+
+			// Check if user has confirmed email
+			const updatedUser = await userRepository.getUserById(user!.id)
+			expect(updatedUser!.githubId).not.toBeNull()
+			expect(updatedUser!.isEmailConfirmed).toBeTruthy()
+			expect(updatedUser!.emailConfirmationCode).toBeNull()
+			expect(updatedUser!.confirmationCodeExpirationDate).toBeNull()
+
+			// Check refreshToken in cookie
+			const cookies = registerRes.headers['set-cookie']
+			expect(cookies[0].startsWith('refreshToken')).toBe(true)
+			const refreshToken = cookies[0].split('=')[1]
+
+			const register = registerRes.body
+			checkSuccessResponse(register, 200)
+
+			// Check accessToken in cookie
+			expect(typeof register.data.accessToken).toBe('string')
+
+			// Try to log out with this refreshToken
+			const logoutRes = await postRequest(app, RouteNames.AUTH.LOGOUT.full)
+				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshToken)
+				.expect(HTTP_STATUSES.OK_200)
 		})
 	})
 })

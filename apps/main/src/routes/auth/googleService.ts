@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { UserInfoFromProvider } from './gitHubService'
 
 type UserInfo = {
 	resourceName: string // 'people/108179069609078490986'
@@ -65,7 +66,7 @@ export class GoogleService {
 		})
 	}
 
-	async getUserByAccessCode(accessToken: string) {
+	async getUserByAccessCode(accessToken: string): Promise<UserInfoFromProvider> {
 		const myHeaders = new Headers()
 		myHeaders.append('Authorization', 'Bearer ' + accessToken)
 

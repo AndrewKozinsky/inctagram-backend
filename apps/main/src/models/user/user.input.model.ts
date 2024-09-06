@@ -1,5 +1,6 @@
 import { DtoFieldDecorators } from '../../db/dtoFieldDecorators'
 import { bdConfig } from '../../db/dbConfig/dbConfig'
+import { IsIn } from 'class-validator'
 
 export class CreateUserDtoModel {
 	@DtoFieldDecorators('name', bdConfig.User.dbFields.name)
@@ -18,4 +19,11 @@ export class SetNewPasswordDtoModel {
 
 	@DtoFieldDecorators('recoveryCode', bdConfig.User.dtoProps.recovery_code)
 	recoveryCode: string
+}
+
+export type OAuthProviderName = 'github' | 'google'
+
+export class ProviderNameQueryModel {
+	@IsIn(['github', 'google'], { message: 'Provider must be either github or google' })
+	provider: OAuthProviderName
 }

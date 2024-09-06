@@ -12,13 +12,9 @@ export const RouteNames = {
 		REGISTRATION: {
 			value: 'registration',
 			full: 'auth/registration',
-			BY_GITHUB: {
-				value: 'by-github',
-				full: 'auth/registration/by-github',
-			},
-			BY_GOOGLE: {
-				value: 'by-google',
-				full: 'auth/registration/by-google',
+			BY_PROVIDER: {
+				value: 'by-provider',
+				full: 'auth/registration/by-provider',
 			},
 		},
 		CONFIRM_EMAIL_RESENDING: {

@@ -4,13 +4,19 @@ import { applyAppSettings } from '../../src/infrastructure/applyAppSettings'
 import { agent as request } from 'supertest'
 import { INestApplication } from '@nestjs/common'
 import { EmailAdapterService } from '@app/email-adapter'
+import { GitHubService } from '../../src/routes/auth/gitHubService'
+import { GoogleService } from '../../src/routes/auth/googleService'
 
 export const adminAuthorizationValue = 'Basic YWRtaW46cXdlcnR5'
 export const userName = 'my-user-name'
 export const userEmail = 'mail@email.com'
 export const userPassword = 'password'
 
-export async function createTestApp(emailAdapter: EmailAdapterService) {
+export async function createTestApp(
+	emailAdapter: EmailAdapterService,
+	gitHubService: GitHubService,
+	googleService: GoogleService,
+) {
 	const moduleFixture: TestingModule = await Test.createTestingModule({
 		imports: [AppModule],
 	})
@@ -19,7 +25,22 @@ export async function createTestApp(emailAdapter: EmailAdapterService) {
 			sendEmailConfirmationMessage: jest.fn().mockResolvedValue('Mocked Email Response'),
 			sendEmail: jest.fn().mockResolvedValue('Mocked Email Response'),
 			sendPasswordRecoveryMessage: jest.fn().mockResolvedValue('Mocked Email Response'),
-			// You can mock other methods if needed
+		})
+		.overrideProvider(GitHubService)
+		.useValue({
+			getUserDataByOAuthCode: jest.fn().mockResolvedValue({
+				providerId: 1,
+				name: userName,
+				email: userEmail,
+			}),
+		})
+		.overrideProvider(GoogleService)
+		.useValue({
+			getUserDataByOAuthCode: jest.fn().mockResolvedValue({
+				providerId: 1,
+				name: userName,
+				email: userEmail,
+			}),
 		})
 		.compile()
 
@@ -28,8 +49,10 @@ export async function createTestApp(emailAdapter: EmailAdapterService) {
 	await app.init()
 
 	emailAdapter = moduleFixture.get<EmailAdapterService>(EmailAdapterService)
+	gitHubService = moduleFixture.get<GitHubService>(GitHubService)
+	googleService = moduleFixture.get<GoogleService>(GoogleService)
 
-	return { app, emailAdapter }
+	return { app, emailAdapter, gitHubService, googleService }
 }
 
 export function postRequest(app: INestApplication, url: string) {

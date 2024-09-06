@@ -105,33 +105,33 @@ export class UserRepository {
 
 	async createUser(
 		dto: CreateUserDtoModel & { githubId?: number; googleId?: number },
-		isEmailConfirmed?: boolean,
+		isEmailConfirmed = false,
 	) {
 		const newUserParams: any = {
 			email: dto.email,
 			name: dto.name,
-			hashed_password: '',
-			email_confirmation_code: '',
-			email_confirmation_code_expiration_date: '',
-			is_email_confirmed: true,
+			hashed_password: await this.hashAdapter.hashString(dto.password),
+			email_confirmation_code: createUniqString(),
+			email_confirmation_code_expiration_date: add(new Date(), {
+				hours: 0,
+				minutes: 5,
+			}).toISOString(),
+			is_email_confirmed: false,
 		}
 
 		if (dto.githubId) {
 			newUserParams.github_id = dto.githubId
+			isEmailConfirmed = true
 		}
 		if (dto.googleId) {
 			newUserParams.google_id = dto.googleId
+			isEmailConfirmed = true
 		}
 
-		if (!isEmailConfirmed) {
-			newUserParams.email_confirmation_code = createUniqString()
-			newUserParams.email_confirmation_code_expiration_date = add(new Date(), {
-				hours: 0,
-				minutes: 5,
-			}).toISOString()
-
-			newUserParams.hashed_password = await this.hashAdapter.hashString(dto.password)
-			newUserParams.is_email_confirmed = false
+		if (isEmailConfirmed) {
+			newUserParams.email_confirmation_code = null
+			newUserParams.email_confirmation_code_expiration_date = null
+			newUserParams.is_email_confirmed = true
 		}
 
 		const user = await this.prisma.user.create({
@@ -172,6 +172,8 @@ export class UserRepository {
 			confirmationCodeExpirationDate: dbUser.email_confirmation_code_expiration_date,
 			isEmailConfirmed: dbUser.is_email_confirmed,
 			passwordRecoveryCode: dbUser.password_recovery_code,
+			githubId: dbUser.github_id,
+			googleId: dbUser.google_id,
 		}
 	}
 }
