@@ -67,10 +67,9 @@ export class GitHubService {
 		})
 
 		return {
-			githubId: userMetaInfo.id,
-			githubLogin: userMetaInfo.login,
-			githubName: userMetaInfo.name,
-			githubEmail: userEmailInfo.email,
+			providerId: userMetaInfo.id,
+			name: userMetaInfo.name,
+			email: userEmailInfo.email,
 		}
 	}
 }

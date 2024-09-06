@@ -1,10 +1,13 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UserRepository } from '../../repositories/user.repository'
 import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
-import { ConfirmEmailCommand } from './ConfirmEmail.command'
-import { GenerateAccessAndRefreshTokensCommand } from './GenerateAccessAndRefreshTokens.command'
 import { AuthRepository } from '../../repositories/auth.repository'
 import { JwtAdapterService } from '@app/jwt-adapter'
+import { DeviceTokenOutModel } from '../../models/auth/auth.output.model'
+
+export class GenerateAccessAndRefreshTokensCommand {
+	constructor(public readonly deviceRefreshToken: DeviceTokenOutModel) {}
+}
 
 @CommandHandler(GenerateAccessAndRefreshTokensCommand)
 export class GenerateAccessAndRefreshTokensHandler
@@ -31,11 +34,13 @@ export class GenerateAccessAndRefreshTokensHandler
 
 		await this.authRepository.updateDeviceRefreshTokenDate(deviceRefreshToken.deviceId)
 
-		const newRefreshToken = this.jwtAdapter.createRefreshTokenStr(deviceRefreshToken.deviceId)
+		const newRefreshTokenStr = this.jwtAdapter.createRefreshTokenStr(
+			deviceRefreshToken.deviceId,
+		)
 
 		return {
 			newAccessToken: this.jwtAdapter.createAccessTokenStr(deviceRefreshToken.userId),
-			newRefreshToken,
+			newRefreshTokenStr,
 		}
 	}
 }

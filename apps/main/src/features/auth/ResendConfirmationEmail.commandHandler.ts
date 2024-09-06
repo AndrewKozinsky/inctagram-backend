@@ -2,9 +2,12 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UserRepository } from '../../repositories/user.repository'
 import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { EmailAdapterService } from '@app/email-adapter'
-import { ResendConfirmationEmailCommand } from './ResendConfirmationEmail.command'
 import { ServerHelperService } from '@app/server-helper'
 import { createUniqString } from '../../utils/stringUtils'
+
+export class ResendConfirmationEmailCommand {
+	constructor(public readonly email: string) {}
+}
 
 @CommandHandler(ResendConfirmationEmailCommand)
 export class ResendConfirmationEmailHandler

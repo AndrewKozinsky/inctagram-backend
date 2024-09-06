@@ -30,11 +30,11 @@ export class UserRepository {
 		}
 	}
 
-	async getUserByEmailOrName(email: string, name: string) {
+	async getUserByEmailOrName(args: { email?: string; name?: string }) {
 		try {
 			const user = await this.prisma.user.findFirst({
 				where: {
-					OR: [{ email }, { name }],
+					OR: [{ email: args.email }, { name: args.name }],
 				},
 			})
 
@@ -103,14 +103,24 @@ export class UserRepository {
 		return this.mapDbUserToServiceUser(user)
 	}
 
-	async createUser(dto: CreateUserDtoModel, isEmailConfirmed?: boolean) {
-		const newUserParams = {
+	async createUser(
+		dto: CreateUserDtoModel & { githubId?: number; googleId?: number },
+		isEmailConfirmed?: boolean,
+	) {
+		const newUserParams: any = {
 			email: dto.email,
 			name: dto.name,
 			hashed_password: '',
 			email_confirmation_code: '',
 			email_confirmation_code_expiration_date: '',
 			is_email_confirmed: true,
+		}
+
+		if (dto.githubId) {
+			newUserParams.github_id = dto.githubId
+		}
+		if (dto.googleId) {
+			newUserParams.google_id = dto.googleId
 		}
 
 		if (!isEmailConfirmed) {

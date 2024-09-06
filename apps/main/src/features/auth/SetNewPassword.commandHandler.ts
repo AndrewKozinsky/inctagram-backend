@@ -1,8 +1,14 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UserRepository } from '../../repositories/user.repository'
-import { SetNewPasswordCommand } from './SetNewPassword.command'
 import { ErrorCode, ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { HashAdapterService } from '@app/hash-adapter'
+
+export class SetNewPasswordCommand {
+	constructor(
+		public readonly recoveryCode: string,
+		public readonly newPassword: string,
+	) {}
+}
 
 @CommandHandler(SetNewPasswordCommand)
 export class SetNewPasswordHandler implements ICommandHandler<SetNewPasswordCommand> {

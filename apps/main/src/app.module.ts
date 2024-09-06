@@ -6,6 +6,7 @@ import { EmailAdapterModule } from '@app/email-adapter'
 import { HashAdapterModule } from '@app/hash-adapter'
 import { BrowserServiceModule } from '@app/browser-service'
 import { TestsModule } from './routes/test/tests.module'
+import { AuthService } from './routes/auth/auth.service'
 
 @Module({
 	imports: [
@@ -18,6 +19,6 @@ import { TestsModule } from './routes/test/tests.module'
 		AuthModule,
 	],
 	controllers: [],
-	providers: [],
+	providers: [AuthService],
 })
 export class AppModule {}

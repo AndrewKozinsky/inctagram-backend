@@ -2,7 +2,10 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { AuthRepository } from '../../repositories/auth.repository'
-import { LogoutCommand } from './Logout.command'
+
+export class LogoutCommand {
+	constructor(public readonly refreshToken: string) {}
+}
 
 @CommandHandler(LogoutCommand)
 export class LogoutHandler implements ICommandHandler<LogoutCommand> {

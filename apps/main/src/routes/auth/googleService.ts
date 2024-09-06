@@ -98,10 +98,9 @@ export class GoogleService {
 		})
 
 		return {
-			googleId: userInfo.emailAddresses[0].metadata.source.id,
-			googleLogin: userInfo.names[0].displayName,
-			googleName: userInfo.names[0].displayName,
-			googleEmail: userInfo.emailAddresses[0].value,
+			providerId: parseInt(userInfo.emailAddresses[0].metadata.source.id),
+			name: userInfo.names[0].displayName,
+			email: userInfo.emailAddresses[0].value,
 		}
 	}
 }

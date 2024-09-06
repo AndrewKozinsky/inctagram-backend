@@ -149,4 +149,6 @@ export const routesConfig: RoutesConfig.Root = {
 			},
 		],
 	},
+	regByGithubAndGetTokens: { response: [] },
+	regByGoogleAndGetTokens: { response: [] },
 }

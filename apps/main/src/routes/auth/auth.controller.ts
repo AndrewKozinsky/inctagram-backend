@@ -7,12 +7,8 @@ import { CreateUserDtoModel, SetNewPasswordDtoModel } from '../../models/user/us
 import RouteNames from '../routesConfig/routeNames'
 import { CreateUserCommand } from '../../features/user/CreateUser.command'
 import { ServerHelperService } from '@app/server-helper'
-import { LoginCommand } from '../../features/auth/Login.command'
 import { BrowserServiceService } from '@app/browser-service'
 import { CheckDeviceRefreshTokenGuard } from '../../infrastructure/guards/checkDeviceRefreshToken.guard'
-import { LogoutCommand } from '../../features/auth/Logout.command'
-import { ConfirmEmailCommand } from '../../features/auth/ConfirmEmail.command'
-import { ResendConfirmationEmailCommand } from '../../features/auth/ResendConfirmationEmail.command'
 import {
 	ConfirmEmailQueries,
 	GetBlogsQueriesPipe,
@@ -20,8 +16,6 @@ import {
 	PasswordRecoveryDtoModel,
 	ResendConfirmationEmailDtoModel,
 } from '../../models/auth/auth.input.model'
-import { RecoveryPasswordCommand } from '../../features/auth/RecoveryPassword.command'
-import { SetNewPasswordCommand } from '../../features/auth/SetNewPassword.command'
 import { RouteDecorators } from '../routesConfig/routesDecorators'
 import { routesConfig } from '../routesConfig/routesConfig'
 import {
@@ -30,12 +24,19 @@ import {
 	SuccessResponse,
 } from '../routesConfig/createHttpRouteBody'
 import { UserOutModel } from '../../models/user/user.out.model'
-import { GenerateAccessAndRefreshTokensCommand } from '../../features/auth/GenerateAccessAndRefreshTokens.command'
 import { LoginOutModel } from '../../models/auth/auth.output.model'
 import { ApiBearerAuth, ApiCookieAuth, ApiSecurity, ApiTags } from '@nestjs/swagger'
-import { GitHubService } from './gitHubService'
-import { GoogleService } from './googleService'
+import { RegByProviderAndGetTokensCommand } from '../../features/user/RegByGithubAndGetTokens.commandHandler'
+import { AuthService } from './auth.service'
+import { GenerateAccessAndRefreshTokensCommand } from '../../features/auth/GenerateAccessAndRefreshTokens.commandHandler'
+import { ConfirmEmailCommand } from '../../features/auth/ConfirmEmail.commandHandler'
+import { LoginCommand } from '../../features/auth/Login.commandHandler'
+import { ResendConfirmationEmailCommand } from '../../features/auth/ResendConfirmationEmail.commandHandler'
+import { LogoutCommand } from '../../features/auth/Logout.commandHandler'
+import { RecoveryPasswordCommand } from '../../features/auth/RecoveryPassword.commandHandler'
+import { SetNewPasswordCommand } from '../../features/auth/SetNewPassword.commandHandler'
 
+@ApiSecurity('crm-user-token')
 @ApiTags('Auth')
 @Controller(RouteNames.AUTH.value)
 export class AuthController {
@@ -45,8 +46,7 @@ export class AuthController {
 		private readonly browserService: BrowserServiceService,
 		private mainConfig: MainConfigService,
 		private jwtAdapter: JwtAdapterService,
-		private gitHubService: GitHubService,
-		private googleService: GoogleService,
+		private authService: AuthService,
 	) {}
 
 	@Post(RouteNames.AUTH.REGISTRATION.value)
@@ -59,6 +59,70 @@ export class AuthController {
 			return createSuccessResp<UserOutModel>(routesConfig.registration, data)
 		} catch (err: any) {
 			createFailResp(routesConfig.registration, err)
+		}
+	}
+
+	@Get(RouteNames.AUTH.REGISTRATION.value + '/' + RouteNames.AUTH.REGISTRATION.BY_GITHUB.value)
+	@RouteDecorators(routesConfig.refreshToken)
+	async regByGithubAndGetTokens(
+		@Req() req: Request,
+		@Res() res: Response,
+		@Query('code') providerCode: string,
+	) {
+		try {
+			const clientIP = this.browserService.getClientIP(req)
+			const clientName = this.browserService.getClientName(req)
+
+			const { refreshTokenStr, user } = await this.commandBus.execute(
+				new RegByProviderAndGetTokensCommand({
+					clientIP,
+					clientName,
+					providerCode,
+					providerName: 'github',
+				}),
+			)
+
+			this.authService.setRefreshTokenInCookie(res, refreshTokenStr)
+
+			const respData = createSuccessResp<LoginOutModel>(routesConfig.login, {
+				accessToken: this.jwtAdapter.createAccessTokenStr(user.id),
+			})
+
+			res.status(HttpStatus.OK).send(respData)
+		} catch (err: any) {
+			createFailResp(routesConfig.regByGithubAndGetTokens, err)
+		}
+	}
+
+	@Get(RouteNames.AUTH.REGISTRATION.value + '/' + RouteNames.AUTH.REGISTRATION.BY_GOOGLE.value)
+	@RouteDecorators(routesConfig.refreshToken)
+	async regByGoogleAndGetTokens(
+		@Req() req: Request,
+		@Res() res: Response,
+		@Query('code') providerCode: string,
+	) {
+		try {
+			const clientIP = this.browserService.getClientIP(req)
+			const clientName = this.browserService.getClientName(req)
+
+			const { refreshTokenStr, user } = await this.commandBus.execute(
+				new RegByProviderAndGetTokensCommand({
+					clientIP,
+					clientName,
+					providerCode,
+					providerName: 'google',
+				}),
+			)
+
+			this.authService.setRefreshTokenInCookie(res, refreshTokenStr)
+
+			const respData = createSuccessResp<LoginOutModel>(routesConfig.login, {
+				accessToken: this.jwtAdapter.createAccessTokenStr(user.id),
+			})
+
+			res.status(HttpStatus.OK).send(respData)
+		} catch (err: any) {
+			createFailResp(routesConfig.regByGithubAndGetTokens, err)
 		}
 	}
 
@@ -88,11 +152,7 @@ export class AuthController {
 			)
 			const { refreshTokenStr, user } = loginRes
 
-			res.cookie(this.mainConfig.get().refreshToken.name, refreshTokenStr, {
-				maxAge: this.mainConfig.get().refreshToken.lifeDurationInMs / 1000,
-				httpOnly: true,
-				secure: true,
-			})
+			this.authService.setRefreshTokenInCookie(res, refreshTokenStr)
 
 			const respData = createSuccessResp<LoginOutModel>(routesConfig.login, {
 				accessToken: this.jwtAdapter.createAccessTokenStr(user.id),
@@ -116,7 +176,8 @@ export class AuthController {
 		}
 	}
 
-	@ApiBearerAuth()
+	@ApiCookieAuth()
+	// @ApiBearerAuth()
 	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Post(RouteNames.AUTH.LOGOUT.value)
 	@RouteDecorators(routesConfig.logout)
@@ -166,7 +227,7 @@ export class AuthController {
 	@RouteDecorators(routesConfig.refreshToken)
 	async refreshToken(@Req() req: Request, @Res() res: Response) {
 		try {
-			const { newAccessToken, newRefreshToken } = await this.commandBus.execute(
+			const { newAccessToken, newRefreshTokenStr } = await this.commandBus.execute(
 				new GenerateAccessAndRefreshTokensCommand(req.deviceRefreshToken!),
 			)
 
@@ -174,29 +235,11 @@ export class AuthController {
 				accessToken: newAccessToken,
 			})
 
-			res.cookie(this.mainConfig.get().refreshToken.name, newRefreshToken, {
-				maxAge: this.mainConfig.get().refreshToken.lifeDurationInMs / 1000,
-				httpOnly: true,
-				secure: true,
-			})
+			this.authService.setRefreshTokenInCookie(res, newRefreshTokenStr)
 
 			res.status(HttpStatus.OK).send(respData)
 		} catch (err: unknown) {
 			createFailResp(routesConfig.refreshToken, err)
 		}
-	}
-
-	@Get('registration/github')
-	@RouteDecorators(routesConfig.refreshToken)
-	async github(@Query('code') code: string, @Query('code') state: string) {
-		const userInfo = await this.gitHubService.getUserDataByOAuthCode(code)
-		console.log(userInfo)
-	}
-
-	@Get('registration/google')
-	@RouteDecorators(routesConfig.refreshToken)
-	async google(@Query('code') code: string, @Query('code') state: string) {
-		const userInfo = await this.googleService.getUserDataByOAuthCode(code)
-		console.log(userInfo)
 	}
 }

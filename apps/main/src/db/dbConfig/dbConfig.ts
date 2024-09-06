@@ -36,6 +36,18 @@ export const bdConfig = {
 				description: "User's email",
 				required: true,
 			},
+			github_id: {
+				type: 'number',
+				unique: true,
+				description: 'Github ID if user used this way or null',
+				required: false,
+			},
+			google_id: {
+				type: 'number',
+				unique: true,
+				description: 'Google ID if user used this way or null',
+				required: false,
+			},
 			name: {
 				type: 'string',
 				unique: true,
