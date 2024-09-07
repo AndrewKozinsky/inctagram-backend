@@ -5,14 +5,20 @@ import {
 } from '../../infrastructure/exceptionFilters/layerResult'
 import { RoutesConfig } from './routesConfigTypes'
 import { bdConfig } from '../../db/dbConfig/dbConfig'
-import { UserOutModel } from '../../models/user/user.out.model'
 import {
 	LoginOutModel,
 	RecoveryPasswordOutModel,
 	RefreshTokenOutModel,
 } from '../../models/auth/auth.output.model'
+import {
+	SWAuthorizeByProviderRouteOut,
+	SWEmptyRouteOut,
+	SWGetNewAccessAndRefreshTokenRouteOut,
+	SWLoginRouteOut,
+	SWRegistrationRouteOut,
+} from '../auth/swaggerTypes'
 
-export const routesConfig: RoutesConfig.Root = {
+export const routesConfig = {
 	registration: {
 		body: {
 			className: 'CreateUserDtoModel',
@@ -36,11 +42,20 @@ export const routesConfig: RoutesConfig.Root = {
 			{
 				code: SuccessCode.Created_201,
 				description: 'Create new user',
-				dataClass: UserOutModel,
+				dataClass: SWRegistrationRouteOut,
 			},
 			{
 				code: ErrorCode.BadRequest_400,
 				errors: [ErrorMessage.EmailOrUsernameIsAlreadyRegistered],
+			},
+		],
+	},
+	authorizeByProvider: {
+		response: [
+			{
+				code: SuccessCode.Ok,
+				description: 'Registration and login by GitHub',
+				dataClass: SWAuthorizeByProviderRouteOut,
 			},
 		],
 	},
@@ -49,7 +64,7 @@ export const routesConfig: RoutesConfig.Root = {
 			{
 				code: SuccessCode.Ok,
 				description: "User's email was confirmed",
-				dataClass: null,
+				dataClass: SWEmptyRouteOut,
 			},
 			{
 				code: ErrorCode.BadRequest_400,
@@ -66,7 +81,7 @@ export const routesConfig: RoutesConfig.Root = {
 				code: SuccessCode.Ok,
 				description:
 					'User is authorized. Returns JWT accessToken (expired after 30 minutes) in body and JWT refreshToken in cookie (expired after 30 days).',
-				dataClass: LoginOutModel,
+				dataClass: SWLoginRouteOut,
 			},
 			{
 				code: ErrorCode.BadRequest_400,
@@ -83,7 +98,7 @@ export const routesConfig: RoutesConfig.Root = {
 			{
 				code: SuccessCode.Ok,
 				description: 'Confirmation email was sent',
-				dataClass: null,
+				dataClass: SWEmptyRouteOut,
 			},
 			{
 				code: ErrorCode.BadRequest_400,
@@ -101,7 +116,7 @@ export const routesConfig: RoutesConfig.Root = {
 			{
 				code: SuccessCode.Ok,
 				description: 'User was logged out',
-				dataClass: null,
+				dataClass: SWEmptyRouteOut,
 			},
 			{
 				code: ErrorCode.Unauthorized_401,
@@ -127,7 +142,7 @@ export const routesConfig: RoutesConfig.Root = {
 			{
 				code: SuccessCode.Ok,
 				description: 'New password was set',
-				dataClass: null,
+				dataClass: SWEmptyRouteOut,
 			},
 			{
 				code: ErrorCode.BadRequest_400,
@@ -135,13 +150,13 @@ export const routesConfig: RoutesConfig.Root = {
 			},
 		],
 	},
-	refreshToken: {
+	getNewAccessAndRefreshToken: {
 		response: [
 			{
 				code: SuccessCode.Ok,
 				description:
 					'Returns new JWT accessToken (expired after 30 minutes) in body and JWT refreshToken in cookie (expired after 30 days).',
-				dataClass: RefreshTokenOutModel,
+				dataClass: SWGetNewAccessAndRefreshTokenRouteOut,
 			},
 			{
 				code: ErrorCode.Unauthorized_401,
@@ -149,13 +164,4 @@ export const routesConfig: RoutesConfig.Root = {
 			},
 		],
 	},
-	authorizeByProvider: {
-		response: [
-			{
-				code: SuccessCode.Ok,
-				description: 'Registration and login by GitHub',
-				dataClass: RefreshTokenOutModel,
-			},
-		],
-	},
-}
+} satisfies RoutesConfig.Root

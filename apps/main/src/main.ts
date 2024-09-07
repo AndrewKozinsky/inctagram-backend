@@ -15,25 +15,13 @@ async function bootstrap() {
 }
 
 function addSwagger(app: INestApplication<any>) {
-	/*const configSwagger = new DocumentBuilder()
+	const configSwagger = new DocumentBuilder()
 		.setTitle('Inctagram API')
 		.setDescription('The Inctagram API')
 		.setVersion('1.0')
-		/!*.addSecurity('basic', {
-			type: 'http',
-			scheme: 'basic',
-		})*!/
-		/!*.addSecurity('refreshToken', {
-			type: 'http',
-			scheme: 'bearer',
-			bearerFormat: 'JWT',
-			in: 'cookie',
-			name: 'refreshToken',
-		})*!/
 		.addBearerAuth(
 			{
 				type: 'http',
-				scheme: 'bearer',
 				bearerFormat: 'Token',
 			},
 			'access-token',
@@ -43,40 +31,6 @@ function addSwagger(app: INestApplication<any>) {
 			in: 'cookie',
 			name: 'refreshToken',
 		})
-		.build()*/
-
-	const configSwagger = new DocumentBuilder()
-		.setTitle('Trainee platform')
-		.setDescription('The trainee platform API description')
-		.setVersion('1.0')
-		.addApiKey(
-			{
-				type: 'apiKey',
-				name: 'token',
-				in: 'header',
-				description: 'Token for crm',
-			},
-			'crm-user-token',
-		)
-		.addApiKey(
-			{
-				type: 'apiKey',
-				name: 'token',
-				in: 'header',
-				description: 'token for public api',
-			},
-			'trainee-token',
-		)
-		.addApiKey(
-			{
-				type: 'apiKey',
-				in: 'header',
-				name: 'friend-token',
-				description: 'token for friend api',
-			},
-			'friend-token',
-		)
-		// .addCookieAuth('optional-session-id')
 		.build()
 
 	const document = SwaggerModule.createDocument(app, configSwagger)

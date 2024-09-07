@@ -7,7 +7,7 @@ import { CreateRefreshTokenCommand } from '../auth/CreateRefreshToken.commandHan
 import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { GoogleService } from '../../routes/auth/googleService'
 import { FunctionFirstArgument } from '../../types/common'
-import { isLogLevelEnabled } from '@nestjs/common/services/utils'
+import { UserQueryRepository } from '../../repositories/user.queryRepository'
 
 export class RegByProviderAndLoginCommand {
 	constructor(
@@ -24,6 +24,7 @@ export class RegByProviderAndLoginCommand {
 export class RegByProviderAndLoginHandler implements ICommandHandler<RegByProviderAndLoginCommand> {
 	constructor(
 		private userRepository: UserRepository,
+		private userQueryRepository: UserQueryRepository,
 		private readonly commandBus: CommandBus,
 		private gitHubService: GitHubService,
 		private googleService: GoogleService,
@@ -80,11 +81,11 @@ export class RegByProviderAndLoginHandler implements ICommandHandler<RegByProvid
 			new CreateRefreshTokenCommand(userId, clientIP, clientName),
 		)
 
-		const user = await this.userRepository.getUserById(userId)
+		const outUser = await this.userQueryRepository.getUserById(userId)
 
 		return {
 			refreshTokenStr,
-			user,
+			user: outUser!,
 		}
 	}
 

@@ -56,4 +56,18 @@ export const userUtils = {
 
 		return [accessToken, refreshTokenStr]
 	},
+
+	checkUserOutModel(user: any) {
+		expect(typeof user.id).toBe('number')
+		expect(typeof user.email).toBe('string')
+		expect(typeof user.name).toBe('string')
+
+		expect(user.hashedPassword).toBeUndefined()
+		expect(user.emailConfirmationCode).toBeUndefined()
+		expect(user.confirmationCodeExpirationDate).toBeUndefined()
+		expect(user.isEmailConfirmed).toBeUndefined()
+		expect(user.passwordRecoveryCode).toBeUndefined()
+		expect(user.githubId).toBeUndefined()
+		expect(user.googleId).toBeUndefined()
+	},
 }

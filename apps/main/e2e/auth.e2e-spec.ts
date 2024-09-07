@@ -25,7 +25,7 @@ import { AuthRepository } from '../src/repositories/auth.repository'
 import { GitHubService } from '../src/routes/auth/gitHubService'
 import { GoogleService } from '../src/routes/auth/googleService'
 
-it('123', async () => {
+it.only('123', async () => {
 	expect(2).toBe(2)
 })
 
@@ -271,6 +271,7 @@ describe('Auth (e2e)', () => {
 			checkSuccessResponse(login, 200)
 
 			expect(typeof login.data.accessToken).toBe('string')
+			userUtils.checkUserOutModel(login.data.user)
 		})
 	})
 
@@ -576,7 +577,7 @@ describe('Auth (e2e)', () => {
 			}
 		})
 
-		it.only('register an existing user by Github', async () => {
+		it('register an existing user by Github', async () => {
 			const user = await userUtils.createUserWithUnconfirmedEmail(app, userRepository)
 
 			const registerRes = await getRequest(
@@ -598,6 +599,8 @@ describe('Auth (e2e)', () => {
 
 			const register = registerRes.body
 			checkSuccessResponse(register, 200)
+
+			userUtils.checkUserOutModel(register.data.user)
 
 			// Check accessToken in cookie
 			expect(typeof register.data.accessToken).toBe('string')

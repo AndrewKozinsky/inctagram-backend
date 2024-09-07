@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
+import { UserOutModel } from '../user/user.out.model'
 
 export type DeviceTokenOutModel = {
 	issuedAt: string
@@ -12,6 +13,9 @@ export type DeviceTokenOutModel = {
 export class LoginOutModel {
 	@ApiProperty()
 	accessToken: string
+
+	@ApiProperty()
+	user: UserOutModel
 }
 
 export class RecoveryPasswordOutModel {

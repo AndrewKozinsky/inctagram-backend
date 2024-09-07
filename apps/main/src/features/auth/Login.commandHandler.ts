@@ -3,6 +3,7 @@ import { UserRepository } from '../../repositories/user.repository'
 import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { CreateRefreshTokenCommand } from './CreateRefreshToken.commandHandler'
 import { LoginDtoModel } from '../../models/auth/auth.input.model'
+import { UserQueryRepository } from '../../repositories/user.queryRepository'
 
 export class LoginCommand {
 	constructor(
@@ -17,6 +18,7 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 	constructor(
 		private readonly commandBus: CommandBus,
 		private userRepository: UserRepository,
+		private userQueryRepository: UserQueryRepository,
 	) {}
 
 	async execute(command: LoginCommand) {
@@ -39,9 +41,11 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 			new CreateRefreshTokenCommand(user.id, clientIP, clientName),
 		)
 
+		const outUser = await this.userQueryRepository.getUserById(user.id)
+
 		return {
 			refreshTokenStr,
-			user,
+			user: outUser!,
 		}
 	}
 }
