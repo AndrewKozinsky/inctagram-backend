@@ -7,6 +7,7 @@ import { HashAdapterModule } from '@app/hash-adapter'
 import { BrowserServiceModule } from '@app/browser-service'
 import { TestsModule } from './routes/test/tests.module'
 import { AuthService } from './routes/auth/auth.service'
+import { ReCaptchaAdapterModule } from '@app/re-captcha-adapter'
 
 @Module({
 	imports: [
@@ -15,6 +16,7 @@ import { AuthService } from './routes/auth/auth.service'
 		EmailAdapterModule,
 		HashAdapterModule,
 		BrowserServiceModule,
+		ReCaptchaAdapterModule,
 		TestsModule,
 		AuthModule,
 	],

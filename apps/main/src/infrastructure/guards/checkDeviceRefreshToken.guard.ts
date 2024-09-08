@@ -1,10 +1,4 @@
-import {
-	Injectable,
-	CanActivate,
-	ExecutionContext,
-	UnauthorizedException,
-	HttpStatus,
-} from '@nestjs/common'
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { BrowserServiceService } from '@app/browser-service'
 import { AuthRepository } from '../../repositories/auth.repository'
@@ -15,9 +9,9 @@ import { ErrorMessage } from '../exceptionFilters/layerResult'
 @Injectable()
 export class CheckDeviceRefreshTokenGuard implements CanActivate {
 	constructor(
-		private readonly browserService: BrowserServiceService,
+		private browserService: BrowserServiceService,
 		private jwtAdapter: JwtAdapterService,
-		private readonly authRepository: AuthRepository,
+		private authRepository: AuthRepository,
 	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {

@@ -25,6 +25,12 @@ export const bdConfig = {
 				example: 'z151JPS16j',
 				required: true,
 			},
+			recaptchaValue: {
+				type: 'string',
+				minLength: 1,
+				maxLength: 100,
+				required: true,
+			},
 		},
 		dbFields: {
 			id: {

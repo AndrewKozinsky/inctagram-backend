@@ -31,6 +31,24 @@ export class MainConfigService {
 			jwt: {
 				secret: 'secret',
 			},
+			oauth: {
+				github: {
+					clientId: this.configService.get<string>('OAUT_GITHUB_CLIENT_ID') as string,
+					clientSecret: this.configService.get<string>(
+						'OAUT_GITHUB_CLIENT_SECRET',
+					) as string,
+				},
+				google: {
+					clientId: this.configService.get<string>('OAUT_GOOGLE_CLIENT_ID') as string,
+					clientSecret: this.configService.get<string>(
+						'OAUT_GOOGLE_CLIENT_SECRET',
+					) as string,
+				},
+			},
+			reCaptcha: {
+				siteKey: '6Ld9TDkqAAAAANasCQUbpTBVD0ZyJhR8WPqks97f', // It's not a secret
+				serverKey: this.configService.get<string>('RECAPTCHA_SERVER_KEY') as string,
+			},
 		}
 	}
 }

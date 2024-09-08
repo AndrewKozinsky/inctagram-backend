@@ -81,6 +81,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/jwt-adapter/tsconfig.lib.json"
       }
+    },
+    "re-captcha-adapter": {
+      "type": "library",
+      "root": "libs/re-captcha-adapter",
+      "entryFile": "index",
+      "sourceRoot": "libs/re-captcha-adapter/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/re-captcha-adapter/tsconfig.lib.json"
+      }
     }
   }
 }

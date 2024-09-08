@@ -6,7 +6,6 @@ import { UserRepository } from '../../repositories/user.repository'
 import { CreateRefreshTokenCommand } from '../auth/CreateRefreshToken.commandHandler'
 import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { GoogleService } from '../../routes/auth/googleService'
-import { FunctionFirstArgument } from '../../types/common'
 import { UserQueryRepository } from '../../repositories/user.queryRepository'
 
 export class RegByProviderAndLoginCommand {
@@ -49,19 +48,21 @@ export class RegByProviderAndLoginHandler implements ICommandHandler<RegByProvid
 		})
 		let userId = userWithThisEmail?.id || 0
 
-		// Add existing user a new provider id
+		// Add existing user a new provider id if it is GitHub
 		if (userWithThisEmail && providerName === 'github' && !userWithThisEmail.githubId) {
 			await this.addProviderIdToExistingUser(userWithThisEmail.id, {
 				github_id: userInfo.providerId,
 			})
-		} else if (userWithThisEmail && providerName === 'google' && !userWithThisEmail.googleId) {
+		}
+		// Add existing user a new provider id if it is Google
+		else if (userWithThisEmail && providerName === 'google' && !userWithThisEmail.googleId) {
 			await this.addProviderIdToExistingUser(userWithThisEmail.id, {
 				google_id: userInfo.providerId,
 			})
 		}
 		// Or create a new user
 		else if (!userWithThisEmail) {
-			const args: FunctionFirstArgument<typeof this.createNewUser> = {
+			const args: any = {
 				email: userInfo.email,
 				name: userInfo.name,
 			}

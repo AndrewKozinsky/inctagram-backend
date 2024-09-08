@@ -24,7 +24,7 @@ import { routesConfig } from '../routesConfig/routesConfig'
 import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
 import { UserOutModel } from '../../models/user/user.out.model'
 import { LoginOutModel } from '../../models/auth/auth.output.model'
-import { ApiBearerAuth, ApiCookieAuth, ApiSecurity, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiCookieAuth, ApiTags } from '@nestjs/swagger'
 import {
 	RegByProviderAndLoginCommand,
 	RegByProviderAndLoginHandler,
@@ -55,6 +55,8 @@ import {
 	SWPasswordRecoveryRouteOut,
 	SWRegistrationRouteOut,
 } from './swaggerTypes'
+import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
+import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 
 @ApiTags('Auth')
 @Controller(RouteNames.AUTH.value)
@@ -66,6 +68,7 @@ export class AuthController {
 		private mainConfig: MainConfigService,
 		private jwtAdapter: JwtAdapterService,
 		private authService: AuthService,
+		private reCaptchaAdapter: ReCaptchaAdapterService,
 	) {}
 
 	@Post(RouteNames.AUTH.REGISTRATION.value)
@@ -210,6 +213,12 @@ export class AuthController {
 		@Body() body: PasswordRecoveryDtoModel,
 	): Promise<SWPasswordRecoveryRouteOut | undefined> {
 		try {
+			const isCaptchaValid = await this.reCaptchaAdapter.isValid(body.recaptchaValue)
+
+			if (!isCaptchaValid) {
+				throw new Error(ErrorMessage.CaptchaIsWrong)
+			}
+
 			const commandRes = await this.commandBus.execute<
 				any,
 				ReturnType<typeof RecoveryPasswordHandler.prototype.execute>

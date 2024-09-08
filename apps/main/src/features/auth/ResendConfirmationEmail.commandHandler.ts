@@ -16,7 +16,6 @@ export class ResendConfirmationEmailHandler
 	constructor(
 		private userRepository: UserRepository,
 		private emailAdapter: EmailAdapterService,
-		private serverHelper: ServerHelperService,
 	) {}
 
 	async execute(command: ResendConfirmationEmailCommand) {

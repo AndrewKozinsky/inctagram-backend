@@ -14,7 +14,6 @@ export class RecoveryPasswordHandler
 	implements ICommandHandler<RecoveryPasswordCommand, null | { recoveryCode: string }>
 {
 	constructor(
-		private serverHelper: ServerHelperService,
 		private userRepository: UserRepository,
 		private emailAdapter: EmailAdapterService,
 	) {}

@@ -12,7 +12,6 @@ import { createUniqString } from '../utils/stringUtils'
 export class UserRepository {
 	constructor(
 		private prisma: PrismaService,
-		private serverHelper: ServerHelperService,
 		private hashAdapter: HashAdapterService,
 	) {}
 

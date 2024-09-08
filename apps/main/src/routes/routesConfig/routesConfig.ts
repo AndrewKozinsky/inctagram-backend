@@ -133,7 +133,7 @@ export const routesConfig = {
 			},
 			{
 				code: ErrorCode.BadRequest_400,
-				errors: [ErrorMessage.UserNotFound],
+				errors: [ErrorMessage.UserNotFound, ErrorMessage.CaptchaIsWrong],
 			},
 		],
 	},

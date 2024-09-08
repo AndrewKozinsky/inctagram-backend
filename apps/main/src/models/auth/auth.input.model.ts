@@ -35,4 +35,7 @@ export class LoginDtoModel {
 export class PasswordRecoveryDtoModel {
 	@DtoFieldDecorators('email', bdConfig.User.dbFields.email)
 	email: string
+
+	@DtoFieldDecorators('email', bdConfig.User.dtoProps.recaptchaValue)
+	recaptchaValue: string
 }

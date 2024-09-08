@@ -13,7 +13,16 @@ declare global {
 declare global {
 	namespace NodeJS {
 		interface ProcessEnv {
+			MODE: 'TEST'
 			DATABASE_URL: string
+			DATABASE_URL_DOCKER: string
+			DATABASE_URL_NEON: string
+			MAIN_MICROSERVICE_PORT: number
+			OAUT_GITHUB_CLIENT_ID: string
+			OAUT_GITHUB_CLIENT_SECRET: string
+			OAUT_GOOGLE_CLIENT_ID: string
+			OAUT_GOOGLE_CLIENT_SECRET: string
+			RECAPTCHA_SERVER_KEY: string
 		}
 	}
 }

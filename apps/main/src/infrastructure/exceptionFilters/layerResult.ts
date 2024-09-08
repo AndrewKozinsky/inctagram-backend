@@ -19,4 +19,5 @@ export enum ErrorMessage {
 	EmailNotFound = 'Email not found',
 	UserNotFound = 'User not found',
 	RefreshTokenIsNotValid = 'Refresh token is not valid',
+	CaptchaIsWrong = 'Captcha is wrong',
 }

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { UserInfoFromProvider } from './gitHubService'
+import { MainConfigService } from '@app/config'
 
 type UserInfo = {
 	resourceName: string // 'people/108179069609078490986'
@@ -25,7 +26,7 @@ type UserInfo = {
 
 @Injectable()
 export class GoogleService {
-	constructor() {}
+	constructor(private mainConfig: MainConfigService) {}
 
 	async getUserDataByOAuthCode(code: string) {
 		const accessToken = await this.getAccessToken(code)
@@ -34,8 +35,8 @@ export class GoogleService {
 
 	async getAccessToken(code: string): Promise<string> {
 		const params = new URLSearchParams({
-			client_id: '792546249106-u5of55jk4hus635kpd936g5968b62a1c.apps.googleusercontent.com',
-			client_secret: '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',
+			client_id: this.mainConfig.get().oauth.google.clientId,
+			client_secret: this.mainConfig.get().oauth.google.clientId,
 			code,
 			grant_type: 'authorization_code',
 			redirect_uri: 'http://localhost:3000/api/v1/auth/registration/google',

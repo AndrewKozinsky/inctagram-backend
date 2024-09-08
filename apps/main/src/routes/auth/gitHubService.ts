@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { MainConfigService } from '@app/config'
 
 type UserMetaInfo = {
 	login: string // 'AndrewKozinsky'
@@ -18,7 +19,7 @@ export type UserInfoFromProvider = {
 
 @Injectable()
 export class GitHubService {
-	constructor() {}
+	constructor(private mainConfig: MainConfigService) {}
 
 	async getUserDataByOAuthCode(code: string) {
 		const accessToken = await this.getAccessToken(code)
@@ -27,8 +28,8 @@ export class GitHubService {
 
 	async getAccessToken(code: string): Promise<string> {
 		const params = new URLSearchParams({
-			client_id: 'Ov23lix6EdcGrBfP7Bee',
-			client_secret: '7cb6f03660fc6b97b8ca6e3b296665319bbba05e',
+			client_id: this.mainConfig.get().oauth.github.clientId,
+			client_secret: this.mainConfig.get().oauth.github.clientSecret,
 			code,
 		}).toString()
 
