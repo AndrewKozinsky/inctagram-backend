@@ -29,6 +29,6 @@ model DeviceToken {
 	device_ip	String
 	device_id	String
 	device_name	String
-	user User @relation(fields: [userId], references: [id])
-	userId Int
+	user User @relation(fields: [user_id], references: [id])
+	user_id Int
 }

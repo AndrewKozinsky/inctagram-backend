@@ -39,13 +39,3 @@ export function createFailResp(routeConfig: RoutesConfig.Route, err: any) {
 	const errorAnswerConfig = errorAnswerConfigs.find((conf) => conf.errors.includes(message))
 	throw CustomException(errorAnswerConfig?.code || '420', message)
 }
-
-// DELETE
-/*export async function createHttpRouteBody(routeConfig: RoutesConfig.Route, executor: any) {
-	try {
-		const data = await executor
-		return createSuccessResp(routeConfig, data)
-	} catch (err: any) {
-		createFailResp(routeConfig, err)
-	}
-}*/

@@ -38,6 +38,19 @@ export const RouteNames = {
 			full: 'auth/new-password',
 		},
 	},
+	SECURITY: {
+		value: 'security',
+		DEVICES: {
+			value: 'devices',
+			full: 'security/devices',
+			DEVICE_ID(deviceId: string) {
+				return {
+					value: deviceId,
+					full: 'security/devices/' + deviceId,
+				}
+			},
+		},
+	},
 	TESTING: {
 		value: 'testing',
 		ALL_DATA: {

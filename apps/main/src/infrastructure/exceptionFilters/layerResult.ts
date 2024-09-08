@@ -20,4 +20,7 @@ export enum ErrorMessage {
 	UserNotFound = 'User not found',
 	RefreshTokenIsNotValid = 'Refresh token is not valid',
 	CaptchaIsWrong = 'Captcha is wrong',
+	RefreshTokenIsNotFound = 'Refresh token is not found',
+	UserDoesNotOwnThisDeviceToken = 'User does not own this device token',
+	UserDeviceNotFound = 'User device not found',
 }

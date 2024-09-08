@@ -82,7 +82,7 @@ export class AuthController {
 				ReturnType<typeof CreateUserHandler.prototype.execute>
 			>(new CreateUserCommand(body))
 
-			return createSuccessResp<UserOutModel>(routesConfig.registration, commandRes)
+			return createSuccessResp(routesConfig.registration, commandRes)
 		} catch (err: any) {
 			createFailResp(routesConfig.registration, err)
 		}

@@ -138,7 +138,7 @@ export const bdConfig = {
 			},
 			user_id: {
 				type: 'manyToOne',
-				thisField: 'userId',
+				thisField: 'user_id',
 				foreignTable: 'User',
 				foreignField: 'id',
 			},

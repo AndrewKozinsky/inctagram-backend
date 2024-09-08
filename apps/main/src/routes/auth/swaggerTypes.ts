@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger'
 
 export class SWEmptyRouteOut {
 	@ApiProperty({ default: 'success' })
-	status: string // 'success'
+	status: string
 
 	@ApiProperty()
 	code: number
@@ -13,7 +13,7 @@ export class SWEmptyRouteOut {
 
 export class SWRegistrationRouteOut {
 	@ApiProperty({ default: 'success' })
-	status: string // 'success'
+	status: string
 
 	@ApiProperty()
 	code: number
@@ -35,7 +35,7 @@ export class SWRegistrationRouteOut {
 
 export class SWAuthorizeByProviderRouteOut {
 	@ApiProperty({ default: 'success' })
-	status: string // 'success'
+	status: string
 
 	@ApiProperty()
 	code: number
@@ -66,7 +66,7 @@ export class SWAuthorizeByProviderRouteOut {
 
 export class SWLoginRouteOut {
 	@ApiProperty({ default: 'success' })
-	status: string // 'success'
+	status: string
 
 	@ApiProperty()
 	code: number
@@ -97,7 +97,7 @@ export class SWLoginRouteOut {
 
 export class SWPasswordRecoveryRouteOut {
 	@ApiProperty({ default: 'success' })
-	status: string // 'success'
+	status: string
 
 	@ApiProperty()
 	code: number
@@ -115,7 +115,7 @@ export class SWPasswordRecoveryRouteOut {
 
 export class SWGetNewAccessAndRefreshTokenRouteOut {
 	@ApiProperty({ default: 'success' })
-	status: string // 'success'
+	status: string
 
 	@ApiProperty()
 	code: number
@@ -129,4 +129,31 @@ export class SWGetNewAccessAndRefreshTokenRouteOut {
 	data: {
 		accessToken: string
 	}
+}
+
+export class SWGetUserDevicesRouteOut {
+	@ApiProperty({ default: 'success' })
+	status: string
+
+	@ApiProperty()
+	code: number
+
+	@ApiProperty({
+		type: 'array',
+		items: {
+			type: 'object',
+			properties: {
+				ip: { type: 'string' },
+				title: { type: 'string' },
+				lastActiveDate: { type: 'string' },
+				deviceId: { type: 'string' },
+			},
+		},
+	})
+	data: {
+		ip: string
+		title: string
+		lastActiveDate: string
+		deviceId: string
+	}[]
 }

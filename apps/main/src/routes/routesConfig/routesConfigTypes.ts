@@ -5,12 +5,13 @@ import {
 } from '../../infrastructure/exceptionFilters/layerResult'
 import { AuthController } from '../auth/auth.controller'
 import { BdConfig } from '../../db/dbConfig/dbConfigType'
+import { SecurityController } from '../security/security.controller'
 
 type MethodNames<T> = {
 	[K in keyof T]: T[K] extends (...args: any[]) => any ? K : never
 }[keyof T]
 
-type RouteName = MethodNames<AuthController>
+type RouteName = MethodNames<AuthController & SecurityController>
 
 export namespace RoutesConfig {
 	export type Root = Record<RouteName, Route>
@@ -18,17 +19,6 @@ export namespace RoutesConfig {
 	export type Route = {
 		body?: Body
 		response: Response
-	}
-
-	export type Body = {
-		className: string
-		filePath: string
-		fields: Record<string, BodyField>
-	}
-
-	export type BodyField = {
-		type: 'string'
-		config: BdConfig.Field
 	}
 
 	export type Response = (ResponseSuccessBlock | ResponseErrorBlock)[]

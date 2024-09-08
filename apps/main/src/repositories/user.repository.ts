@@ -7,12 +7,14 @@ import { PrismaService } from '../db/prisma.service'
 import { CreateUserDtoModel } from '../models/user/user.input.model'
 import { UserServiceModel } from '../models/user/user.service.model'
 import { createUniqString } from '../utils/stringUtils'
+import { JwtAdapterService } from '@app/jwt-adapter'
 
 @Injectable()
 export class UserRepository {
 	constructor(
 		private prisma: PrismaService,
 		private hashAdapter: HashAdapterService,
+		private jwtAdapter: JwtAdapterService,
 	) {}
 
 	async getUserByEmail(email: string) {
@@ -95,6 +97,24 @@ export class UserRepository {
 	async getUserByPasswordRecoveryCode(password_recovery_code: string) {
 		const user = await this.prisma.user.findFirst({
 			where: { password_recovery_code },
+		})
+
+		if (!user) return null
+
+		return this.mapDbUserToServiceUser(user)
+	}
+
+	async getUserByRefreshToken(refreshTokenStr: string) {
+		const refreshTokenData = this.jwtAdapter.getRefreshTokenDataFromTokenStr(refreshTokenStr)
+
+		const device = await this.prisma.deviceToken.findFirst({
+			where: { device_id: refreshTokenData!.deviceId },
+		})
+
+		if (!device) return null
+
+		const user = await this.prisma.user.findFirst({
+			where: { id: device.user_id },
 		})
 
 		if (!user) return null

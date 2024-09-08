@@ -4,40 +4,18 @@ import {
 	SuccessCode,
 } from '../../infrastructure/exceptionFilters/layerResult'
 import { RoutesConfig } from './routesConfigTypes'
-import { bdConfig } from '../../db/dbConfig/dbConfig'
-import {
-	LoginOutModel,
-	RecoveryPasswordOutModel,
-	RefreshTokenOutModel,
-} from '../../models/auth/auth.output.model'
+import { RecoveryPasswordOutModel } from '../../models/auth/auth.output.model'
 import {
 	SWAuthorizeByProviderRouteOut,
 	SWEmptyRouteOut,
 	SWGetNewAccessAndRefreshTokenRouteOut,
+	SWGetUserDevicesRouteOut,
 	SWLoginRouteOut,
 	SWRegistrationRouteOut,
 } from '../auth/swaggerTypes'
 
 export const routesConfig = {
 	registration: {
-		body: {
-			className: 'CreateUserDtoModel',
-			filePath: 'auth/CreateUserDtoModel',
-			fields: {
-				name: {
-					type: 'string',
-					config: bdConfig.User.dbFields.name,
-				},
-				password: {
-					type: 'string',
-					config: bdConfig.User.dtoProps.password,
-				},
-				email: {
-					type: 'string',
-					config: bdConfig.User.dbFields.email,
-				},
-			},
-		},
 		response: [
 			{
 				code: SuccessCode.Created_201,
@@ -161,6 +139,33 @@ export const routesConfig = {
 			{
 				code: ErrorCode.Unauthorized_401,
 				errors: [ErrorMessage.RefreshTokenIsNotValid, ErrorMessage.UserNotFound],
+			},
+		],
+	},
+	getUserDevices: {
+		response: [
+			{
+				code: SuccessCode.Ok,
+				description: 'Returns all user devices.',
+				dataClass: SWGetUserDevicesRouteOut,
+			},
+		],
+	},
+	terminateUserDevicesExceptOne: {
+		response: [
+			{
+				code: SuccessCode.Ok,
+				description: "All other user's devices were terminated",
+				dataClass: SWEmptyRouteOut,
+			},
+		],
+	},
+	terminateUserDevice: {
+		response: [
+			{
+				code: SuccessCode.Ok,
+				description: 'This device is terminated',
+				dataClass: SWEmptyRouteOut,
 			},
 		],
 	},

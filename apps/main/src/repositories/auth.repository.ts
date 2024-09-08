@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common'
 import { DeviceToken } from '@prisma/client'
-import { PrismaService } from '../db/prisma.service'
-import { DeviceTokenServiceModel } from '../models/auth/auth.service.model'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { addMilliseconds } from 'date-fns'
 import { MainConfigService } from '@app/config'
+import { PrismaService } from '../db/prisma.service'
+import { DeviceTokenServiceModel } from '../models/auth/auth.service.model'
 
 @Injectable()
 export class AuthRepository {
@@ -20,7 +20,7 @@ export class AuthRepository {
 		const deviceToken = await this.prisma.deviceToken.create({
 			data: {
 				issued_at: new Date(deviceRefreshToken.issuedAt).toISOString(),
-				userId: deviceRefreshToken.userId,
+				user_id: deviceRefreshToken.userId,
 				expiration_date: new Date(deviceRefreshToken.expirationDate).toISOString(),
 				device_ip: deviceRefreshToken.deviceIP,
 				device_id: deviceRefreshToken.deviceId,
@@ -78,7 +78,7 @@ export class AuthRepository {
 			deviceIP: dbDeviceToken.device_ip,
 			deviceId: dbDeviceToken.device_id,
 			deviceName: dbDeviceToken.device_name,
-			userId: dbDeviceToken.userId,
+			userId: dbDeviceToken.user_id,
 		}
 	}
 }
