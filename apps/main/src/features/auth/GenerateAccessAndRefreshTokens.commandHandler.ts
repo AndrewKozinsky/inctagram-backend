@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
+import { JwtAdapterService } from '@app/jwt-adapter'
 import { UserRepository } from '../../repositories/user.repository'
 import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
-import { JwtAdapterService } from '@app/jwt-adapter'
 import { DeviceTokenOutModel } from '../../models/auth/auth.output.model'
 import { SecurityRepository } from '../../repositories/security.repository'
 
