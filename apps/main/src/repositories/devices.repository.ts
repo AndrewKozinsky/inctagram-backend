@@ -8,7 +8,7 @@ import { DeviceTokenServiceModel } from '../models/auth/auth.service.model'
 import { DeviceRefreshTokenServiceModel } from '../models/security/security.service.model'
 
 @Injectable()
-export class SecurityRepository {
+export class DevicesRepository {
 	constructor(
 		private prisma: PrismaService,
 		private jwtAdapter: JwtAdapterService,

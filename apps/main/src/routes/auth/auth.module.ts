@@ -22,7 +22,7 @@ import { RegByProviderAndLoginHandler } from '../../features/user/RegByGithubAnd
 import { CreateRefreshTokenHandler } from '../../features/auth/CreateRefreshToken.commandHandler'
 import { AuthService } from './auth.service'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
-import { SecurityRepository } from '../../repositories/security.repository'
+import { DevicesRepository } from '../../repositories/devices.repository'
 
 const services = [
 	GitHubService,
@@ -36,7 +36,7 @@ const services = [
 	ReCaptchaAdapterService,
 ]
 
-const repositories = [UserRepository, UserQueryRepository, SecurityRepository]
+const repositories = [UserRepository, UserQueryRepository, DevicesRepository]
 
 const commandHandlers = [
 	CreateUserHandler,

@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UserRepository } from '../../repositories/user.repository'
 import { JwtAdapterService } from '@app/jwt-adapter'
-import { SecurityRepository } from '../../repositories/security.repository'
+import { DevicesRepository } from '../../repositories/devices.repository'
 
 export class TerminateAllDeviceRefreshTokensApartThisCommand {
 	constructor(public readonly refreshTokenStr: string) {}
@@ -13,7 +13,7 @@ export class TerminateAllDeviceRefreshTokensApartThisHandler
 {
 	constructor(
 		private userRepository: UserRepository,
-		private securityRepository: SecurityRepository,
+		private securityRepository: DevicesRepository,
 		private jwtAdapter: JwtAdapterService,
 	) {}
 

@@ -5,15 +5,15 @@ import { MainConfigService } from '@app/config'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { UserRepository } from '../../repositories/user.repository'
 import { UserQueryRepository } from '../../repositories/user.queryRepository'
-import { SecurityController } from './security.controller'
-import { SecurityRepository } from '../../repositories/security.repository'
-import { SecurityQueryRepository } from '../../repositories/security.queryRepository'
+import { DevicesController } from './devices.controller'
+import { DevicesRepository } from '../../repositories/devices.repository'
+import { DevicesQueryRepository } from '../../repositories/devices.queryRepository'
 import { TerminateUserDeviceHandler } from '../../features/security/TerminateUserDevice.commandHandler'
 import { TerminateAllDeviceRefreshTokensApartThisHandler } from '../../features/security/TerminateAllDeviceRefreshTokensApartThis.commandHandler'
 
-const services = [PrismaService, MainConfigService, JwtAdapterService, SecurityQueryRepository]
+const services = [PrismaService, MainConfigService, JwtAdapterService, DevicesQueryRepository]
 
-const repositories = [UserRepository, UserQueryRepository, SecurityRepository]
+const repositories = [UserRepository, UserQueryRepository, DevicesRepository]
 
 const commandHandlers = [
 	TerminateUserDeviceHandler,
@@ -22,7 +22,7 @@ const commandHandlers = [
 
 @Module({
 	imports: [CqrsModule],
-	controllers: [SecurityController],
+	controllers: [DevicesController],
 	providers: [...services, ...repositories, ...commandHandlers],
 })
-export class SecurityModule {}
+export class DevicesModule {}

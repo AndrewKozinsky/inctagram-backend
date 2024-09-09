@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { JwtAdapterService } from '@app/jwt-adapter'
-import { SecurityRepository } from '../../repositories/security.repository'
+import { DevicesRepository } from '../../repositories/devices.repository'
 
 export class CreateRefreshTokenCommand {
 	constructor(
@@ -14,7 +14,7 @@ export class CreateRefreshTokenCommand {
 export class CreateRefreshTokenHandler implements ICommandHandler<CreateRefreshTokenCommand> {
 	constructor(
 		private jwtAdapter: JwtAdapterService,
-		private securityRepository: SecurityRepository,
+		private securityRepository: DevicesRepository,
 	) {}
 
 	async execute(command: CreateRefreshTokenCommand) {

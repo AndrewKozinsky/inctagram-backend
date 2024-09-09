@@ -3,7 +3,7 @@ import { JwtAdapterService } from '@app/jwt-adapter'
 import { UserRepository } from '../../repositories/user.repository'
 import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { DeviceTokenOutModel } from '../../models/auth/auth.output.model'
-import { SecurityRepository } from '../../repositories/security.repository'
+import { DevicesRepository } from '../../repositories/devices.repository'
 
 export class GenerateAccessAndRefreshTokensCommand {
 	constructor(public readonly deviceRefreshToken: DeviceTokenOutModel) {}
@@ -15,7 +15,7 @@ export class GenerateAccessAndRefreshTokensHandler
 {
 	constructor(
 		private userRepository: UserRepository,
-		private securityRepository: SecurityRepository,
+		private securityRepository: DevicesRepository,
 		private jwtAdapter: JwtAdapterService,
 	) {}
 

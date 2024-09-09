@@ -14,7 +14,7 @@ import {
 import { UserRepository } from './user.repository'
 
 @Injectable()
-export class SecurityQueryRepository {
+export class DevicesQueryRepository {
 	constructor(
 		private prisma: PrismaService,
 		private userRepository: UserRepository,
