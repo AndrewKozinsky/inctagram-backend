@@ -1,9 +1,14 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { EmailAdapterService } from '@app/email-adapter'
-import { CreateUserCommand } from './CreateUser.command'
 import { UserRepository } from '../../repositories/user.repository'
-import { ErrorMessage } from '../../../../../libs/layerResult'
+import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { UserQueryRepository } from '../../repositories/user.queryRepository'
+import { CreateUserDtoModel } from '../../models/user/user.input.model'
+import { UserOutModel } from '../../models/user/user.out.model'
+
+export class CreateUserCommand {
+	constructor(public readonly createUserDto: CreateUserDtoModel) {}
+}
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
@@ -16,10 +21,10 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 	async execute(command: CreateUserCommand) {
 		const { createUserDto } = command
 
-		const existingUser = await this.userRepository.getUserByEmailOrName(
-			createUserDto.email,
-			createUserDto.name,
-		)
+		const existingUser = await this.userRepository.getUserByEmailOrName({
+			email: createUserDto.email,
+			name: createUserDto.name,
+		})
 
 		if (existingUser) {
 			if (existingUser.isEmailConfirmed) {
@@ -36,6 +41,6 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 			createdUser.emailConfirmationCode!,
 		)
 
-		return await this.userQueryRepository.getUserById(createdUser.id)
+		return (await this.userQueryRepository.getUserById(createdUser.id)) as UserOutModel
 	}
 }

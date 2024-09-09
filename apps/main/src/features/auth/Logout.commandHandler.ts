@@ -1,14 +1,16 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
-import { ErrorCode } from '../../../../../libs/layerResult'
 import { JwtAdapterService } from '@app/jwt-adapter'
-import { AuthRepository } from '../../repositories/auth.repository'
-import { LogoutCommand } from './Logout.command'
-import { CustomException } from '../../utils/misc'
+import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
+import { SecurityRepository } from '../../repositories/security.repository'
+
+export class LogoutCommand {
+	constructor(public readonly refreshToken: string) {}
+}
 
 @CommandHandler(LogoutCommand)
 export class LogoutHandler implements ICommandHandler<LogoutCommand> {
 	constructor(
-		private authRepository: AuthRepository,
+		private securityRepository: SecurityRepository,
 		private jwtAdapter: JwtAdapterService,
 	) {}
 
@@ -16,14 +18,13 @@ export class LogoutHandler implements ICommandHandler<LogoutCommand> {
 		const { refreshToken } = command
 
 		const refreshTokenInDb =
-			await this.authRepository.getDeviceRefreshTokenByTokenStr(refreshToken)
+			await this.securityRepository.getDeviceRefreshTokenByTokenStr(refreshToken)
 
 		if (!refreshTokenInDb || !this.jwtAdapter.isRefreshTokenStrValid(refreshToken)) {
-			// !!!!!!
-			throw new Error(ErrorCode.Unauthorized_401)
+			throw new Error(ErrorMessage.RefreshTokenIsNotValid)
 		}
 
-		await this.authRepository.deleteDeviceRefreshTokenByDeviceId(refreshTokenInDb.deviceId)
+		await this.securityRepository.deleteRefreshTokenByDeviceId(refreshTokenInDb.deviceId)
 
 		return null
 	}

@@ -4,9 +4,9 @@ import { useContainer } from 'class-validator'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { AppModule } from '../app.module'
 import { NextFunction, Request, Response } from 'express'
-import { SetReqUserMiddleware } from '../middlewares/setReqUser.middleware'
+import { SetReqUserMiddleware } from './middlewares/setReqUser.middleware'
 import { UserRepository } from '../repositories/user.repository'
-import { ErrorExceptionFilter } from '../infrastructure/exceptionFilters/exception.filter'
+import { ErrorExceptionFilter } from './exceptionFilters/exception.filter'
 
 export function applyAppSettings(app: INestApplication) {
 	app.use(cookieParser())

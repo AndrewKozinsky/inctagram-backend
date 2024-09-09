@@ -6,6 +6,9 @@ import { EmailAdapterModule } from '@app/email-adapter'
 import { HashAdapterModule } from '@app/hash-adapter'
 import { BrowserServiceModule } from '@app/browser-service'
 import { TestsModule } from './routes/test/tests.module'
+import { AuthService } from './routes/auth/auth.service'
+import { ReCaptchaAdapterModule } from '@app/re-captcha-adapter'
+import { SecurityModule } from './routes/security/security.module'
 
 @Module({
 	imports: [
@@ -14,10 +17,12 @@ import { TestsModule } from './routes/test/tests.module'
 		EmailAdapterModule,
 		HashAdapterModule,
 		BrowserServiceModule,
+		ReCaptchaAdapterModule,
 		TestsModule,
 		AuthModule,
+		SecurityModule,
 	],
 	controllers: [],
-	providers: [],
+	providers: [AuthService],
 })
 export class AppModule {}

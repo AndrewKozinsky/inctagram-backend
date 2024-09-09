@@ -1,9 +1,14 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UserRepository } from '../../repositories/user.repository'
-import { SetNewPasswordCommand } from './SetNewPassword.command'
-import { ErrorCode } from '../../../../../libs/layerResult'
+import { ErrorCode, ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { HashAdapterService } from '@app/hash-adapter'
-import { CustomException } from '../../utils/misc'
+
+export class SetNewPasswordCommand {
+	constructor(
+		public readonly recoveryCode: string,
+		public readonly newPassword: string,
+	) {}
+}
 
 @CommandHandler(SetNewPasswordCommand)
 export class SetNewPasswordHandler implements ICommandHandler<SetNewPasswordCommand> {
@@ -18,8 +23,7 @@ export class SetNewPasswordHandler implements ICommandHandler<SetNewPasswordComm
 		const user = await this.userRepository.getUserByPasswordRecoveryCode(recoveryCode)
 
 		if (!user) {
-			// !!!!!!
-			throw new Error(ErrorCode.BadRequest_400)
+			throw new Error(ErrorMessage.UserNotFound)
 		}
 
 		const newHashedPassword = await this.hashAdapter.hashString(newPassword)

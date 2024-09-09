@@ -16,6 +16,7 @@
     "test:e2e": "NODE_ENV=TEST jest --config apps/main/e2e/jest-e2e.json --runInBand",
     "test:cov": "NODE_ENV=TEST jest --coverage",
     "migrate:dev": "prisma migrate dev",
+    "migrate:deploy": "prisma migrate deploy",
     "migrate:generate-types": "prisma generate",
     "generatePrismaFile": "ts-node apps/main/src/db/prismaGenerator/generatePrismaSchemaFile.ts"
   },
@@ -95,7 +96,8 @@
       "^@app/email-adapter(|/.*)$": "<rootDir>/libs/email-adapter/src/$1",
       "^@app/hash-adapter(|/.*)$": "<rootDir>/libs/hash-adapter/src/$1",
       "^@app/browser-service(|/.*)$": "<rootDir>/libs/browser-service/src/$1",
-      "^@app/jwt-adapter(|/.*)$": "<rootDir>/libs/jwt-adapter/src/$1"
+      "^@app/jwt-adapter(|/.*)$": "<rootDir>/libs/jwt-adapter/src/$1",
+      "^@app/re-captcha-adapter(|/.*)$": "<rootDir>/libs/re-captcha-adapter/src/$1"
     }
   }
 }

@@ -18,7 +18,7 @@ export const bdTestConfig = {
 				unique: true,
 				required: true,
 			},
-			isEmailConfirmed: {
+			is_email_confirmed: {
 				type: 'boolean',
 				default: false,
 				required: true,
@@ -34,13 +34,13 @@ export const bdTestConfig = {
 			id: {
 				type: 'index',
 			},
-			deviceIP: {
+			device_ip: {
 				type: 'string',
 				required: true,
 			},
-			userId: {
+			user_id: {
 				type: 'manyToOne',
-				thisField: 'userId',
+				thisField: 'user_id',
 				foreignTable: 'User',
 				foreignField: 'id',
 			},
@@ -64,15 +64,15 @@ model User {
 	id	Int	@id	@default(autoincrement())
 	email	String	@unique
 	name	String	@unique
-	isEmailConfirmed	Boolean	@default(false)
+	is_email_confirmed	Boolean	@default(false)
 	DeviceToken	DeviceToken[]
 }
 
 model DeviceToken {
 	id	Int	@id	@default(autoincrement())
-	deviceIP	String
-	user User @relation(fields: [userId], references: [id])
-	userId Int
+	device_ip	String
+	user User @relation(fields: [user_id], references: [id])
+	user_id Int
 }`
 
 		const generatedPrismaSchema = createSchemaPrisma(bdTestConfig)

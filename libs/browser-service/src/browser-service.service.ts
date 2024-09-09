@@ -20,8 +20,8 @@ export class BrowserServiceService {
 		return browserInfo.browser + ' ' + browserInfo.version
 	}
 
-	getRefreshTokenStrFromReq(req: Request): null | string {
-		if (!req.cookies) return null
+	getRefreshTokenStrFromReq(req: Request): string {
+		if (!req.cookies) return ''
 
 		const { refreshToken } = this.mainConfig.get()
 		return req.cookies[refreshToken.name]

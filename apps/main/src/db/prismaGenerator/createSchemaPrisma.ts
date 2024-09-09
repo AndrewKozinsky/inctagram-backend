@@ -83,7 +83,7 @@ model ${tableName} {
 		} else if (field.type === 'number') {
 			columnsArr.push(`\t${dbFieldName}	Int` + createColumnAttrs(field))
 		} else if (field.type === 'manyToOne') {
-			columnsArr.push(...createManyToOneColumn(bdConfig, dbFieldName, field))
+			columnsArr.push(...createManyToOneColumn(field))
 		} else if (field.type === 'oneToMany') {
 			columnsArr.push(`\t${dbFieldName}	${dbFieldName}[]`)
 		}
@@ -143,17 +143,14 @@ function createColumnAttrs(columnConfig: BdConfig.Field) {
  * 	and returns an array with 2 strings:
  * 	['author User @relation(fields: [authorId], references: [id])', userId  Int]
  * }
- * @param dbConfig
- * @param fieldName
  * @param fieldConfig
  */
-function createManyToOneColumn(
-	dbConfig: BdConfig.Root,
-	fieldName: string,
-	fieldConfig: BdConfig.ManyToOneField,
-) {
+function createManyToOneColumn(fieldConfig: BdConfig.ManyToOneField) {
 	// Get first column name from thisField name: userId -> user
-	const firstColumnName = fieldConfig.thisField.slice(0, -2)
+	let firstColumnName = fieldConfig.thisField.slice(0, -2)
+	if (firstColumnName.endsWith('_')) {
+		firstColumnName = firstColumnName.slice(0, -1)
+	}
 
 	// User, userId, id
 	const { foreignTable, thisField, foreignField } = fieldConfig

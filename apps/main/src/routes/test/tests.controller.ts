@@ -3,7 +3,9 @@ import { Response } from 'express'
 import RouteNames from '../routesConfig/routeNames'
 import { DbService } from '../../db/dbService'
 import { MainConfigService } from '@app/config'
+import { ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Testing')
 @Controller(RouteNames.TESTING.value)
 export class TestsController {
 	constructor(

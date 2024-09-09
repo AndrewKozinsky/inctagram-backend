@@ -1,4 +1,7 @@
 import { INestApplication } from '@nestjs/common'
+import { add } from 'date-fns'
+import { JwtAdapterService } from '@app/jwt-adapter'
+import { MainConfigService } from '@app/config'
 import {
 	checkErrorResponse,
 	checkSuccessResponse,
@@ -11,10 +14,17 @@ import {
 	userPassword,
 } from './utils/common'
 import RouteNames from '../src/routes/routesConfig/routeNames'
-import { HTTP_STATUSES } from '../src/settings/config'
+import { HTTP_STATUSES } from '../src/utils/httpStatuses'
 import { clearAllDB } from './utils/db'
 import { EmailAdapterService } from '@app/email-adapter'
 import { UserRepository } from '../src/repositories/user.repository'
+import { userUtils } from './utils/userUtils'
+import { createUniqString, parseCookieStringToObj } from '../src/utils/stringUtils'
+import { DeviceTokenOutModel } from '../src/models/auth/auth.output.model'
+import { GitHubService } from '../src/routes/auth/gitHubService'
+import { GoogleService } from '../src/routes/auth/googleService'
+import { SecurityRepository } from '../src/repositories/security.repository'
+import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 
 it.only('123', async () => {
 	expect(2).toBe(2)
@@ -23,19 +33,41 @@ it.only('123', async () => {
 describe('Auth (e2e)', () => {
 	let app: INestApplication
 	let emailAdapter: EmailAdapterService
+	let gitHubService: GitHubService
+	let googleService: GoogleService
+	let reCaptchaAdapter: ReCaptchaAdapterService
 
 	let userRepository: UserRepository
-	// const jwtService = new JwtService()
+	let securityRepository: SecurityRepository
+	let jwtService: JwtAdapterService
+	let mainConfig: MainConfigService
 
 	beforeAll(async () => {
-		const createAppRes = await createTestApp(emailAdapter)
+		const createAppRes = await createTestApp(
+			emailAdapter,
+			gitHubService,
+			googleService,
+			reCaptchaAdapter,
+		)
 		app = createAppRes.app
+
 		emailAdapter = createAppRes.emailAdapter
+		gitHubService = createAppRes.gitHubService
+		googleService = createAppRes.googleService
+		reCaptchaAdapter = createAppRes.reCaptchaAdapter
+
 		userRepository = await app.resolve(UserRepository)
+		securityRepository = await app.resolve(SecurityRepository)
+		jwtService = await app.resolve(JwtAdapterService)
+		mainConfig = await app.resolve(MainConfigService)
 	})
 
 	beforeEach(async () => {
 		await clearAllDB(app)
+	})
+
+	afterEach(() => {
+		jest.clearAllMocks()
 	})
 
 	describe('Register user', () => {
@@ -65,13 +97,7 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return an error if the entered email is registered already', async () => {
-			const firstRegRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
-				.send({
-					name: userName,
-					password: userPassword,
-					email: userEmail,
-				})
-				.expect(HTTP_STATUSES.CREATED_201)
+			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
 
 			const secondRegRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
 				.send({ name: userName, password: userPassword, email: userEmail })
@@ -86,7 +112,7 @@ describe('Auth (e2e)', () => {
 				.send({ name: userName, password: userPassword, email: userEmail })
 				.expect(HTTP_STATUSES.CREATED_201)
 
-			expect(emailAdapter.sendEmailConfirmationMessage).toBeCalled()
+			expect(emailAdapter.sendEmailConfirmationMessage).toBeCalledTimes(1)
 		})
 
 		it('should return 201 if tries to register an user with existed, but unconfirmed email', async () => {
@@ -141,9 +167,7 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 400 if email verification allowed time is over', async () => {
-			const firstRegRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
-				.send({ name: userName, password: userPassword, email: userEmail })
-				.expect(HTTP_STATUSES.CREATED_201)
+			const user = await userUtils.createUserWithUnconfirmedEmail(app, userRepository)
 
 			// Try to confirm email with a wrong confirmation code
 			const confirmEmailRes = await getRequest(
@@ -156,16 +180,10 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 400 if email verification allowed time is over', async () => {
-			const firstRegRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
-				.send({ name: userName, password: userPassword, email: userEmail })
-				.expect(HTTP_STATUSES.CREATED_201)
-
-			const userId = firstRegRes.body.data.id
-
-			const user = await userRepository.getUserById(userId)
+			const user = await userUtils.createUserWithUnconfirmedEmail(app, userRepository)
 
 			// Change email confirmation allowed time to past
-			await userRepository.updateUser(userId, {
+			await userRepository.updateUser(user!.id, {
 				email_confirmation_code_expiration_date: new Date().toISOString(),
 			})
 
@@ -180,13 +198,7 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 200 if email successfully confirmed', async () => {
-			const firstRegRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
-				.send({ name: userName, password: userPassword, email: userEmail })
-				.expect(HTTP_STATUSES.CREATED_201)
-
-			const userId = firstRegRes.body.data.id
-
-			const user = await userRepository.getUserById(userId)
+			const user = await userUtils.createUserWithUnconfirmedEmail(app, userRepository)
 
 			// Try to confirm email
 			const confirmEmailRes = await getRequest(
@@ -199,22 +211,7 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 400 if they tries confirm email second time', async () => {
-			const firstRegRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
-				.send({ name: userName, password: userPassword, email: userEmail })
-				.expect(HTTP_STATUSES.CREATED_201)
-
-			const userId = firstRegRes.body.data.id
-			const user = await userRepository.getUserById(userId)
-
-			// Confirm email
-			await getRequest(
-				app,
-				RouteNames.AUTH.EMAIL_CONFIRMATION.full + '?code=' + user!.emailConfirmationCode,
-			)
-				.send({
-					code: user!.emailConfirmationCode,
-				})
-				.expect(HTTP_STATUSES.OK_200)
+			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
 
 			// Try to confirm email second time
 			const confirmEmailSecondTimeRes = await getRequest(
@@ -224,6 +221,416 @@ describe('Auth (e2e)', () => {
 
 			const confirmEmailSecondTime = confirmEmailSecondTimeRes.body
 			checkErrorResponse(confirmEmailSecondTime, 400, 'Email confirmation code not found')
+		})
+	})
+
+	describe('Login', () => {
+		it('should return 400 if dto has incorrect values', async () => {
+			const loginRes = await postRequest(app, RouteNames.AUTH.LOGIN.full).expect(
+				HTTP_STATUSES.BAD_REQUEST_400,
+			)
+
+			const login = loginRes.body
+
+			checkErrorResponse(login, 400, 'Wrong body')
+
+			expect({}.toString.call(login.wrongFields)).toBe('[object Array]')
+			expect(login.wrongFields.length).toBe(2)
+			const [emailFieldErrText, passwordFieldErrText] = getFieldInErrorObject(login, [
+				'email',
+				'password',
+			])
+
+			expect(emailFieldErrText).toBe('Email must be a string')
+			expect(passwordFieldErrText).toBe('Password must be a string')
+		})
+
+		it('should return 400 if email and password does not match', async () => {
+			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
+
+			const loginRes = await postRequest(app, RouteNames.AUTH.LOGIN.full)
+				.send({ password: 'mywrongpassword', email: userEmail })
+				.expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+			const login = loginRes.body
+
+			checkErrorResponse(login, 400, 'Email or passwords do not match')
+		})
+
+		it('should return 403 if email is not confirmed', async () => {
+			const user = await userUtils.createUserWithUnconfirmedEmail(app, userRepository)
+
+			const loginRes = await postRequest(app, RouteNames.AUTH.LOGIN.full)
+				.send({ password: userPassword, email: userEmail })
+				.expect(HTTP_STATUSES.FORBIDDEN_403)
+
+			const login = loginRes.body
+			checkErrorResponse(login, 403, 'Email is not confirmed')
+		})
+
+		it('should return 200 if dto has correct values and email is confirmed', async () => {
+			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
+
+			const loginRes = await postRequest(app, RouteNames.AUTH.LOGIN.full)
+				.send({ password: userPassword, email: userEmail })
+				.expect(HTTP_STATUSES.OK_200)
+
+			const login = loginRes.body
+			checkSuccessResponse(login, 200)
+
+			expect(typeof login.data.accessToken).toBe('string')
+			userUtils.checkUserOutModel(login.data.user)
+		})
+	})
+
+	describe('Confirmation email resending', () => {
+		it('should return 400 if dto has incorrect values', async () => {
+			const resendConfirmEmailRes = await postRequest(
+				app,
+				RouteNames.AUTH.CONFIRM_EMAIL_RESENDING.full,
+			).expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+			const resend = resendConfirmEmailRes.body
+
+			expect(resend.status).toBe('error')
+			expect(resend.code).toBe(HTTP_STATUSES.BAD_REQUEST_400)
+
+			expect({}.toString.call(resend.wrongFields)).toBe('[object Array]')
+			expect(resend.wrongFields.length).toBe(1)
+
+			const [emailFieldErrText] = getFieldInErrorObject(resend, ['email'])
+
+			expect(emailFieldErrText).toBe('Email must be a string')
+		})
+
+		it('should return an error if the entered email is not exists', async () => {
+			const resendConfirmEmailRes = await postRequest(
+				app,
+				RouteNames.AUTH.CONFIRM_EMAIL_RESENDING.full,
+			)
+				.send({ email: 'wrong-email@email.com' })
+				.expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+			const resend = resendConfirmEmailRes.body
+			checkErrorResponse(resend, 400, 'Email not found')
+		})
+
+		it('should return an error if the entered email is not confirmed', async () => {
+			const user = await userUtils.createUserWithUnconfirmedEmail(app, userRepository)
+
+			const resendConfirmEmailRes = await postRequest(
+				app,
+				RouteNames.AUTH.CONFIRM_EMAIL_RESENDING.full,
+			)
+				.send({ email: userEmail })
+				.expect(HTTP_STATUSES.FORBIDDEN_403)
+
+			const resend = resendConfirmEmailRes.body
+			checkErrorResponse(resend, 403, 'Email is not confirmed')
+		})
+
+		it('should return 201 if dto has correct values', async () => {
+			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
+			jest.clearAllMocks()
+
+			const resendConfirmEmailRes = await postRequest(
+				app,
+				RouteNames.AUTH.CONFIRM_EMAIL_RESENDING.full,
+			)
+				.send({ email: userEmail })
+				.expect(HTTP_STATUSES.OK_200)
+			const resend = resendConfirmEmailRes.body
+
+			expect(emailAdapter.sendEmailConfirmationMessage).toBeCalledTimes(1)
+			checkSuccessResponse(resend, 200)
+		})
+	})
+
+	describe('User log out', () => {
+		it('should return 401 if there is not cookies', async () => {
+			const logoutRes = await postRequest(app, RouteNames.AUTH.LOGOUT.full).expect(
+				HTTP_STATUSES.UNAUTHORIZED_401,
+			)
+			const logout = logoutRes.body
+
+			checkErrorResponse(logout, 401, 'Refresh token is not valid')
+		})
+
+		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
+			const user = await userUtils.createUserWithUnconfirmedEmail(app, userRepository)
+
+			// Create expired token
+			const deviceId = createUniqString()
+
+			const expiredRefreshToken: DeviceTokenOutModel = {
+				issuedAt: new Date().toISOString(),
+				expirationDate: new Date().toISOString(),
+				deviceIP: '123',
+				deviceId,
+				deviceName: 'Unknown',
+				userId: user!.id,
+			}
+
+			await securityRepository.insertDeviceRefreshToken(expiredRefreshToken)
+
+			// Get created expired token
+			const refreshToken = await securityRepository.getDeviceRefreshTokenByDeviceId(deviceId)
+			const refreshTokenStr = jwtService.createRefreshTokenStr(
+				refreshToken!.deviceId,
+				refreshToken!.expirationDate,
+			)
+
+			const logoutRes = await postRequest(app, RouteNames.AUTH.LOGOUT.full)
+				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
+				.expect(HTTP_STATUSES.UNAUTHORIZED_401)
+		})
+
+		it('should return 200 if the JWT refreshToken inside cookie is valid', async () => {
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+				app,
+				userRepository,
+				userName,
+				userEmail,
+				userPassword,
+			)
+
+			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
+
+			const logoutRes = await postRequest(app, RouteNames.AUTH.LOGOUT.full)
+				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
+				.expect(HTTP_STATUSES.OK_200)
+		})
+	})
+
+	describe('Reset password', () => {
+		it('should return 400 if email in body is not exist or has wrong format', async () => {
+			const recoverRes = await postRequest(
+				app,
+				RouteNames.AUTH.PASSWORD_RECOVERY.full,
+			).expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+			const recover = recoverRes.body
+			checkErrorResponse(recover, 400, 'Wrong body')
+
+			expect({}.toString.call(recover.wrongFields)).toBe('[object Array]')
+			expect(recover.wrongFields.length).toBe(2)
+			const [emailFieldErrText] = getFieldInErrorObject(recover, ['email'])
+
+			expect(emailFieldErrText).toBe('Email must be a string')
+		})
+
+		it('should return 400 if email is not registered and email is not be sent', async () => {
+			const recoverRes = await postRequest(app, RouteNames.AUTH.PASSWORD_RECOVERY.full)
+				.send({ email: userEmail, recaptchaValue: 'recaptchaValue' })
+				.expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+			const recover = recoverRes.body
+			checkErrorResponse(recover, 400, 'User not found')
+			expect(emailAdapter.sendPasswordRecoveryMessage).toBeCalledTimes(0)
+		})
+
+		it('should return 200 if email is registered and email is sent', async () => {
+			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
+
+			const recoverRes = await postRequest(app, RouteNames.AUTH.PASSWORD_RECOVERY.full)
+				.send({ email: user!.email, recaptchaValue: 'recaptchaValue' })
+				.expect(HTTP_STATUSES.OK_200)
+
+			const recover = recoverRes.body
+			checkSuccessResponse(recover, 200)
+			expect(typeof recover.data.recoveryCode).toBe('string')
+
+			expect(emailAdapter.sendPasswordRecoveryMessage).toBeCalledTimes(1)
+		})
+
+		it('should return 400 if capcha is wrong', async () => {
+			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
+
+			reCaptchaAdapter.isValid = jest.fn().mockReturnValueOnce(false)
+			const recoverRes = await postRequest(app, RouteNames.AUTH.PASSWORD_RECOVERY.full)
+				.send({ email: user!.email, recaptchaValue: 'recaptchaValue' })
+				.expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+			const recover = recoverRes.body
+			checkErrorResponse(recover, 400, 'Captcha is wrong')
+		})
+	})
+
+	describe('Set new password', () => {
+		it('should return 400 if email in body is not exist or has wrong format', async () => {
+			const newPasswordRes = await postRequest(app, RouteNames.AUTH.NEW_PASSWORD.full).expect(
+				HTTP_STATUSES.BAD_REQUEST_400,
+			)
+
+			const newPassword = newPasswordRes.body
+			checkErrorResponse(newPassword, 400, 'Wrong body')
+
+			expect({}.toString.call(newPassword.wrongFields)).toBe('[object Array]')
+			expect(newPassword.wrongFields.length).toBe(2)
+			const [newPasswordFieldErrText, recoveryCodeFieldErrText] = getFieldInErrorObject(
+				newPassword,
+				['newPassword', 'recoveryCode'],
+			)
+
+			expect(newPasswordFieldErrText).toBe('NewPassword must be a string')
+			expect(recoveryCodeFieldErrText).toBe('RecoveryCode must be a string')
+		})
+
+		it('should return 400 if user, who made request to reset password is not found', async () => {
+			const newPasswordRes = await postRequest(app, RouteNames.AUTH.NEW_PASSWORD.full)
+				.send({ newPassword: 'my-new-password', recoveryCode: 'asdfghjkl' })
+				.expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+			const newPassword = newPasswordRes.body
+			checkErrorResponse(newPassword, 400, 'User not found')
+		})
+
+		it('should return 200 if user is really made request to reset password', async () => {
+			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
+
+			const recoverRes = await postRequest(app, RouteNames.AUTH.PASSWORD_RECOVERY.full)
+				.send({ email: user!.email, recaptchaValue: 'recaptchaValue' })
+				.expect(HTTP_STATUSES.OK_200)
+
+			const recover = recoverRes.body
+
+			const myNewPassword = 'my-new-password'
+			const newPasswordRes = await postRequest(app, RouteNames.AUTH.NEW_PASSWORD.full)
+				.send({ newPassword: myNewPassword, recoveryCode: recover.data.recoveryCode })
+				.expect(HTTP_STATUSES.OK_200)
+
+			const newPassword = newPasswordRes.body
+			checkSuccessResponse(newPassword, 200)
+
+			// Try login with the new password
+			await postRequest(app, RouteNames.AUTH.LOGIN.full)
+				.send({ password: myNewPassword, email: userEmail })
+				.expect(HTTP_STATUSES.OK_200)
+		})
+	})
+
+	describe('Get new refresh and access token', () => {
+		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
+			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
+
+			// Create expired token
+			const deviceId = createUniqString()
+
+			const expiredRefreshToken: DeviceTokenOutModel = {
+				issuedAt: new Date().toISOString(),
+				expirationDate: add(new Date(), { days: -6 }).toISOString(),
+				deviceIP: '123',
+				deviceId,
+				deviceName: 'Unknown',
+				userId: user.id,
+			}
+
+			await securityRepository.insertDeviceRefreshToken(expiredRefreshToken)
+
+			// Get created expired token
+			const refreshToken = await securityRepository.getDeviceRefreshTokenByDeviceId(deviceId)
+			const refreshTokenStr = jwtService.createRefreshTokenStr(
+				refreshToken!.deviceId,
+				refreshToken!.expirationDate,
+			)
+
+			const refreshRes = await postRequest(app, RouteNames.AUTH.REFRESH_TOKEN.full)
+				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
+				.expect(HTTP_STATUSES.UNAUTHORIZED_401)
+		})
+
+		it('should return 200 if the JWT refreshToken inside cookie is valid', async () => {
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+				app,
+				userRepository,
+				userName,
+				userEmail,
+				userPassword,
+			)
+
+			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
+
+			const refreshRes = await postRequest(app, RouteNames.AUTH.REFRESH_TOKEN.full)
+				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
+				.expect(HTTP_STATUSES.OK_200)
+
+			const newRefreshTokenStr = refreshRes.headers['set-cookie'][0]
+			const newRefreshTokenObj = parseCookieStringToObj(newRefreshTokenStr)
+			expect(newRefreshTokenObj['Max-Age']).toBe(60 * 60 * 24 * 30)
+			expect(newRefreshTokenObj.Secure).toBe(true)
+			expect(newRefreshTokenObj.HttpOnly).toBe(true)
+
+			const newAccessToken = refreshRes.body.data.accessToken
+			expect(typeof newAccessToken).toBe('string')
+		})
+	})
+
+	describe('Sign up with Github or Google', () => {
+		it('return 400 if provider name is wrong', async () => {
+			const registerRes = await getRequest(
+				app,
+				RouteNames.AUTH.REGISTRATION.BY_PROVIDER.full + '?provider=wrong&code=123',
+			).expect(HTTP_STATUSES.BAD_REQUEST_400)
+		})
+
+		it('register a new user by Github and Google', async () => {
+			const providerNames = ['github', 'google']
+
+			for (const providerName of providerNames) {
+				const registerRes = await getRequest(
+					app,
+					RouteNames.AUTH.REGISTRATION.BY_PROVIDER.full +
+						`?provider=${providerName}&code=123`,
+				).expect(HTTP_STATUSES.OK_200)
+
+				const cookies = registerRes.headers['set-cookie']
+				expect(cookies[0].startsWith('refreshToken')).toBe(true)
+				const refreshToken = cookies[0].split('=')[1]
+
+				const register = registerRes.body
+				checkSuccessResponse(register, 200)
+
+				expect(typeof register.data.accessToken).toBe('string')
+
+				// Try to log out with this refreshToken
+				const logoutRes = await postRequest(app, RouteNames.AUTH.LOGOUT.full)
+					.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshToken)
+					.expect(HTTP_STATUSES.OK_200)
+			}
+		})
+
+		it('register an existing user by Github', async () => {
+			const user = await userUtils.createUserWithUnconfirmedEmail(app, userRepository)
+
+			const registerRes = await getRequest(
+				app,
+				RouteNames.AUTH.REGISTRATION.BY_PROVIDER.full + '?provider=github&code=123',
+			).expect(HTTP_STATUSES.OK_200)
+
+			// Check if user has confirmed email
+			const updatedUser = await userRepository.getUserById(user!.id)
+			expect(updatedUser!.githubId).not.toBeNull()
+			expect(updatedUser!.isEmailConfirmed).toBeTruthy()
+			expect(updatedUser!.emailConfirmationCode).toBeNull()
+			expect(updatedUser!.confirmationCodeExpirationDate).toBeNull()
+
+			// Check refreshToken in cookie
+			const cookies = registerRes.headers['set-cookie']
+			expect(cookies[0].startsWith('refreshToken')).toBe(true)
+			const refreshToken = cookies[0].split('=')[1]
+
+			const register = registerRes.body
+			checkSuccessResponse(register, 200)
+
+			userUtils.checkUserOutModel(register.data.user)
+
+			// Check accessToken in cookie
+			expect(typeof register.data.accessToken).toBe('string')
+
+			// Try to log out with this refreshToken
+			const logoutRes = await postRequest(app, RouteNames.AUTH.LOGOUT.full)
+				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshToken)
+				.expect(HTTP_STATUSES.OK_200)
 		})
 	})
 })

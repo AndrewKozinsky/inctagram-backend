@@ -54,6 +54,12 @@
       ],
       "@app/jwt-adapter/*": [
         "libs/jwt-adapter/src/*"
+      ],
+      "@app/re-captcha-adapter": [
+        "libs/re-captcha-adapter/src"
+      ],
+      "@app/re-captcha-adapter/*": [
+        "libs/re-captcha-adapter/src/*"
       ]
     }
   }

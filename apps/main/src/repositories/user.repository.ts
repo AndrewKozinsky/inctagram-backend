@@ -6,13 +6,15 @@ import { HashAdapterService } from '@app/hash-adapter'
 import { PrismaService } from '../db/prisma.service'
 import { CreateUserDtoModel } from '../models/user/user.input.model'
 import { UserServiceModel } from '../models/user/user.service.model'
+import { createUniqString } from '../utils/stringUtils'
+import { JwtAdapterService } from '@app/jwt-adapter'
 
 @Injectable()
 export class UserRepository {
 	constructor(
 		private prisma: PrismaService,
-		private serverHelper: ServerHelperService,
 		private hashAdapter: HashAdapterService,
+		private jwtAdapter: JwtAdapterService,
 	) {}
 
 	async getUserByEmail(email: string) {
@@ -29,11 +31,11 @@ export class UserRepository {
 		}
 	}
 
-	async getUserByEmailOrName(email: string, name: string) {
+	async getUserByEmailOrName(args: { email?: string; name?: string }) {
 		try {
 			const user = await this.prisma.user.findFirst({
 				where: {
-					OR: [{ email }, { name }],
+					OR: [{ email: args.email }, { name: args.name }],
 				},
 			})
 
@@ -79,11 +81,11 @@ export class UserRepository {
 		return this.mapDbUserToServiceUser(user)
 	}
 
-	async getConfirmedUserByEmailAndPassword(loginDto: {
-		email: string
-		password: string
-	}): Promise<null | UserServiceModel> {
-		const user = await this.getUserByEmailAndPassword(loginDto.email, loginDto.password)
+	async getConfirmedUserByEmailAndPassword(
+		email: string,
+		password: string,
+	): Promise<null | UserServiceModel> {
+		const user = await this.getUserByEmailAndPassword(email, password)
 
 		if (!user || !user.isEmailConfirmed) {
 			return null
@@ -102,25 +104,53 @@ export class UserRepository {
 		return this.mapDbUserToServiceUser(user)
 	}
 
-	async createUser(dto: CreateUserDtoModel, isEmailConfirmed?: boolean) {
-		const newUserParams = {
+	async getUserByRefreshToken(refreshTokenStr: string) {
+		const refreshTokenData = this.jwtAdapter.getRefreshTokenDataFromTokenStr(refreshTokenStr)
+
+		const device = await this.prisma.deviceToken.findFirst({
+			where: { device_id: refreshTokenData!.deviceId },
+		})
+
+		if (!device) return null
+
+		const user = await this.prisma.user.findFirst({
+			where: { id: device.user_id },
+		})
+
+		if (!user) return null
+
+		return this.mapDbUserToServiceUser(user)
+	}
+
+	async createUser(
+		dto: CreateUserDtoModel & { githubId?: number; googleId?: number },
+		isEmailConfirmed = false,
+	) {
+		const newUserParams: any = {
 			email: dto.email,
 			name: dto.name,
-			hashed_password: '',
-			email_confirmation_code: '',
-			email_confirmation_code_expiration_date: '',
-			is_email_confirmed: true,
-		}
-
-		if (!isEmailConfirmed) {
-			newUserParams.email_confirmation_code = this.serverHelper.strUtils().createUniqString()
-			newUserParams.email_confirmation_code_expiration_date = add(new Date(), {
+			hashed_password: await this.hashAdapter.hashString(dto.password),
+			email_confirmation_code: createUniqString(),
+			email_confirmation_code_expiration_date: add(new Date(), {
 				hours: 0,
 				minutes: 5,
-			}).toISOString()
+			}).toISOString(),
+			is_email_confirmed: false,
+		}
 
-			newUserParams.hashed_password = await this.hashAdapter.hashString(dto.password)
-			newUserParams.is_email_confirmed = false
+		if (dto.githubId) {
+			newUserParams.github_id = dto.githubId
+			isEmailConfirmed = true
+		}
+		if (dto.googleId) {
+			newUserParams.google_id = dto.googleId
+			isEmailConfirmed = true
+		}
+
+		if (isEmailConfirmed) {
+			newUserParams.email_confirmation_code = null
+			newUserParams.email_confirmation_code_expiration_date = null
+			newUserParams.is_email_confirmed = true
 		}
 
 		const user = await this.prisma.user.create({
@@ -161,6 +191,8 @@ export class UserRepository {
 			confirmationCodeExpirationDate: dbUser.email_confirmation_code_expiration_date,
 			isEmailConfirmed: dbUser.is_email_confirmed,
 			passwordRecoveryCode: dbUser.password_recovery_code,
+			githubId: dbUser.github_id,
+			googleId: dbUser.google_id,
 		}
 	}
 }

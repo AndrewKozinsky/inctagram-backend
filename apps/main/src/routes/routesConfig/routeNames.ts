@@ -5,15 +5,19 @@ export const RouteNames = {
 			value: 'login',
 			full: 'auth/login',
 		},
-		/*REFRESH_TOKEN: {
+		REFRESH_TOKEN: {
 			value: 'refresh-token',
 			full: 'auth/refresh-token',
-		},*/
+		},
 		REGISTRATION: {
 			value: 'registration',
 			full: 'auth/registration',
+			BY_PROVIDER: {
+				value: 'by-provider',
+				full: 'auth/registration/by-provider',
+			},
 		},
-		REGISTRATION_EMAIL_RESENDING: {
+		CONFIRM_EMAIL_RESENDING: {
 			value: 'registration-email-resending',
 			full: 'auth/registration-email-resending',
 		},
@@ -32,6 +36,19 @@ export const RouteNames = {
 		NEW_PASSWORD: {
 			value: 'new-password',
 			full: 'auth/new-password',
+		},
+	},
+	SECURITY: {
+		value: 'security',
+		DEVICES: {
+			value: 'devices',
+			full: 'security/devices',
+			DEVICE_ID(deviceId: string) {
+				return {
+					value: deviceId,
+					full: 'security/devices/' + deviceId,
+				}
+			},
 		},
 	},
 	TESTING: {

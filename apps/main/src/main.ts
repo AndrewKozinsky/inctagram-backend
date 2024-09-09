@@ -2,10 +2,10 @@ import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { INestApplication } from '@nestjs/common'
-import { applyAppSettings } from './settings/applyAppSettings'
+import { applyAppSettings } from './infrastructure/applyAppSettings'
 
 async function bootstrap() {
-	const app = await NestFactory.create(AppModule)
+	const app = await NestFactory.create(AppModule, { cors: false })
 	await applyAppSettings(app)
 	app.setGlobalPrefix('api/v1')
 	addSwagger(app)
@@ -15,13 +15,25 @@ async function bootstrap() {
 }
 
 function addSwagger(app: INestApplication<any>) {
-	const config = new DocumentBuilder()
+	const configSwagger = new DocumentBuilder()
 		.setTitle('Inctagram API')
 		.setDescription('The Inctagram API')
 		.setVersion('1.0')
-		.addTag('inctagram')
+		.addBearerAuth(
+			{
+				type: 'http',
+				bearerFormat: 'Token',
+			},
+			'access-token',
+		)
+		.addCookieAuth('refreshToken', {
+			type: 'apiKey',
+			in: 'cookie',
+			name: 'refreshToken',
+		})
 		.build()
-	const document = SwaggerModule.createDocument(app, config)
+
+	const document = SwaggerModule.createDocument(app, configSwagger)
 	SwaggerModule.setup('api/v1', app, document)
 }
 

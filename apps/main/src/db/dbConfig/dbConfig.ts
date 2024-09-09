@@ -17,12 +17,18 @@ export const bdConfig = {
 				example: '$1Hn[595n8]T',
 				required: true,
 			},
-			recovery_code: {
+			recoveryCode: {
 				type: 'string',
 				minLength: 1,
 				maxLength: 100,
 				description: 'The code that the server sent after the password recovery request',
 				example: 'z151JPS16j',
+				required: true,
+			},
+			recaptchaValue: {
+				type: 'string',
+				minLength: 1,
+				maxLength: 100,
 				required: true,
 			},
 		},
@@ -35,6 +41,18 @@ export const bdConfig = {
 				unique: true,
 				description: "User's email",
 				required: true,
+			},
+			github_id: {
+				type: 'number',
+				unique: true,
+				description: 'Github ID if user used this way or null',
+				required: false,
+			},
+			google_id: {
+				type: 'number',
+				unique: true,
+				description: 'Google ID if user used this way or null',
+				required: false,
 			},
 			name: {
 				type: 'string',
@@ -120,7 +138,7 @@ export const bdConfig = {
 			},
 			user_id: {
 				type: 'manyToOne',
-				thisField: 'userId',
+				thisField: 'user_id',
 				foreignTable: 'User',
 				foreignField: 'id',
 			},

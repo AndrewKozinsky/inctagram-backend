@@ -1,10 +1,13 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UserRepository } from '../../repositories/user.repository'
-import { ErrorCode } from '../../../../../libs/layerResult'
+import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { EmailAdapterService } from '@app/email-adapter'
-import { ResendConfirmationEmailCommand } from './ResendConfirmationEmail.command'
 import { ServerHelperService } from '@app/server-helper'
-import { CustomException } from '../../utils/misc'
+import { createUniqString } from '../../utils/stringUtils'
+
+export class ResendConfirmationEmailCommand {
+	constructor(public readonly email: string) {}
+}
 
 @CommandHandler(ResendConfirmationEmailCommand)
 export class ResendConfirmationEmailHandler
@@ -13,7 +16,6 @@ export class ResendConfirmationEmailHandler
 	constructor(
 		private userRepository: UserRepository,
 		private emailAdapter: EmailAdapterService,
-		private serverHelper: ServerHelperService,
 	) {}
 
 	async execute(command: ResendConfirmationEmailCommand) {
@@ -21,13 +23,16 @@ export class ResendConfirmationEmailHandler
 
 		const user = await this.userRepository.getUserByEmail(email)
 
-		if (!user || user.isEmailConfirmed) {
-			// !!!!!!
-			throw new Error(ErrorCode.BadRequest_400)
+		if (!user) {
+			throw new Error(ErrorMessage.EmailNotFound)
 		}
 
-		const confirmationCode = this.serverHelper.strUtils().createUniqString()
-		const newConfirmationCode = await this.userRepository.updateUser(user.id, {
+		if (!user.isEmailConfirmed) {
+			throw new Error(ErrorMessage.EmailIsNotConfirmed)
+		}
+
+		const confirmationCode = createUniqString()
+		await this.userRepository.updateUser(user.id, {
 			email_confirmation_code: confirmationCode,
 		})
 

@@ -1,14 +1,17 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common'
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { BrowserServiceService } from '@app/browser-service'
-import { AuthRepository } from '../../repositories/auth.repository'
+import { CustomException } from '../exceptionFilters/customException'
+import { HTTP_STATUSES } from '../../utils/httpStatuses'
+import { ErrorMessage } from '../exceptionFilters/layerResult'
+import { SecurityRepository } from '../../repositories/security.repository'
 
 @Injectable()
 export class CheckDeviceRefreshTokenGuard implements CanActivate {
 	constructor(
-		private readonly browserService: BrowserServiceService,
+		private browserService: BrowserServiceService,
 		private jwtAdapter: JwtAdapterService,
-		private readonly authRepository: AuthRepository,
+		private securityRepository: SecurityRepository,
 	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -18,7 +21,10 @@ export class CheckDeviceRefreshTokenGuard implements CanActivate {
 			const refreshTokenStr = this.browserService.getRefreshTokenStrFromReq(request)
 
 			if (!refreshTokenStr || !this.jwtAdapter.isRefreshTokenStrValid(refreshTokenStr)) {
-				throw new UnauthorizedException()
+				throw CustomException(
+					HTTP_STATUSES.UNAUTHORIZED_401.toString(),
+					ErrorMessage.RefreshTokenIsNotValid,
+				)
 			}
 
 			// Check if refreshTokenStr has another expiration date
@@ -26,23 +32,31 @@ export class CheckDeviceRefreshTokenGuard implements CanActivate {
 				this.jwtAdapter.getTokenStrExpirationDate(refreshTokenStr)
 
 			const deviceRefreshToken =
-				await this.authRepository.getDeviceRefreshTokenByTokenStr(refreshTokenStr)
+				await this.securityRepository.getDeviceRefreshTokenByTokenStr(refreshTokenStr)
 
 			if (!refreshTokenStrExpirationDate || !deviceRefreshToken) {
-				throw new UnauthorizedException()
+				throw CustomException(
+					HTTP_STATUSES.UNAUTHORIZED_401.toString(),
+					ErrorMessage.RefreshTokenIsNotValid,
+				)
 			}
 
 			if (
-				refreshTokenStrExpirationDate!.toLocaleString() ===
-				deviceRefreshToken!.expirationDate.toLocaleString()
+				refreshTokenStrExpirationDate!.toISOString() === deviceRefreshToken!.expirationDate
 			) {
 				request.deviceRefreshToken = deviceRefreshToken
 				return true
 			}
 
-			throw new UnauthorizedException()
+			throw CustomException(
+				HTTP_STATUSES.UNAUTHORIZED_401.toString(),
+				ErrorMessage.RefreshTokenIsNotValid,
+			)
 		} catch (err: unknown) {
-			throw new UnauthorizedException()
+			throw CustomException(
+				HTTP_STATUSES.UNAUTHORIZED_401.toString(),
+				ErrorMessage.RefreshTokenIsNotValid,
+			)
 		}
 	}
 }

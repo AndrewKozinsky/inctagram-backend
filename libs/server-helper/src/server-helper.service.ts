@@ -7,10 +7,11 @@ import {
 	UnauthorizedException,
 } from '@nestjs/common'
 import { v4 as uuid } from 'uuid'
-import { ErrorCode } from '../../layerResult'
+import { ErrorCode } from '../../../apps/main/src/infrastructure/exceptionFilters/layerResult'
 
 @Injectable()
 export class ServerHelperService {
+	// Is it need???
 	convertLayerErrToHttpErr(err: unknown) {
 		if (err instanceof Error) {
 			const errorStatus = err.message as ErrorCode
@@ -28,12 +29,5 @@ export class ServerHelperService {
 		}
 
 		throw new NotImplementedException()
-	}
-	strUtils() {
-		return {
-			createUniqString() {
-				return uuid()
-			},
-		}
 	}
 }

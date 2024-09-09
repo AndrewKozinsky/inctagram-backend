@@ -1,7 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UserRepository } from '../../repositories/user.repository'
-import { ErrorMessage } from '../../../../../libs/layerResult'
-import { ConfirmEmailCommand } from './ConfirmEmail.command'
+import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
+
+export class ConfirmEmailCommand {
+	constructor(public readonly confirmationCode: string) {}
+}
 
 @CommandHandler(ConfirmEmailCommand)
 export class ConfirmEmailHandler implements ICommandHandler<ConfirmEmailCommand> {
