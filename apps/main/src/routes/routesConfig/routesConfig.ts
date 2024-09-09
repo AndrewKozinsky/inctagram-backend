@@ -155,7 +155,7 @@ export const routesConfig = {
 		response: [
 			{
 				code: SuccessCode.Ok,
-				description: "All other user's devices were terminated",
+				description: "Terminate all user's devices except current",
 				dataClass: SWEmptyRouteOut,
 			},
 		],
@@ -164,7 +164,7 @@ export const routesConfig = {
 		response: [
 			{
 				code: SuccessCode.Ok,
-				description: 'This device is terminated',
+				description: 'Terminate the current user device',
 				dataClass: SWEmptyRouteOut,
 			},
 			{

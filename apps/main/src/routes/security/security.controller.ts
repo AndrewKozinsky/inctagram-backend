@@ -17,7 +17,9 @@ import {
 	TerminateUserDeviceCommand,
 	TerminateUserDeviceHandler,
 } from '../../features/security/TerminateUserDevice.commandHandler'
+import { ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Devices')
 @Controller(RouteNames.SECURITY.value)
 export class SecurityController {
 	constructor(
