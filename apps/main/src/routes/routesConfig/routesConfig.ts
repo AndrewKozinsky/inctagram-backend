@@ -41,7 +41,7 @@ export const routesConfig = {
 		response: [
 			{
 				code: SuccessCode.Ok,
-				description: "User's email was confirmed",
+				description: "Confirm user's email",
 				dataClass: SWEmptyRouteOut,
 			},
 			{
@@ -75,7 +75,7 @@ export const routesConfig = {
 		response: [
 			{
 				code: SuccessCode.Ok,
-				description: 'Confirmation email was sent',
+				description: 'Send confirmation email letter',
 				dataClass: SWEmptyRouteOut,
 			},
 			{
@@ -93,7 +93,7 @@ export const routesConfig = {
 		response: [
 			{
 				code: SuccessCode.Ok,
-				description: 'User was logged out',
+				description: 'Log out user',
 				dataClass: SWEmptyRouteOut,
 			},
 			{

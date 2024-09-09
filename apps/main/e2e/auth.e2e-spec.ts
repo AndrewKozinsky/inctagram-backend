@@ -26,7 +26,7 @@ import { GoogleService } from '../src/routes/auth/googleService'
 import { DevicesRepository } from '../src/repositories/devices.repository'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 
-it.only('123', async () => {
+it('123', async () => {
 	expect(2).toBe(2)
 })
 
@@ -96,25 +96,6 @@ describe('Auth (e2e)', () => {
 			expect(emailFieldErrText).toBe('The email must match the format example@example.com')
 		})
 
-		it('should return an error if the entered email is registered already', async () => {
-			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
-
-			const secondRegRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
-				.send({ name: userName, password: userPassword, email: userEmail })
-				.expect(HTTP_STATUSES.BAD_REQUEST_400)
-
-			const secondReg = secondRegRes.body
-			checkErrorResponse(secondReg, 400, 'Email or username is already registered')
-		})
-
-		it('should return 201 if dto has correct values', async () => {
-			const registrationRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
-				.send({ name: userName, password: userPassword, email: userEmail })
-				.expect(HTTP_STATUSES.CREATED_201)
-
-			expect(emailAdapter.sendEmailConfirmationMessage).toBeCalledTimes(1)
-		})
-
 		it('should return 201 if tries to register an user with existed, but unconfirmed email', async () => {
 			await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
 				.send({ name: userName, password: userPassword, email: userEmail })
@@ -127,6 +108,27 @@ describe('Auth (e2e)', () => {
 					email: userEmail,
 				})
 				.expect(HTTP_STATUSES.CREATED_201)
+		})
+
+		it.only('should return an error if the entered email is already registered and confirmed', async () => {
+			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
+			expect(emailAdapter.sendEmailConfirmationMessage).toBeCalledTimes(1)
+
+			const secondRegRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
+				.send({ name: userName, password: userPassword, email: userEmail })
+				.expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+			const secondReg = secondRegRes.body
+			checkErrorResponse(secondReg, 400, 'Email or username is already registered')
+			expect(emailAdapter.sendEmailConfirmationMessage).toBeCalledTimes(1)
+		})
+
+		it('should return 201 if dto has correct values', async () => {
+			const registrationRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
+				.send({ name: userName, password: userPassword, email: userEmail })
+				.expect(HTTP_STATUSES.CREATED_201)
+
+			expect(emailAdapter.sendEmailConfirmationMessage).toBeCalledTimes(1)
 		})
 
 		it('should return 400 if they try to register a user with a verified email', async () => {

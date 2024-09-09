@@ -60,3 +60,21 @@ Run
 yarn run migrate:deploy
 ```
 This will apply all your pending migrations to the Neon.tech database.
+
+## How to publish new code
+If you created a new microservice make sure that package.json contains commands
+```
+"build:paiments": "nest build paiments",
+"start:paiments": "nest start paiments",
+```
+paiments is mean name of the microservice.
+
+And a folder with the microservice has contain this files from Incubator personal account:
+```
+deployment, preparingDeploy, Jenkinsfile and Dockerfile.
+```
+To publish the code to the server make a Pull Request and leave a comment with text
+```
+run build production paiments
+```
+The last word in a comment means a microservice name which will be published.
