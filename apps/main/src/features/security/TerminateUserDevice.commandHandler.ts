@@ -1,8 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { JwtAdapterService } from '@app/jwt-adapter'
-import { UserRepository } from '../../repositories/user.repository'
 import { SecurityRepository } from '../../repositories/security.repository'
-import { AuthRepository } from '../../repositories/auth.repository'
 import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 
 export class TerminateUserDeviceCommand {
@@ -15,8 +13,6 @@ export class TerminateUserDeviceCommand {
 @CommandHandler(TerminateUserDeviceCommand)
 export class TerminateUserDeviceHandler implements ICommandHandler<TerminateUserDeviceCommand> {
 	constructor(
-		private authRepository: AuthRepository,
-		private userRepository: UserRepository,
 		private securityRepository: SecurityRepository,
 		private jwtAdapter: JwtAdapterService,
 	) {}
@@ -26,7 +22,7 @@ export class TerminateUserDeviceHandler implements ICommandHandler<TerminateUser
 
 		// Is device for deletion is not exist give NotFound code
 		const deviceRefreshToken =
-			await this.authRepository.getDeviceRefreshTokenByDeviceId(deletionDeviceId)
+			await this.securityRepository.getDeviceRefreshTokenByDeviceId(deletionDeviceId)
 
 		if (!deviceRefreshToken) {
 			throw new Error(ErrorMessage.RefreshTokenIsNotFound)
@@ -39,7 +35,6 @@ export class TerminateUserDeviceHandler implements ICommandHandler<TerminateUser
 		if (!currentUserDeviceId) {
 			throw new Error(ErrorMessage.UserDoesNotOwnThisDeviceToken)
 		}
-
 		const userDevices =
 			await this.securityRepository.getUserDevicesByDeviceId(currentUserDeviceId)
 

@@ -1,9 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UserRepository } from '../../repositories/user.repository'
 import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
-import { AuthRepository } from '../../repositories/auth.repository'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { DeviceTokenOutModel } from '../../models/auth/auth.output.model'
+import { SecurityRepository } from '../../repositories/security.repository'
 
 export class GenerateAccessAndRefreshTokensCommand {
 	constructor(public readonly deviceRefreshToken: DeviceTokenOutModel) {}
@@ -15,7 +15,7 @@ export class GenerateAccessAndRefreshTokensHandler
 {
 	constructor(
 		private userRepository: UserRepository,
-		private authRepository: AuthRepository,
+		private securityRepository: SecurityRepository,
 		private jwtAdapter: JwtAdapterService,
 	) {}
 
@@ -32,7 +32,7 @@ export class GenerateAccessAndRefreshTokensHandler
 			throw new Error(ErrorMessage.UserNotFound)
 		}
 
-		await this.authRepository.updateDeviceRefreshTokenDate(deviceRefreshToken.deviceId)
+		await this.securityRepository.updateDeviceRefreshTokenDate(deviceRefreshToken.deviceId)
 
 		const newRefreshTokenStr = this.jwtAdapter.createRefreshTokenStr(
 			deviceRefreshToken.deviceId,

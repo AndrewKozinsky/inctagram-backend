@@ -16,6 +16,7 @@
     "test:e2e": "NODE_ENV=TEST jest --config apps/main/e2e/jest-e2e.json --runInBand",
     "test:cov": "NODE_ENV=TEST jest --coverage",
     "migrate:dev": "prisma migrate dev",
+    "migrate:deploy": "prisma migrate deploy",
     "migrate:generate-types": "prisma generate",
     "generatePrismaFile": "ts-node apps/main/src/db/prismaGenerator/generatePrismaSchemaFile.ts"
   },

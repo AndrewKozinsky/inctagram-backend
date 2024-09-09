@@ -2,25 +2,23 @@ import { Module } from '@nestjs/common'
 import { CqrsModule } from '@nestjs/cqrs'
 import { PrismaService } from '../../db/prisma.service'
 import { MainConfigService } from '@app/config'
-import { HashAdapterService } from '@app/hash-adapter'
-import { BrowserServiceService } from '@app/browser-service'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { UserRepository } from '../../repositories/user.repository'
-import { AuthRepository } from '../../repositories/auth.repository'
 import { UserQueryRepository } from '../../repositories/user.queryRepository'
 import { SecurityController } from './security.controller'
+import { SecurityRepository } from '../../repositories/security.repository'
+import { SecurityQueryRepository } from '../../repositories/security.queryRepository'
+import { TerminateUserDeviceHandler } from '../../features/security/TerminateUserDevice.commandHandler'
+import { TerminateAllDeviceRefreshTokensApartThisHandler } from '../../features/security/TerminateAllDeviceRefreshTokensApartThis.commandHandler'
 
-const services = [
-	PrismaService,
-	MainConfigService,
-	HashAdapterService,
-	BrowserServiceService,
-	JwtAdapterService,
+const services = [PrismaService, MainConfigService, JwtAdapterService, SecurityQueryRepository]
+
+const repositories = [UserRepository, UserQueryRepository, SecurityRepository]
+
+const commandHandlers = [
+	TerminateUserDeviceHandler,
+	TerminateAllDeviceRefreshTokensApartThisHandler,
 ]
-
-const repositories = [UserRepository, UserQueryRepository, AuthRepository]
-
-const commandHandlers: any[] = []
 
 @Module({
 	imports: [CqrsModule],

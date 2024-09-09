@@ -23,7 +23,6 @@ export class RecoveryPasswordHandler
 
 		const user = await this.userRepository.getUserByEmail(email)
 
-		// Send success status even if current email is not registered (for prevent user's email detection)
 		if (!user) {
 			throw new Error(ErrorMessage.UserNotFound)
 		}

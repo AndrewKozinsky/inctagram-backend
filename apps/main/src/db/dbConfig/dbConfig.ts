@@ -17,7 +17,7 @@ export const bdConfig = {
 				example: '$1Hn[595n8]T',
 				required: true,
 			},
-			recovery_code: {
+			recoveryCode: {
 				type: 'string',
 				minLength: 1,
 				maxLength: 100,

@@ -6,6 +6,7 @@ import { INestApplication } from '@nestjs/common'
 import { EmailAdapterService } from '@app/email-adapter'
 import { GitHubService } from '../../src/routes/auth/gitHubService'
 import { GoogleService } from '../../src/routes/auth/googleService'
+import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 
 export const adminAuthorizationValue = 'Basic YWRtaW46cXdlcnR5'
 export const userName = 'my-user-name'
@@ -16,6 +17,7 @@ export async function createTestApp(
 	emailAdapter: EmailAdapterService,
 	gitHubService: GitHubService,
 	googleService: GoogleService,
+	reCaptchaAdapter: ReCaptchaAdapterService,
 ) {
 	const moduleFixture: TestingModule = await Test.createTestingModule({
 		imports: [AppModule],
@@ -42,6 +44,10 @@ export async function createTestApp(
 				email: userEmail,
 			}),
 		})
+		.overrideProvider(ReCaptchaAdapterService)
+		.useValue({
+			isValid: jest.fn().mockResolvedValue(true),
+		})
 		.compile()
 
 	const app = moduleFixture.createNestApplication()
@@ -51,8 +57,9 @@ export async function createTestApp(
 	emailAdapter = moduleFixture.get<EmailAdapterService>(EmailAdapterService)
 	gitHubService = moduleFixture.get<GitHubService>(GitHubService)
 	googleService = moduleFixture.get<GoogleService>(GoogleService)
+	reCaptchaAdapter = moduleFixture.get<ReCaptchaAdapterService>(ReCaptchaAdapterService)
 
-	return { app, emailAdapter, gitHubService, googleService }
+	return { app, emailAdapter, gitHubService, googleService, reCaptchaAdapter }
 }
 
 export function postRequest(app: INestApplication, url: string) {
@@ -61,6 +68,10 @@ export function postRequest(app: INestApplication, url: string) {
 
 export function getRequest(app: INestApplication, url: string) {
 	return request(app.getHttpServer()).get('/' + url)
+}
+
+export function deleteRequest(app: INestApplication, url: string) {
+	return request(app.getHttpServer()).delete('/' + url)
 }
 
 /**

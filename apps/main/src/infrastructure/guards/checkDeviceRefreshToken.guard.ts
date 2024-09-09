@@ -1,17 +1,17 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { BrowserServiceService } from '@app/browser-service'
-import { AuthRepository } from '../../repositories/auth.repository'
 import { CustomException } from '../exceptionFilters/customException'
 import { HTTP_STATUSES } from '../../utils/httpStatuses'
 import { ErrorMessage } from '../exceptionFilters/layerResult'
+import { SecurityRepository } from '../../repositories/security.repository'
 
 @Injectable()
 export class CheckDeviceRefreshTokenGuard implements CanActivate {
 	constructor(
 		private browserService: BrowserServiceService,
 		private jwtAdapter: JwtAdapterService,
-		private authRepository: AuthRepository,
+		private securityRepository: SecurityRepository,
 	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -32,7 +32,7 @@ export class CheckDeviceRefreshTokenGuard implements CanActivate {
 				this.jwtAdapter.getTokenStrExpirationDate(refreshTokenStr)
 
 			const deviceRefreshToken =
-				await this.authRepository.getDeviceRefreshTokenByTokenStr(refreshTokenStr)
+				await this.securityRepository.getDeviceRefreshTokenByTokenStr(refreshTokenStr)
 
 			if (!refreshTokenStrExpirationDate || !deviceRefreshToken) {
 				throw CustomException(

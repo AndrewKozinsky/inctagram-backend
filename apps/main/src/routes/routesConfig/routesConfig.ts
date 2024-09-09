@@ -167,6 +167,18 @@ export const routesConfig = {
 				description: 'This device is terminated',
 				dataClass: SWEmptyRouteOut,
 			},
+			{
+				code: ErrorCode.Unauthorized_401,
+				errors: [ErrorMessage.UserDeviceNotFound],
+			},
+			{
+				code: ErrorCode.Forbidden_403,
+				errors: [ErrorMessage.UserDoesNotOwnThisDeviceToken],
+			},
+			{
+				code: ErrorCode.NotFound_404,
+				errors: [ErrorMessage.RefreshTokenIsNotFound],
+			},
 		],
 	},
 } satisfies RoutesConfig.Root

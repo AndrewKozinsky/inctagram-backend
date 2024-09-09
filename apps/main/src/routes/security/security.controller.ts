@@ -58,7 +58,7 @@ export class SecurityController {
 
 			return createSuccessResp(routesConfig.terminateUserDevicesExceptOne, null)
 		} catch (err: any) {
-			createFailResp(routesConfig.registration, err)
+			createFailResp(routesConfig.terminateUserDevicesExceptOne, err)
 		}
 	}
 
@@ -76,7 +76,8 @@ export class SecurityController {
 
 			return createSuccessResp(routesConfig.terminateUserDevice, null)
 		} catch (err: any) {
-			createFailResp(routesConfig.registration, err)
+			console.log(err)
+			createFailResp(routesConfig.terminateUserDevice, err)
 		}
 	}
 }

@@ -22,7 +22,6 @@ import {
 import { RouteDecorators } from '../routesConfig/routesDecorators'
 import { routesConfig } from '../routesConfig/routesConfig'
 import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
-import { UserOutModel } from '../../models/user/user.out.model'
 import { LoginOutModel } from '../../models/auth/auth.output.model'
 import { ApiBearerAuth, ApiCookieAuth, ApiTags } from '@nestjs/swagger'
 import {

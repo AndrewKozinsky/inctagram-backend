@@ -8,7 +8,7 @@ export class AuthService {
 
 	setRefreshTokenInCookie(res: Response, refreshTokenStr: string) {
 		res.cookie(this.mainConfig.get().refreshToken.name, refreshTokenStr, {
-			maxAge: this.mainConfig.get().refreshToken.lifeDurationInMs / 1000,
+			maxAge: this.mainConfig.get().refreshToken.lifeDurationInMs,
 			httpOnly: true,
 			secure: true,
 		})

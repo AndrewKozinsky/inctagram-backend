@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { JwtAdapterService } from '@app/jwt-adapter'
-import { AuthRepository } from '../../repositories/auth.repository'
+import { SecurityRepository } from '../../repositories/security.repository'
 
 export class CreateRefreshTokenCommand {
 	constructor(
@@ -14,7 +14,7 @@ export class CreateRefreshTokenCommand {
 export class CreateRefreshTokenHandler implements ICommandHandler<CreateRefreshTokenCommand> {
 	constructor(
 		private jwtAdapter: JwtAdapterService,
-		private authRepository: AuthRepository,
+		private securityRepository: SecurityRepository,
 	) {}
 
 	async execute(command: CreateRefreshTokenCommand) {
@@ -26,7 +26,7 @@ export class CreateRefreshTokenHandler implements ICommandHandler<CreateRefreshT
 			clientName,
 		)
 
-		await this.authRepository.insertDeviceRefreshToken(newDeviceRefreshToken)
+		await this.securityRepository.insertDeviceRefreshToken(newDeviceRefreshToken)
 
 		const refreshTokenStr = this.jwtAdapter.createRefreshTokenStr(
 			newDeviceRefreshToken.deviceId,

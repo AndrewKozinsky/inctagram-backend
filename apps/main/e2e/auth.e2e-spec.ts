@@ -21,9 +21,10 @@ import { UserRepository } from '../src/repositories/user.repository'
 import { userUtils } from './utils/userUtils'
 import { createUniqString, parseCookieStringToObj } from '../src/utils/stringUtils'
 import { DeviceTokenOutModel } from '../src/models/auth/auth.output.model'
-import { AuthRepository } from '../src/repositories/auth.repository'
 import { GitHubService } from '../src/routes/auth/gitHubService'
 import { GoogleService } from '../src/routes/auth/googleService'
+import { SecurityRepository } from '../src/repositories/security.repository'
+import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 
 it.only('123', async () => {
 	expect(2).toBe(2)
@@ -34,22 +35,29 @@ describe('Auth (e2e)', () => {
 	let emailAdapter: EmailAdapterService
 	let gitHubService: GitHubService
 	let googleService: GoogleService
+	let reCaptchaAdapter: ReCaptchaAdapterService
 
 	let userRepository: UserRepository
-	let authRepository: AuthRepository
+	let securityRepository: SecurityRepository
 	let jwtService: JwtAdapterService
 	let mainConfig: MainConfigService
 
 	beforeAll(async () => {
-		const createAppRes = await createTestApp(emailAdapter, gitHubService, googleService)
+		const createAppRes = await createTestApp(
+			emailAdapter,
+			gitHubService,
+			googleService,
+			reCaptchaAdapter,
+		)
 		app = createAppRes.app
 
 		emailAdapter = createAppRes.emailAdapter
 		gitHubService = createAppRes.gitHubService
 		googleService = createAppRes.googleService
+		reCaptchaAdapter = createAppRes.reCaptchaAdapter
 
 		userRepository = await app.resolve(UserRepository)
-		authRepository = await app.resolve(AuthRepository)
+		securityRepository = await app.resolve(SecurityRepository)
 		jwtService = await app.resolve(JwtAdapterService)
 		mainConfig = await app.resolve(MainConfigService)
 	})
@@ -304,7 +312,7 @@ describe('Auth (e2e)', () => {
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
 
 			const resend = resendConfirmEmailRes.body
-			checkErrorResponse(resend, 400, 'User not found')
+			checkErrorResponse(resend, 400, 'Email not found')
 		})
 
 		it('should return an error if the entered email is not confirmed', async () => {
@@ -363,10 +371,10 @@ describe('Auth (e2e)', () => {
 				userId: user!.id,
 			}
 
-			await authRepository.insertDeviceRefreshToken(expiredRefreshToken)
+			await securityRepository.insertDeviceRefreshToken(expiredRefreshToken)
 
 			// Get created expired token
-			const refreshToken = await authRepository.getDeviceRefreshTokenByDeviceId(deviceId)
+			const refreshToken = await securityRepository.getDeviceRefreshTokenByDeviceId(deviceId)
 			const refreshTokenStr = jwtService.createRefreshTokenStr(
 				refreshToken!.deviceId,
 				refreshToken!.expirationDate,
@@ -381,6 +389,7 @@ describe('Auth (e2e)', () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
 				app,
 				userRepository,
+				userName,
 				userEmail,
 				userPassword,
 			)
@@ -404,19 +413,19 @@ describe('Auth (e2e)', () => {
 			checkErrorResponse(recover, 400, 'Wrong body')
 
 			expect({}.toString.call(recover.wrongFields)).toBe('[object Array]')
-			expect(recover.wrongFields.length).toBe(1)
+			expect(recover.wrongFields.length).toBe(2)
 			const [emailFieldErrText] = getFieldInErrorObject(recover, ['email'])
 
 			expect(emailFieldErrText).toBe('Email must be a string')
 		})
 
-		it('should return 200 if email is not registered and email is not be sent', async () => {
+		it('should return 400 if email is not registered and email is not be sent', async () => {
 			const recoverRes = await postRequest(app, RouteNames.AUTH.PASSWORD_RECOVERY.full)
-				.send({ email: userEmail })
-				.expect(HTTP_STATUSES.OK_200)
+				.send({ email: userEmail, recaptchaValue: 'recaptchaValue' })
+				.expect(HTTP_STATUSES.BAD_REQUEST_400)
 
 			const recover = recoverRes.body
-			checkSuccessResponse(recover, 200)
+			checkErrorResponse(recover, 400, 'User not found')
 			expect(emailAdapter.sendPasswordRecoveryMessage).toBeCalledTimes(0)
 		})
 
@@ -424,7 +433,7 @@ describe('Auth (e2e)', () => {
 			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
 
 			const recoverRes = await postRequest(app, RouteNames.AUTH.PASSWORD_RECOVERY.full)
-				.send({ email: user!.email })
+				.send({ email: user!.email, recaptchaValue: 'recaptchaValue' })
 				.expect(HTTP_STATUSES.OK_200)
 
 			const recover = recoverRes.body
@@ -432,6 +441,18 @@ describe('Auth (e2e)', () => {
 			expect(typeof recover.data.recoveryCode).toBe('string')
 
 			expect(emailAdapter.sendPasswordRecoveryMessage).toBeCalledTimes(1)
+		})
+
+		it('should return 400 if capcha is wrong', async () => {
+			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
+
+			reCaptchaAdapter.isValid = jest.fn().mockReturnValueOnce(false)
+			const recoverRes = await postRequest(app, RouteNames.AUTH.PASSWORD_RECOVERY.full)
+				.send({ email: user!.email, recaptchaValue: 'recaptchaValue' })
+				.expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+			const recover = recoverRes.body
+			checkErrorResponse(recover, 400, 'Captcha is wrong')
 		})
 	})
 
@@ -468,7 +489,7 @@ describe('Auth (e2e)', () => {
 			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
 
 			const recoverRes = await postRequest(app, RouteNames.AUTH.PASSWORD_RECOVERY.full)
-				.send({ email: user!.email })
+				.send({ email: user!.email, recaptchaValue: 'recaptchaValue' })
 				.expect(HTTP_STATUSES.OK_200)
 
 			const recover = recoverRes.body
@@ -504,10 +525,10 @@ describe('Auth (e2e)', () => {
 				userId: user.id,
 			}
 
-			await authRepository.insertDeviceRefreshToken(expiredRefreshToken)
+			await securityRepository.insertDeviceRefreshToken(expiredRefreshToken)
 
 			// Get created expired token
-			const refreshToken = await authRepository.getDeviceRefreshTokenByDeviceId(deviceId)
+			const refreshToken = await securityRepository.getDeviceRefreshTokenByDeviceId(deviceId)
 			const refreshTokenStr = jwtService.createRefreshTokenStr(
 				refreshToken!.deviceId,
 				refreshToken!.expirationDate,
@@ -522,6 +543,7 @@ describe('Auth (e2e)', () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
 				app,
 				userRepository,
+				userName,
 				userEmail,
 				userPassword,
 			)
