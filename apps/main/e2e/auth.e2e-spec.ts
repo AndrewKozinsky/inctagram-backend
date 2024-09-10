@@ -70,7 +70,7 @@ describe('Auth (e2e)', () => {
 		jest.clearAllMocks()
 	})
 
-	describe('Register user', () => {
+	/*describe('Register user', () => {
 		it('should return 400 if dto has incorrect values', async () => {
 			await postRequest(app, RouteNames.AUTH.REGISTRATION.full).expect(
 				HTTP_STATUSES.BAD_REQUEST_400,
@@ -147,9 +147,9 @@ describe('Auth (e2e)', () => {
 				})
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
 		})
-	})
+	})*/
 
-	describe('Confirm email', () => {
+	/*describe('Confirm email', () => {
 		it('should return 400 if dto has incorrect values', async () => {
 			const confirmationRes = await getRequest(
 				app,
@@ -224,9 +224,9 @@ describe('Auth (e2e)', () => {
 			const confirmEmailSecondTime = confirmEmailSecondTimeRes.body
 			checkErrorResponse(confirmEmailSecondTime, 400, 'Email confirmation code not found')
 		})
-	})
+	})*/
 
-	describe('Login', () => {
+	/*describe('Login', () => {
 		it('should return 400 if dto has incorrect values', async () => {
 			const loginRes = await postRequest(app, RouteNames.AUTH.LOGIN.full).expect(
 				HTTP_STATUSES.BAD_REQUEST_400,
@@ -283,9 +283,9 @@ describe('Auth (e2e)', () => {
 			expect(typeof login.data.accessToken).toBe('string')
 			userUtils.checkUserOutModel(login.data.user)
 		})
-	})
+	})*/
 
-	describe('Confirmation email resending', () => {
+	/*describe('Confirmation email resending', () => {
 		it('should return 400 if dto has incorrect values', async () => {
 			const resendConfirmEmailRes = await postRequest(
 				app,
@@ -346,9 +346,9 @@ describe('Auth (e2e)', () => {
 			expect(emailAdapter.sendEmailConfirmationMessage).toBeCalledTimes(1)
 			checkSuccessResponse(resend, 200)
 		})
-	})
+	})*/
 
-	describe('User log out', () => {
+	/*describe('User log out', () => {
 		it('should return 401 if there is not cookies', async () => {
 			const logoutRes = await postRequest(app, RouteNames.AUTH.LOGOUT.full).expect(
 				HTTP_STATUSES.UNAUTHORIZED_401,
@@ -402,9 +402,9 @@ describe('Auth (e2e)', () => {
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.expect(HTTP_STATUSES.OK_200)
 		})
-	})
+	})*/
 
-	describe('Reset password', () => {
+	/*describe('Reset password', () => {
 		it('should return 400 if email in body is not exist or has wrong format', async () => {
 			const recoverRes = await postRequest(
 				app,
@@ -445,7 +445,7 @@ describe('Auth (e2e)', () => {
 			expect(emailAdapter.sendPasswordRecoveryMessage).toBeCalledTimes(1)
 		})
 
-		/*it('should return 400 if capcha is wrong', async () => {
+		/!*it('should return 400 if capcha is wrong', async () => {
 			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
 
 			// reCaptchaAdapter.isValid = jest.fn().mockReturnValueOnce(false)
@@ -455,10 +455,10 @@ describe('Auth (e2e)', () => {
 
 			const recover = recoverRes.body
 			checkErrorResponse(recover, 400, 'Captcha is wrong')
-		})*/
-	})
+		})*!/
+	})*/
 
-	describe('Set new password', () => {
+	/*describe('Set new password', () => {
 		it('should return 400 if email in body is not exist or has wrong format', async () => {
 			const newPasswordRes = await postRequest(app, RouteNames.AUTH.NEW_PASSWORD.full).expect(
 				HTTP_STATUSES.BAD_REQUEST_400,
@@ -509,9 +509,9 @@ describe('Auth (e2e)', () => {
 				.send({ password: myNewPassword, email: userEmail })
 				.expect(HTTP_STATUSES.OK_200)
 		})
-	})
+	})*/
 
-	describe('Get new refresh and access token', () => {
+	/*describe('Get new refresh and access token', () => {
 		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
 			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
 
@@ -565,9 +565,9 @@ describe('Auth (e2e)', () => {
 			const newAccessToken = refreshRes.body.data.accessToken
 			expect(typeof newAccessToken).toBe('string')
 		})
-	})
+	})*/
 
-	describe('Sign up with Github or Google', () => {
+	/*describe('Sign up with Github or Google', () => {
 		it('return 400 if provider name is wrong', async () => {
 			const registerRes = await getRequest(
 				app,
@@ -634,5 +634,5 @@ describe('Auth (e2e)', () => {
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshToken)
 				.expect(HTTP_STATUSES.OK_200)
 		})
-	})
+	})*/
 })

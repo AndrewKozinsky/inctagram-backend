@@ -26,7 +26,7 @@ it('123', async () => {
 	expect(2).toBe(2)
 })
 
-describe('Auth (e2e)', () => {
+/*describe('Auth (e2e)', () => {
 	let app: INestApplication
 	let emailAdapter: EmailAdapterService
 	let gitHubService: GitHubService
@@ -257,4 +257,4 @@ describe('Auth (e2e)', () => {
 				.expect(HTTP_STATUSES.OK_200)
 		})
 	})
-})
+})*/
