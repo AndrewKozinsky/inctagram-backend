@@ -22,7 +22,7 @@ import { GoogleService } from '../src/routes/auth/googleService'
 import { DevicesRepository } from '../src/repositories/devices.repository'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 
-it.only('123', async () => {
+it('123', async () => {
 	expect(2).toBe(2)
 })
 
@@ -134,9 +134,9 @@ describe('Auth (e2e)', () => {
 			await securityRepository.insertDeviceRefreshToken(expiredRefreshToken)
 
 			// Get created expired token
-			const refreshToken = securityRepository.getDeviceRefreshTokenByDeviceId(deviceId)
+			const refreshToken = await securityRepository.getDeviceRefreshTokenByDeviceId(deviceId)
 
-			deleteRequest(app, RouteNames.SECURITY.DEVICES.DEVICE_ID('999').full)
+			await deleteRequest(app, RouteNames.SECURITY.DEVICES.DEVICE_ID('999').full)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshToken)
 				.expect(HTTP_STATUSES.UNAUTHORIZED_401)
 		})
@@ -151,7 +151,7 @@ describe('Auth (e2e)', () => {
 			)
 			const refreshTokenStr = userUtils.convertCookieRefreshTokenToTokenStr(refreshToken)
 
-			deleteRequest(app, RouteNames.SECURITY.DEVICES.DEVICE_ID('999').full)
+			await deleteRequest(app, RouteNames.SECURITY.DEVICES.DEVICE_ID('999').full)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
 				.expect(HTTP_STATUSES.NOT_FOUNT_404)
 		})
@@ -201,7 +201,7 @@ describe('Auth (e2e)', () => {
 
 			const deviceId = jwtService.getRefreshTokenDataFromTokenStr(refreshTokenStr)!.deviceId
 
-			return deleteRequest(app, RouteNames.SECURITY.DEVICES.DEVICE_ID(deviceId).full)
+			return await deleteRequest(app, RouteNames.SECURITY.DEVICES.DEVICE_ID(deviceId).full)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
 				.expect(HTTP_STATUSES.OK_200)
 		})
@@ -252,7 +252,7 @@ describe('Auth (e2e)', () => {
 			const deviceRefreshTokenStr =
 				userUtils.convertCookieRefreshTokenToTokenStr(refreshToken)
 
-			return deleteRequest(app, RouteNames.SECURITY.DEVICES.full)
+			return await deleteRequest(app, RouteNames.SECURITY.DEVICES.full)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + deviceRefreshTokenStr)
 				.expect(HTTP_STATUSES.OK_200)
 		})

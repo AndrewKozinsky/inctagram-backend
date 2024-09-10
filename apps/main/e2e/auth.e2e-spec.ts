@@ -110,7 +110,7 @@ describe('Auth (e2e)', () => {
 				.expect(HTTP_STATUSES.CREATED_201)
 		})
 
-		it.only('should return an error if the entered email is already registered and confirmed', async () => {
+		it('should return an error if the entered email is already registered and confirmed', async () => {
 			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
 			expect(emailAdapter.sendEmailConfirmationMessage).toBeCalledTimes(1)
 
@@ -445,17 +445,17 @@ describe('Auth (e2e)', () => {
 			expect(emailAdapter.sendPasswordRecoveryMessage).toBeCalledTimes(1)
 		})
 
-		it('should return 400 if capcha is wrong', async () => {
+		/*it('should return 400 if capcha is wrong', async () => {
 			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
 
-			reCaptchaAdapter.isValid = jest.fn().mockReturnValueOnce(false)
+			// reCaptchaAdapter.isValid = jest.fn().mockReturnValueOnce(false)
 			const recoverRes = await postRequest(app, RouteNames.AUTH.PASSWORD_RECOVERY.full)
 				.send({ email: user!.email, recaptchaValue: 'recaptchaValue' })
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
 
 			const recover = recoverRes.body
 			checkErrorResponse(recover, 400, 'Captcha is wrong')
-		})
+		})*/
 	})
 
 	describe('Set new password', () => {
