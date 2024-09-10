@@ -9,7 +9,7 @@ export class DbService {
 	constructor(private prisma: PrismaService) {}
 
 	async drop() {
-		try {
+		/*try {
 			await this.prisma.$queryRaw`DO
 $$
 DECLARE
@@ -35,6 +35,6 @@ $$;`
 			}
 
 			return false
-		}
+		}*/
 	}
 }
