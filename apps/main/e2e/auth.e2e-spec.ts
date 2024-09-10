@@ -42,7 +42,7 @@ describe('Auth (e2e)', () => {
 	let jwtService: JwtAdapterService
 	let mainConfig: MainConfigService
 
-	beforeAll(async () => {
+	/*beforeAll(async () => {
 		const createAppRes = await createTestApp(
 			emailAdapter,
 			gitHubService,
@@ -60,15 +60,15 @@ describe('Auth (e2e)', () => {
 		securityRepository = await app.resolve(DevicesRepository)
 		jwtService = await app.resolve(JwtAdapterService)
 		mainConfig = await app.resolve(MainConfigService)
-	})
+	})*/
 
-	beforeEach(async () => {
+	/*beforeEach(async () => {
 		await clearAllDB(app)
 	})
 
 	afterEach(() => {
 		jest.clearAllMocks()
-	})
+	})*/
 
 	/*describe('Register user', () => {
 		it('should return 400 if dto has incorrect values', async () => {
