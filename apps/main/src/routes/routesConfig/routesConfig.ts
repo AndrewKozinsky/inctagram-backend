@@ -7,12 +7,12 @@ import { RoutesConfig } from './routesConfigTypes'
 import { RecoveryPasswordOutModel } from '../../models/auth/auth.output.model'
 import {
 	SWAuthorizeByProviderRouteOut,
-	SWEmptyRouteOut,
 	SWGetNewAccessAndRefreshTokenRouteOut,
 	SWGetUserDevicesRouteOut,
 	SWLoginRouteOut,
 	SWRegistrationRouteOut,
 } from '../auth/swaggerTypes'
+import { SWEmptyRouteOut } from './swaggerTypesCommon'
 
 export const routesConfig = {
 	registration: {
@@ -178,6 +178,15 @@ export const routesConfig = {
 			{
 				code: ErrorCode.NotFound_404,
 				errors: [ErrorMessage.RefreshTokenIsNotFound],
+			},
+		],
+	},
+	generateAllCountriesAndCities: {
+		response: [
+			{
+				code: SuccessCode.Ok,
+				description: 'Countries and cities were generated',
+				dataClass: SWEmptyRouteOut,
 			},
 		],
 	},

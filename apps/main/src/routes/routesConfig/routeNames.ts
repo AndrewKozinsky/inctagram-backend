@@ -51,6 +51,28 @@ export const RouteNames = {
 			},
 		},
 	},
+	COUNTRIES: {
+		value: 'countries',
+		COUNTRY_ID(countryId: string) {
+			return {
+				value: countryId,
+				full: 'countries/' + countryId,
+				CITIES: {
+					value: 'cities',
+					COUNTRY_ID(citiesId: string) {
+						return {
+							value: citiesId,
+							full: 'countries/' + countryId + 'cities/' + citiesId,
+						}
+					},
+				},
+			}
+		},
+		ALL: {
+			value: 'all',
+			full: 'countries/all',
+		},
+	},
 	TESTING: {
 		value: 'testing',
 		ALL_DATA: {

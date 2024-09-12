@@ -5,7 +5,7 @@ import RouteNames from '../routesConfig/routeNames'
 import { RouteDecorators } from '../routesConfig/routesDecorators'
 import { routesConfig } from '../routesConfig/routesConfig'
 import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
-import { SWEmptyRouteOut, SWGetUserDevicesRouteOut } from '../auth/swaggerTypes'
+import { SWGetUserDevicesRouteOut } from '../auth/swaggerTypes'
 import { CheckDeviceRefreshTokenGuard } from '../../infrastructure/guards/checkDeviceRefreshToken.guard'
 import { BrowserServiceService } from '@app/browser-service'
 import { DevicesQueryRepository } from '../../repositories/devices.queryRepository'
@@ -18,6 +18,7 @@ import {
 	TerminateUserDeviceHandler,
 } from '../../features/security/TerminateUserDevice.commandHandler'
 import { ApiTags } from '@nestjs/swagger'
+import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
 
 @ApiTags('Devices')
 @Controller(RouteNames.SECURITY.value)
