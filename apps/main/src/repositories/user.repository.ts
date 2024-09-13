@@ -153,7 +153,7 @@ export class UserRepository {
 			newUserParams.is_email_confirmed = true
 		}*/
 
-		console.log(newUserParams)
+		// console.log(newUserParams)
 		/*const user = await this.prisma.user.create({
 			data: newUserParams,
 		})
