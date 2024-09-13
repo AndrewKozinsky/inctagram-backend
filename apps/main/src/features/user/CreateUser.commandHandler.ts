@@ -20,13 +20,13 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 
 	async execute(command: CreateUserCommand) {
 		const { createUserDto } = command
-		/*console.log(1)
+		console.log(1)
 		const existingUser = await this.userRepository.getUserByEmailOrName({
 			email: createUserDto.email,
 			name: createUserDto.name,
 		})
 		console.log(2)
-		if (existingUser) {
+		/*if (existingUser) {
 			console.log(3)
 			if (existingUser.isEmailConfirmed) {
 				throw new Error(ErrorMessage.EmailOrUsernameIsAlreadyRegistered)
