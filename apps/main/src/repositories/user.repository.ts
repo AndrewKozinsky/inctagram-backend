@@ -126,7 +126,6 @@ export class UserRepository {
 		dto: CreateUserDtoModel & { githubId?: number; googleId?: number },
 		isEmailConfirmed = false,
 	) {
-		console.log(333)
 		const newUserParams: any = {
 			email: dto.email,
 			name: dto.name,
@@ -139,10 +138,10 @@ export class UserRepository {
 			is_email_confirmed: false,
 		}
 
-		/*if (dto.githubId) {
+		if (dto.githubId) {
 			newUserParams.github_id = dto.githubId
 			isEmailConfirmed = true
-		}*/
+		}
 		/*if (dto.googleId) {
 			newUserParams.google_id = dto.googleId
 			isEmailConfirmed = true
