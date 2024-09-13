@@ -153,11 +153,15 @@ export class UserRepository {
 			newUserParams.is_email_confirmed = true
 		}
 
-		const user = await this.prisma.user.create({
-			data: newUserParams,
-		})
+		try {
+			const user = await this.prisma.user.create({
+				data: newUserParams,
+			})
 
-		return this.mapDbUserToServiceUser(user)
+			return this.mapDbUserToServiceUser(user)
+		} catch (err) {
+			console.log(err)
+		}
 	}
 
 	async updateUser(userId: number, data: Partial<User>) {
