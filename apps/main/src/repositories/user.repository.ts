@@ -126,6 +126,7 @@ export class UserRepository {
 		dto: CreateUserDtoModel & { githubId?: number; googleId?: number },
 		isEmailConfirmed = false,
 	) {
+		console.log(333)
 		const newUserParams: any = {
 			email: dto.email,
 			name: dto.name,
