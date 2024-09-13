@@ -94,12 +94,12 @@ export class AuthController {
 		@Body() body: CreateUserDtoModel,
 	): Promise<SWRegistrationRouteOut | undefined> {
 		try {
-			/*const commandRes = await this.commandBus.execute<
+			const commandRes = await this.commandBus.execute<
 				any,
 				ReturnType<typeof CreateUserHandler.prototype.execute>
 			>(new CreateUserCommand(body))
 
-			return createSuccessResp(routesConfig.registration, commandRes)*/
+			/*return createSuccessResp(routesConfig.registration, commandRes)*/
 			// ---
 			return {
 				status: 'success',
