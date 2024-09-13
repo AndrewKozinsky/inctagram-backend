@@ -50,6 +50,6 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 		console.log(7)
 		return (await this.userQueryRepository.getUserById(createdUser.id)) as UserOutModel*/
 		//---
-		return null
+		return { id: 1, email: 'string', name: 'string' }
 	}
 }
