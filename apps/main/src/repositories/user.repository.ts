@@ -138,20 +138,20 @@ export class UserRepository {
 			is_email_confirmed: false,
 		}
 
-		if (dto.githubId) {
+		/*if (dto.githubId) {
 			newUserParams.github_id = dto.githubId
 			isEmailConfirmed = true
-		}
-		if (dto.googleId) {
+		}*/
+		/*if (dto.googleId) {
 			newUserParams.google_id = dto.googleId
 			isEmailConfirmed = true
-		}
+		}*/
 
-		if (isEmailConfirmed) {
+		/*if (isEmailConfirmed) {
 			newUserParams.email_confirmation_code = null
 			newUserParams.email_confirmation_code_expiration_date = null
 			newUserParams.is_email_confirmed = true
-		}
+		}*/
 
 		console.log(newUserParams)
 		/*const user = await this.prisma.user.create({
