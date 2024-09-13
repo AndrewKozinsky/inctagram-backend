@@ -140,7 +140,7 @@ export class UserRepository {
 
 		if (dto.githubId) {
 			newUserParams.github_id = dto.githubId
-			isEmailConfirmed = true
+			// isEmailConfirmed = true
 		}
 		/*if (dto.googleId) {
 			newUserParams.google_id = dto.googleId
