@@ -153,27 +153,25 @@ export class UserRepository {
 			newUserParams.is_email_confirmed = true
 		}
 
-		try {
-			const user = await this.prisma.user.create({
-				data: newUserParams,
-			})
+		console.log(newUserParams)
+		/*const user = await this.prisma.user.create({
+			data: newUserParams,
+		})
 
-			return this.mapDbUserToServiceUser(user)
-		} catch (err) {
-			console.log(err)
+		return this.mapDbUserToServiceUser(user)*/
 
-			return {
-				id: 1,
-				email: 'dbUser.email',
-				name: 'dbUser.name',
-				hashedPassword: 'dbUser.hashed_password',
-				emailConfirmationCode: 'dbUser.email_confirmation_code',
-				confirmationCodeExpirationDate: 'dbUser.email_confirmation_code_expiration_date',
-				isEmailConfirmed: false,
-				passwordRecoveryCode: 'dbUser.password_recovery_code',
-				githubId: null,
-				googleId: null,
-			}
+		// ---
+		return {
+			id: 1,
+			email: 'dbUser.email',
+			name: 'dbUser.name',
+			hashedPassword: 'dbUser.hashed_password',
+			emailConfirmationCode: 'dbUser.email_confirmation_code',
+			confirmationCodeExpirationDate: 'dbUser.email_confirmation_code_expiration_date',
+			isEmailConfirmed: false,
+			passwordRecoveryCode: 'dbUser.password_recovery_code',
+			githubId: null,
+			googleId: null,
 		}
 	}
 
