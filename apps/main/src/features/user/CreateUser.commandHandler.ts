@@ -35,7 +35,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 			await this.userRepository.deleteUser(existingUser.id)
 		}
 		console.log(5)
-		const createdUser = await this.userRepository.createUser(createUserDto)
+		// const createdUser = await this.userRepository.createUser(createUserDto)
 
 		/*try {
 			console.log(6)
