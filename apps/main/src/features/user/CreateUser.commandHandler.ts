@@ -20,7 +20,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 
 	async execute(command: CreateUserCommand) {
 		const { createUserDto } = command
-		console.log(1)
+		/*console.log(1)
 		const existingUser = await this.userRepository.getUserByEmailOrName({
 			email: createUserDto.email,
 			name: createUserDto.name,
@@ -48,6 +48,8 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 			console.log(err)
 		}
 		console.log(7)
-		return (await this.userQueryRepository.getUserById(createdUser.id)) as UserOutModel
+		return (await this.userQueryRepository.getUserById(createdUser.id)) as UserOutModel*/
+		//---
+		return null
 	}
 }
