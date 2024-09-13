@@ -94,16 +94,13 @@ export class AuthController {
 		@Body() body: CreateUserDtoModel,
 	): Promise<SWRegistrationRouteOut | undefined> {
 		try {
-			console.log('Before commandRes')
 			const commandRes = await this.commandBus.execute<
 				any,
 				ReturnType<typeof CreateUserHandler.prototype.execute>
 			>(new CreateUserCommand(body))
-			console.log('After commandRes')
+
 			return createSuccessResp(routesConfig.registration, commandRes)
 		} catch (err: any) {
-			console.log('Error')
-			console.log(err)
 			createFailResp(routesConfig.registration, err)
 		}
 	}
