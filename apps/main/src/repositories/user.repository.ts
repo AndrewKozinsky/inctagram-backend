@@ -130,12 +130,12 @@ export class UserRepository {
 			email: dto.email,
 			name: dto.name,
 			hashed_password: await this.hashAdapter.hashString(dto.password),
-			// email_confirmation_code: createUniqString(),
-			/*email_confirmation_code_expiration_date: add(new Date(), {
+			email_confirmation_code: createUniqString(),
+			email_confirmation_code_expiration_date: add(new Date(), {
 				hours: 0,
 				minutes: 5,
-			}).toISOString(),*/
-			// is_email_confirmed: false,
+			}).toISOString(),
+			is_email_confirmed: false,
 		}
 
 		// if (dto.githubId) {
