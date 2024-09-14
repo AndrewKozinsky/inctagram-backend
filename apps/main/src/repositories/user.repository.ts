@@ -126,7 +126,7 @@ export class UserRepository {
 		dto: CreateUserDtoModel & { githubId?: number; googleId?: number },
 		isEmailConfirmed = false,
 	) {
-		const newUserParams: any = {
+		/*const newUserParams: any = {
 			email: dto.email,
 			name: dto.name,
 			hashed_password: await this.hashAdapter.hashString(dto.password),
@@ -136,13 +136,13 @@ export class UserRepository {
 				minutes: 5,
 			}).toISOString(),
 			is_email_confirmed: false,
-		}
+		}*/
 
-		if (dto.githubId) {
-			// newUserParams.github_id = dto.githubId
-			//--
-			// isEmailConfirmed = true
-		}
+		// if (dto.githubId) {
+		// newUserParams.github_id = dto.githubId
+		//--
+		// isEmailConfirmed = true
+		// }
 		/*if (dto.googleId) {
 			newUserParams.google_id = dto.googleId
 			isEmailConfirmed = true
