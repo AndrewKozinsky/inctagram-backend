@@ -129,7 +129,7 @@ export class UserRepository {
 		const newUserParams: any = {
 			email: dto.email,
 			name: dto.name,
-			hashed_password: await this.hashAdapter.hashString(dto.password),
+			// hashed_password: await this.hashAdapter.hashString(dto.password),
 			// email_confirmation_code: createUniqString(),
 			/*email_confirmation_code_expiration_date: add(new Date(), {
 				hours: 0,
