@@ -126,17 +126,10 @@ export class UserRepository {
 		dto: CreateUserDtoModel & { githubId?: number; googleId?: number },
 		isEmailConfirmed = false,
 	) {
-		console.log(dto.password)
-		try {
-			// const hashed_password = await this.hashAdapter.hashString(dto.password)
-		} catch (error) {
-			console.log(error)
-		}
-
 		const newUserParams: any = {
 			email: dto.email,
 			name: dto.name,
-			// hashed_password: await this.hashAdapter.hashString(dto.password),
+			hashed_password: await this.hashAdapter.hashString(dto.password),
 			// email_confirmation_code: createUniqString(),
 			/*email_confirmation_code_expiration_date: add(new Date(), {
 				hours: 0,

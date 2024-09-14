@@ -10,8 +10,11 @@ export class HashAdapterService {
 		return bcrypt.hash(str, salt)
 	}
 	async hashString(str: string) {
-		const passwordSalt = await this.generateSalt()
-		return await this.generateHash(str, passwordSalt)
+		console.log({ str })
+		// const passwordSalt = await this.generateSalt()
+		// return await this.generateHash(str, passwordSalt)
+		//---
+		return '4ererdgrdfverd'
 	}
 	compare(str: string, hashedStr: string) {
 		return bcrypt.compare(str, hashedStr)
