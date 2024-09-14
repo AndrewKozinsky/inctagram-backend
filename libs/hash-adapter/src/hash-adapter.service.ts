@@ -4,7 +4,12 @@ import * as bcrypt from 'bcrypt'
 @Injectable()
 export class HashAdapterService {
 	generateSalt() {
-		return bcrypt.genSalt()
+		try {
+			return bcrypt.genSalt()
+		} catch (err) {
+			console.log(err)
+		}
+		return 'dfgdgdddfg'
 	}
 	generateHash(str: string, salt: string) {
 		return bcrypt.hash(str, salt)
