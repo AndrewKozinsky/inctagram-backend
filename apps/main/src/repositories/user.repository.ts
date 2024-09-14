@@ -127,7 +127,7 @@ export class UserRepository {
 		isEmailConfirmed = false,
 	) {
 		const newUserParams: any = {
-			// email: dto.email,
+			email: dto.email,
 			// name: dto.name,
 			// hashed_password: await this.hashAdapter.hashString(dto.password),
 			// email_confirmation_code: createUniqString(),
