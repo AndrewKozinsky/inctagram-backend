@@ -126,7 +126,11 @@ export class UserRepository {
 		dto: CreateUserDtoModel & { githubId?: number; googleId?: number },
 		isEmailConfirmed = false,
 	) {
-		const hashed_password = await this.hashAdapter.hashString(dto.password)
+		try {
+			const hashed_password = await this.hashAdapter.hashString(dto.password)
+		} catch (error) {
+			console.log(error)
+		}
 
 		const newUserParams: any = {
 			email: dto.email,
