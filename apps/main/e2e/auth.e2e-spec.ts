@@ -2,20 +2,6 @@ import { INestApplication } from '@nestjs/common'
 import { add } from 'date-fns'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { MainConfigService } from '@app/config'
-import {
-	checkErrorResponse,
-	checkSuccessResponse,
-	createTestApp,
-	getFieldInErrorObject,
-	getRequest,
-	postRequest,
-	userEmail,
-	userName,
-	userPassword,
-} from './utils/common'
-import RouteNames from '../src/routes/routesConfig/routeNames'
-import { HTTP_STATUSES } from '../src/utils/httpStatuses'
-import { clearAllDB } from './utils/db'
 import { EmailAdapterService } from '@app/email-adapter'
 import { UserRepository } from '../src/repositories/user.repository'
 import { userUtils } from './utils/userUtils'
