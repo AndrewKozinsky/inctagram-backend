@@ -9,6 +9,10 @@ import { UserRepository } from '../repositories/user.repository'
 import { ErrorExceptionFilter } from './exceptionFilters/exception.filter'
 
 export function applyAppSettings(app: INestApplication) {
+	app.enableCors({
+		origin: ['http://localhost', 'https://sociable-people.com'],
+	})
+
 	app.use(cookieParser())
 
 	app.use(async (req: Request, res: Response, next: NextFunction) => {
@@ -47,4 +51,24 @@ export function applyAppSettings(app: INestApplication) {
 	useContainer(app.select(AppModule), { fallbackOnErrors: true })
 
 	app.useGlobalFilters(new ErrorExceptionFilter())
+}
+
+export const onUncaughtException = () => {
+	process.on('uncaughtException', (e) => {
+		console.log('!!! Uncaught Exception: ', e)
+	})
+}
+export const onUnhandledRejection = () => {
+	process.on('unhandledRejection', (reason, p) => {
+		console.log(
+			'!!! Unhandled Rejection',
+			reason,
+			p.then((x) => console.log('!!! then: ', x)).catch((e) => console.log('!!! catch: ', e)),
+		)
+	})
+}
+// отлов ошибок чтоб сервер не падал
+export const globalCatch = () => {
+	onUncaughtException()
+	onUnhandledRejection()
 }

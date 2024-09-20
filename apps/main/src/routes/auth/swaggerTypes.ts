@@ -1,16 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
 
-export class SWEmptyRouteOut {
-	@ApiProperty({ default: 'success' })
-	status: string
-
-	@ApiProperty()
-	code: number
-
-	@ApiProperty({ type: 'null' })
-	data: null
-}
-
 export class SWRegistrationRouteOut {
 	@ApiProperty({ default: 'success' })
 	status: string

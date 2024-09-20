@@ -5,13 +5,13 @@ import {
 } from '../../infrastructure/exceptionFilters/layerResult'
 import { AuthController } from '../auth/auth.controller'
 import { BdConfig } from '../../db/dbConfig/dbConfigType'
-import { SecurityController } from '../security/security.controller'
+import { DevicesController } from '../devices/devices.controller'
 
 type MethodNames<T> = {
 	[K in keyof T]: T[K] extends (...args: any[]) => any ? K : never
 }[keyof T]
 
-type RouteName = MethodNames<AuthController & SecurityController>
+type RouteName = MethodNames<AuthController & DevicesController>
 
 export namespace RoutesConfig {
 	export type Root = Record<RouteName, Route>

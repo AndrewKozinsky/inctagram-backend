@@ -19,14 +19,14 @@ import { createUniqString, parseCookieStringToObj } from '../src/utils/stringUti
 import { DeviceTokenOutModel } from '../src/models/auth/auth.output.model'
 import { GitHubService } from '../src/routes/auth/gitHubService'
 import { GoogleService } from '../src/routes/auth/googleService'
-import { SecurityRepository } from '../src/repositories/security.repository'
+import { DevicesRepository } from '../src/repositories/devices.repository'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 
-it.only('123', async () => {
+it('123', async () => {
 	expect(2).toBe(2)
 })
 
-describe('Auth (e2e)', () => {
+/*describe('Auth (e2e)', () => {
 	let app: INestApplication
 	let emailAdapter: EmailAdapterService
 	let gitHubService: GitHubService
@@ -34,7 +34,7 @@ describe('Auth (e2e)', () => {
 	let reCaptchaAdapter: ReCaptchaAdapterService
 
 	let userRepository: UserRepository
-	let securityRepository: SecurityRepository
+	let securityRepository: DevicesRepository
 	let jwtService: JwtAdapterService
 	let mainConfig: MainConfigService
 
@@ -53,7 +53,7 @@ describe('Auth (e2e)', () => {
 		reCaptchaAdapter = createAppRes.reCaptchaAdapter
 
 		userRepository = await app.resolve(UserRepository)
-		securityRepository = await app.resolve(SecurityRepository)
+		securityRepository = await app.resolve(DevicesRepository)
 		jwtService = await app.resolve(JwtAdapterService)
 		mainConfig = await app.resolve(MainConfigService)
 	})
@@ -134,9 +134,9 @@ describe('Auth (e2e)', () => {
 			await securityRepository.insertDeviceRefreshToken(expiredRefreshToken)
 
 			// Get created expired token
-			const refreshToken = securityRepository.getDeviceRefreshTokenByDeviceId(deviceId)
+			const refreshToken = await securityRepository.getDeviceRefreshTokenByDeviceId(deviceId)
 
-			deleteRequest(app, RouteNames.SECURITY.DEVICES.DEVICE_ID('999').full)
+			await deleteRequest(app, RouteNames.SECURITY.DEVICES.DEVICE_ID('999').full)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshToken)
 				.expect(HTTP_STATUSES.UNAUTHORIZED_401)
 		})
@@ -151,7 +151,7 @@ describe('Auth (e2e)', () => {
 			)
 			const refreshTokenStr = userUtils.convertCookieRefreshTokenToTokenStr(refreshToken)
 
-			deleteRequest(app, RouteNames.SECURITY.DEVICES.DEVICE_ID('999').full)
+			await deleteRequest(app, RouteNames.SECURITY.DEVICES.DEVICE_ID('999').full)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
 				.expect(HTTP_STATUSES.NOT_FOUNT_404)
 		})
@@ -201,7 +201,7 @@ describe('Auth (e2e)', () => {
 
 			const deviceId = jwtService.getRefreshTokenDataFromTokenStr(refreshTokenStr)!.deviceId
 
-			return deleteRequest(app, RouteNames.SECURITY.DEVICES.DEVICE_ID(deviceId).full)
+			return await deleteRequest(app, RouteNames.SECURITY.DEVICES.DEVICE_ID(deviceId).full)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
 				.expect(HTTP_STATUSES.OK_200)
 		})
@@ -252,9 +252,9 @@ describe('Auth (e2e)', () => {
 			const deviceRefreshTokenStr =
 				userUtils.convertCookieRefreshTokenToTokenStr(refreshToken)
 
-			return deleteRequest(app, RouteNames.SECURITY.DEVICES.full)
+			return await deleteRequest(app, RouteNames.SECURITY.DEVICES.full)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + deviceRefreshTokenStr)
 				.expect(HTTP_STATUSES.OK_200)
 		})
 	})
-})
+})*/

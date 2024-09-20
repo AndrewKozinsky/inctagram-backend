@@ -4,14 +4,14 @@ import { BrowserServiceService } from '@app/browser-service'
 import { CustomException } from '../exceptionFilters/customException'
 import { HTTP_STATUSES } from '../../utils/httpStatuses'
 import { ErrorMessage } from '../exceptionFilters/layerResult'
-import { SecurityRepository } from '../../repositories/security.repository'
+import { DevicesRepository } from '../../repositories/devices.repository'
 
 @Injectable()
 export class CheckDeviceRefreshTokenGuard implements CanActivate {
 	constructor(
 		private browserService: BrowserServiceService,
 		private jwtAdapter: JwtAdapterService,
-		private securityRepository: SecurityRepository,
+		private securityRepository: DevicesRepository,
 	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {

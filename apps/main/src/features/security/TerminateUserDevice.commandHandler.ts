@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { JwtAdapterService } from '@app/jwt-adapter'
-import { SecurityRepository } from '../../repositories/security.repository'
+import { DevicesRepository } from '../../repositories/devices.repository'
 import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 
 export class TerminateUserDeviceCommand {
@@ -13,7 +13,7 @@ export class TerminateUserDeviceCommand {
 @CommandHandler(TerminateUserDeviceCommand)
 export class TerminateUserDeviceHandler implements ICommandHandler<TerminateUserDeviceCommand> {
 	constructor(
-		private securityRepository: SecurityRepository,
+		private securityRepository: DevicesRepository,
 		private jwtAdapter: JwtAdapterService,
 	) {}
 

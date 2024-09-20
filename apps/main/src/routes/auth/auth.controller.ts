@@ -1,4 +1,15 @@
-import { Body, Controller, Get, HttpStatus, Post, Query, Req, Res, UseGuards } from '@nestjs/common'
+import {
+	Body,
+	Controller,
+	Get,
+	HttpCode,
+	HttpStatus,
+	Post,
+	Query,
+	Req,
+	Res,
+	UseGuards,
+} from '@nestjs/common'
 import { CommandBus } from '@nestjs/cqrs'
 import { Request, Response } from 'express'
 import { MainConfigService } from '@app/config'
@@ -48,7 +59,6 @@ import { SetNewPasswordCommand } from '../../features/auth/SetNewPassword.comman
 import { CreateUserCommand, CreateUserHandler } from '../../features/user/CreateUser.commandHandler'
 import {
 	SWAuthorizeByProviderRouteOut,
-	SWEmptyRouteOut,
 	SWGetNewAccessAndRefreshTokenRouteOut,
 	SWLoginRouteOut,
 	SWPasswordRecoveryRouteOut,
@@ -56,6 +66,7 @@ import {
 } from './swaggerTypes'
 import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
+import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
 
 @ApiTags('Auth')
 @Controller(RouteNames.AUTH.value)
@@ -70,6 +81,13 @@ export class AuthController {
 		private reCaptchaAdapter: ReCaptchaAdapterService,
 	) {}
 
+	@Get('hello')
+	@HttpCode(HttpStatus.OK)
+	async hello() {
+		console.log('hello')
+		return 'hello'
+	}
+
 	@Post(RouteNames.AUTH.REGISTRATION.value)
 	@RouteDecorators(routesConfig.registration)
 	async registration(
@@ -81,7 +99,17 @@ export class AuthController {
 				ReturnType<typeof CreateUserHandler.prototype.execute>
 			>(new CreateUserCommand(body))
 
-			return createSuccessResp(routesConfig.registration, commandRes)
+			/*return createSuccessResp(routesConfig.registration, commandRes)*/
+			// ---
+			return {
+				status: 'success',
+				code: HttpStatus.CREATED,
+				data: {
+					id: 1,
+					name: 'name',
+					email: 'email',
+				},
+			}
 		} catch (err: any) {
 			createFailResp(routesConfig.registration, err)
 		}

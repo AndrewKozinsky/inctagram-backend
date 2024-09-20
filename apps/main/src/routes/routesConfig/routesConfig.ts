@@ -7,12 +7,12 @@ import { RoutesConfig } from './routesConfigTypes'
 import { RecoveryPasswordOutModel } from '../../models/auth/auth.output.model'
 import {
 	SWAuthorizeByProviderRouteOut,
-	SWEmptyRouteOut,
 	SWGetNewAccessAndRefreshTokenRouteOut,
 	SWGetUserDevicesRouteOut,
 	SWLoginRouteOut,
 	SWRegistrationRouteOut,
 } from '../auth/swaggerTypes'
+import { SWEmptyRouteOut } from './swaggerTypesCommon'
 
 export const routesConfig = {
 	registration: {
@@ -41,7 +41,7 @@ export const routesConfig = {
 		response: [
 			{
 				code: SuccessCode.Ok,
-				description: "User's email was confirmed",
+				description: "Confirm user's email",
 				dataClass: SWEmptyRouteOut,
 			},
 			{
@@ -75,7 +75,7 @@ export const routesConfig = {
 		response: [
 			{
 				code: SuccessCode.Ok,
-				description: 'Confirmation email was sent',
+				description: 'Send confirmation email letter',
 				dataClass: SWEmptyRouteOut,
 			},
 			{
@@ -93,7 +93,7 @@ export const routesConfig = {
 		response: [
 			{
 				code: SuccessCode.Ok,
-				description: 'User was logged out',
+				description: 'Log out user',
 				dataClass: SWEmptyRouteOut,
 			},
 			{
@@ -155,7 +155,7 @@ export const routesConfig = {
 		response: [
 			{
 				code: SuccessCode.Ok,
-				description: "All other user's devices were terminated",
+				description: "Terminate all user's devices except current",
 				dataClass: SWEmptyRouteOut,
 			},
 		],
@@ -164,7 +164,7 @@ export const routesConfig = {
 		response: [
 			{
 				code: SuccessCode.Ok,
-				description: 'This device is terminated',
+				description: 'Terminate the current user device',
 				dataClass: SWEmptyRouteOut,
 			},
 			{
@@ -178,6 +178,15 @@ export const routesConfig = {
 			{
 				code: ErrorCode.NotFound_404,
 				errors: [ErrorMessage.RefreshTokenIsNotFound],
+			},
+		],
+	},
+	generateAllCountriesAndCities: {
+		response: [
+			{
+				code: SuccessCode.Ok,
+				description: 'Countries and cities were generated',
+				dataClass: SWEmptyRouteOut,
 			},
 		],
 	},

@@ -15,10 +15,6 @@ export class TestsController {
 
 	@Delete(RouteNames.TESTING.ALL_DATA.value)
 	async deleteAllData(@Res() res: Response) {
-		if (this.mainConfig.get().mode !== 'TEST') {
-			throw new BadRequestException()
-		}
-
 		const isDropped = await this.dbService.drop()
 
 		if (isDropped) {

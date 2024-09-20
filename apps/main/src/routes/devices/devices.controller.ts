@@ -5,10 +5,10 @@ import RouteNames from '../routesConfig/routeNames'
 import { RouteDecorators } from '../routesConfig/routesDecorators'
 import { routesConfig } from '../routesConfig/routesConfig'
 import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
-import { SWEmptyRouteOut, SWGetUserDevicesRouteOut } from '../auth/swaggerTypes'
+import { SWGetUserDevicesRouteOut } from '../auth/swaggerTypes'
 import { CheckDeviceRefreshTokenGuard } from '../../infrastructure/guards/checkDeviceRefreshToken.guard'
 import { BrowserServiceService } from '@app/browser-service'
-import { SecurityQueryRepository } from '../../repositories/security.queryRepository'
+import { DevicesQueryRepository } from '../../repositories/devices.queryRepository'
 import {
 	TerminateAllDeviceRefreshTokensApartThisCommand,
 	TerminateAllDeviceRefreshTokensApartThisHandler,
@@ -17,13 +17,16 @@ import {
 	TerminateUserDeviceCommand,
 	TerminateUserDeviceHandler,
 } from '../../features/security/TerminateUserDevice.commandHandler'
+import { ApiTags } from '@nestjs/swagger'
+import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
 
+@ApiTags('Devices')
 @Controller(RouteNames.SECURITY.value)
-export class SecurityController {
+export class DevicesController {
 	constructor(
 		private readonly commandBus: CommandBus,
 		private browserService: BrowserServiceService,
-		private securityQueryRepository: SecurityQueryRepository,
+		private securityQueryRepository: DevicesQueryRepository,
 	) {}
 
 	// Returns all devices with active sessions for current user
@@ -65,6 +68,7 @@ export class SecurityController {
 	// Terminate specified device session
 	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Delete(RouteNames.SECURITY.DEVICES.value + '/:deviceId')
+	@RouteDecorators(routesConfig.terminateUserDevice)
 	async terminateUserDevice(@Param('deviceId') deviceId: string, @Req() req: Request) {
 		try {
 			const refreshToken = this.browserService.getRefreshTokenStrFromReq(req)
@@ -76,7 +80,6 @@ export class SecurityController {
 
 			return createSuccessResp(routesConfig.terminateUserDevice, null)
 		} catch (err: any) {
-			console.log(err)
 			createFailResp(routesConfig.terminateUserDevice, err)
 		}
 	}

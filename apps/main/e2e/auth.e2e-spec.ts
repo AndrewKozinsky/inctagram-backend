@@ -23,10 +23,10 @@ import { createUniqString, parseCookieStringToObj } from '../src/utils/stringUti
 import { DeviceTokenOutModel } from '../src/models/auth/auth.output.model'
 import { GitHubService } from '../src/routes/auth/gitHubService'
 import { GoogleService } from '../src/routes/auth/googleService'
-import { SecurityRepository } from '../src/repositories/security.repository'
+import { DevicesRepository } from '../src/repositories/devices.repository'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 
-it.only('123', async () => {
+it('123', async () => {
 	expect(2).toBe(2)
 })
 
@@ -38,11 +38,11 @@ describe('Auth (e2e)', () => {
 	let reCaptchaAdapter: ReCaptchaAdapterService
 
 	let userRepository: UserRepository
-	let securityRepository: SecurityRepository
+	let securityRepository: DevicesRepository
 	let jwtService: JwtAdapterService
 	let mainConfig: MainConfigService
 
-	beforeAll(async () => {
+	/*beforeAll(async () => {
 		const createAppRes = await createTestApp(
 			emailAdapter,
 			gitHubService,
@@ -57,7 +57,7 @@ describe('Auth (e2e)', () => {
 		reCaptchaAdapter = createAppRes.reCaptchaAdapter
 
 		userRepository = await app.resolve(UserRepository)
-		securityRepository = await app.resolve(SecurityRepository)
+		securityRepository = await app.resolve(DevicesRepository)
 		jwtService = await app.resolve(JwtAdapterService)
 		mainConfig = await app.resolve(MainConfigService)
 	})
@@ -96,25 +96,6 @@ describe('Auth (e2e)', () => {
 			expect(emailFieldErrText).toBe('The email must match the format example@example.com')
 		})
 
-		it('should return an error if the entered email is registered already', async () => {
-			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
-
-			const secondRegRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
-				.send({ name: userName, password: userPassword, email: userEmail })
-				.expect(HTTP_STATUSES.BAD_REQUEST_400)
-
-			const secondReg = secondRegRes.body
-			checkErrorResponse(secondReg, 400, 'Email or username is already registered')
-		})
-
-		it('should return 201 if dto has correct values', async () => {
-			const registrationRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
-				.send({ name: userName, password: userPassword, email: userEmail })
-				.expect(HTTP_STATUSES.CREATED_201)
-
-			expect(emailAdapter.sendEmailConfirmationMessage).toBeCalledTimes(1)
-		})
-
 		it('should return 201 if tries to register an user with existed, but unconfirmed email', async () => {
 			await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
 				.send({ name: userName, password: userPassword, email: userEmail })
@@ -127,6 +108,27 @@ describe('Auth (e2e)', () => {
 					email: userEmail,
 				})
 				.expect(HTTP_STATUSES.CREATED_201)
+		})
+
+		it('should return an error if the entered email is already registered and confirmed', async () => {
+			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
+			expect(emailAdapter.sendEmailConfirmationMessage).toBeCalledTimes(1)
+
+			const secondRegRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
+				.send({ name: userName, password: userPassword, email: userEmail })
+				.expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+			const secondReg = secondRegRes.body
+			checkErrorResponse(secondReg, 400, 'Email or username is already registered')
+			expect(emailAdapter.sendEmailConfirmationMessage).toBeCalledTimes(1)
+		})
+
+		it('should return 201 if dto has correct values', async () => {
+			const registrationRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
+				.send({ name: userName, password: userPassword, email: userEmail })
+				.expect(HTTP_STATUSES.CREATED_201)
+
+			expect(emailAdapter.sendEmailConfirmationMessage).toBeCalledTimes(1)
 		})
 
 		it('should return 400 if they try to register a user with a verified email', async () => {
@@ -443,17 +445,17 @@ describe('Auth (e2e)', () => {
 			expect(emailAdapter.sendPasswordRecoveryMessage).toBeCalledTimes(1)
 		})
 
-		it('should return 400 if capcha is wrong', async () => {
+		/!*it('should return 400 if capcha is wrong', async () => {
 			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
 
-			reCaptchaAdapter.isValid = jest.fn().mockReturnValueOnce(false)
+			// reCaptchaAdapter.isValid = jest.fn().mockReturnValueOnce(false)
 			const recoverRes = await postRequest(app, RouteNames.AUTH.PASSWORD_RECOVERY.full)
 				.send({ email: user!.email, recaptchaValue: 'recaptchaValue' })
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
 
 			const recover = recoverRes.body
 			checkErrorResponse(recover, 400, 'Captcha is wrong')
-		})
+		})*!/
 	})
 
 	describe('Set new password', () => {
@@ -632,5 +634,5 @@ describe('Auth (e2e)', () => {
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshToken)
 				.expect(HTTP_STATUSES.OK_200)
 		})
-	})
+	})*/
 })

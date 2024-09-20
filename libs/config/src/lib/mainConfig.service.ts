@@ -11,6 +11,7 @@ export class MainConfigService {
 			site: {
 				name: 'Inctagram',
 				domain: 'sociable-people.com',
+				domainApi: 'sociable-people.com/api/v1',
 			},
 			db: {
 				host: this.configService.get<string>('DATABASE_URL'),
