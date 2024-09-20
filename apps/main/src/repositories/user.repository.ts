@@ -160,20 +160,6 @@ export class UserRepository {
 		})
 
 		return this.mapDbUserToServiceUser(user)
-
-		// ---
-		/*return {
-			id: 1,
-			email: 'dbUser.email',
-			name: 'dbUser.name',
-			hashedPassword: 'dbUser.hashed_password',
-			emailConfirmationCode: 'dbUser.email_confirmation_code',
-			confirmationCodeExpirationDate: 'dbUser.email_confirmation_code_expiration_date',
-			isEmailConfirmed: false,
-			passwordRecoveryCode: 'dbUser.password_recovery_code',
-			githubId: null,
-			googleId: null,
-		}*/
 	}
 
 	async updateUser(userId: number, data: Partial<User>) {

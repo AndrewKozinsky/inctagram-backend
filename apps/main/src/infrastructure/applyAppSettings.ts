@@ -9,6 +9,10 @@ import { UserRepository } from '../repositories/user.repository'
 import { ErrorExceptionFilter } from './exceptionFilters/exception.filter'
 
 export function applyAppSettings(app: INestApplication) {
+	app.enableCors({
+		origin: ['http://localhost', 'https://sociable-people.com'],
+	})
+
 	app.use(cookieParser())
 
 	app.use(async (req: Request, res: Response, next: NextFunction) => {

@@ -18,6 +18,7 @@ export class HashAdapterService {
 	}
 }
 
+// DELETE
 /*@Injectable()
 export class HashAdapterService {
 	generateSalt() {
