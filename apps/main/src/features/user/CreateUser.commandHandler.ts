@@ -36,19 +36,11 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 
 		const createdUser = await this.userRepository.createUser(createUserDto)
 
-		/*try {
-			console.log(6)
-			await this.emailAdapter.sendEmailConfirmationMessage(
-				createdUser.email,
-				createdUser.emailConfirmationCode!,
-			)
-		} catch (err) {
-			console.log(err)
-			console.log(err)
-		}
-		console.log(7)
-		return (await this.userQueryRepository.getUserById(createdUser.id)) as UserOutModel*/
-		//---
-		return { id: 1, email: 'string', name: 'string' }
+		await this.emailAdapter.sendEmailConfirmationMessage(
+			createdUser.email,
+			createdUser.emailConfirmationCode!,
+		)
+
+		return (await this.userQueryRepository.getUserById(createdUser.id)) as UserOutModel
 	}
 }
