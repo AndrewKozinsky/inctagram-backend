@@ -5,7 +5,7 @@ import { INestApplication } from '@nestjs/common'
 import { applyAppSettings, globalCatch } from './infrastructure/applyAppSettings'
 
 async function bootstrap() {
-	const app = await NestFactory.create(AppModule, { cors: false })
+	const app = await NestFactory.create(AppModule)
 	await applyAppSettings(app)
 	app.setGlobalPrefix('api/v1')
 	globalCatch()
