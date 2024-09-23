@@ -27,10 +27,6 @@ export class ResendConfirmationEmailHandler
 			throw new Error(ErrorMessage.EmailNotFound)
 		}
 
-		if (!user.isEmailConfirmed) {
-			throw new Error(ErrorMessage.EmailIsNotConfirmed)
-		}
-
 		const confirmationCode = createUniqString()
 		await this.userRepository.updateUser(user.id, {
 			email_confirmation_code: confirmationCode,

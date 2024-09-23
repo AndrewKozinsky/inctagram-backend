@@ -82,10 +82,6 @@ export const routesConfig = {
 				code: ErrorCode.BadRequest_400,
 				errors: [ErrorMessage.EmailNotFound],
 			},
-			{
-				code: ErrorCode.Forbidden_403,
-				errors: [ErrorMessage.EmailIsNotConfirmed],
-			},
 		],
 	},
 
