@@ -186,4 +186,17 @@ export const routesConfig = {
 			},
 		],
 	},
+	users: {
+		me: {
+			addAvatar: {
+				response: [
+					{
+						code: SuccessCode.Ok,
+						description: "User's avatar was added",
+						dataClass: SWEmptyRouteOut,
+					},
+				],
+			},
+		},
+	},
 } satisfies RoutesConfig.Root

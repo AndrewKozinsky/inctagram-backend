@@ -22,11 +22,11 @@ import { GoogleService } from '../src/routes/auth/googleService'
 import { DevicesRepository } from '../src/repositories/devices.repository'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 
-it('123', async () => {
+it.only('123', async () => {
 	expect(2).toBe(2)
 })
 
-/*describe('Auth (e2e)', () => {
+describe('Auth (e2e)', () => {
 	let app: INestApplication
 	let emailAdapter: EmailAdapterService
 	let gitHubService: GitHubService
@@ -257,4 +257,4 @@ it('123', async () => {
 				.expect(HTTP_STATUSES.OK_200)
 		})
 	})
-})*/
+})

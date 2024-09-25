@@ -9,6 +9,7 @@ import { TestsModule } from './routes/test/tests.module'
 import { AuthService } from './routes/auth/auth.service'
 import { ReCaptchaAdapterModule } from '@app/re-captcha-adapter'
 import { DevicesModule } from './routes/devices/devices.module'
+import { UserModule } from './routes/user/user.module'
 
 @Module({
 	imports: [
@@ -21,6 +22,7 @@ import { DevicesModule } from './routes/devices/devices.module'
 		TestsModule,
 		AuthModule,
 		DevicesModule,
+		UserModule,
 	],
 	controllers: [],
 	providers: [AuthService],

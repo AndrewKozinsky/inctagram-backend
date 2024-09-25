@@ -80,6 +80,17 @@ export const RouteNames = {
 			full: 'testing/all-data',
 		},
 	},
+	USERS: {
+		value: 'users',
+		ME: {
+			value: 'me',
+			full: 'users/me',
+			AVATAR: {
+				value: 'avatar',
+				full: 'users/me/avatar',
+			},
+		},
+	},
 }
 
 export default RouteNames

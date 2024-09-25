@@ -81,13 +81,6 @@ export class AuthController {
 		private reCaptchaAdapter: ReCaptchaAdapterService,
 	) {}
 
-	@Get('hello')
-	@HttpCode(HttpStatus.OK)
-	async hello() {
-		console.log('hello')
-		return 'hello'
-	}
-
 	@Post(RouteNames.AUTH.REGISTRATION.value)
 	@RouteDecorators(routesConfig.registration)
 	async registration(

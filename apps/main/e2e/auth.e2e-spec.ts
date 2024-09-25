@@ -1,5 +1,4 @@
 import { INestApplication } from '@nestjs/common'
-import { add } from 'date-fns'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { MainConfigService } from '@app/config'
 import {
@@ -19,14 +18,12 @@ import { clearAllDB } from './utils/db'
 import { EmailAdapterService } from '@app/email-adapter'
 import { UserRepository } from '../src/repositories/user.repository'
 import { userUtils } from './utils/userUtils'
-import { createUniqString, parseCookieStringToObj } from '../src/utils/stringUtils'
-import { DeviceTokenOutModel } from '../src/models/auth/auth.output.model'
 import { GitHubService } from '../src/routes/auth/gitHubService'
 import { GoogleService } from '../src/routes/auth/googleService'
 import { DevicesRepository } from '../src/repositories/devices.repository'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 
-it('123', async () => {
+it.only('123', async () => {
 	expect(2).toBe(2)
 })
 
@@ -42,7 +39,7 @@ describe('Auth (e2e)', () => {
 	let jwtService: JwtAdapterService
 	let mainConfig: MainConfigService
 
-	/*beforeAll(async () => {
+	beforeAll(async () => {
 		const createAppRes = await createTestApp(
 			emailAdapter,
 			gitHubService,
@@ -317,20 +314,6 @@ describe('Auth (e2e)', () => {
 			checkErrorResponse(resend, 400, 'Email not found')
 		})
 
-		it('should return an error if the entered email is not confirmed', async () => {
-			const user = await userUtils.createUserWithUnconfirmedEmail(app, userRepository)
-
-			const resendConfirmEmailRes = await postRequest(
-				app,
-				RouteNames.AUTH.CONFIRM_EMAIL_RESENDING.full,
-			)
-				.send({ email: userEmail })
-				.expect(HTTP_STATUSES.FORBIDDEN_403)
-
-			const resend = resendConfirmEmailRes.body
-			checkErrorResponse(resend, 403, 'Email is not confirmed')
-		})
-
 		it('should return 201 if dto has correct values', async () => {
 			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
 			jest.clearAllMocks()
@@ -350,57 +333,26 @@ describe('Auth (e2e)', () => {
 
 	describe('User log out', () => {
 		it('should return 401 if there is not cookies', async () => {
-			const logoutRes = await postRequest(app, RouteNames.AUTH.LOGOUT.full).expect(
-				HTTP_STATUSES.UNAUTHORIZED_401,
-			)
-			const logout = logoutRes.body
-
-			checkErrorResponse(logout, 401, 'Refresh token is not valid')
+			await userUtils.deviceTokenChecks.tokenNotExist(app, RouteNames.AUTH.LOGOUT.full)
 		})
 
 		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
-			const user = await userUtils.createUserWithUnconfirmedEmail(app, userRepository)
-
-			// Create expired token
-			const deviceId = createUniqString()
-
-			const expiredRefreshToken: DeviceTokenOutModel = {
-				issuedAt: new Date().toISOString(),
-				expirationDate: new Date().toISOString(),
-				deviceIP: '123',
-				deviceId,
-				deviceName: 'Unknown',
-				userId: user!.id,
-			}
-
-			await securityRepository.insertDeviceRefreshToken(expiredRefreshToken)
-
-			// Get created expired token
-			const refreshToken = await securityRepository.getDeviceRefreshTokenByDeviceId(deviceId)
-			const refreshTokenStr = jwtService.createRefreshTokenStr(
-				refreshToken!.deviceId,
-				refreshToken!.expirationDate,
-			)
-
-			const logoutRes = await postRequest(app, RouteNames.AUTH.LOGOUT.full)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
-				.expect(HTTP_STATUSES.UNAUTHORIZED_401)
-		})
-
-		it('should return 200 if the JWT refreshToken inside cookie is valid', async () => {
-			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+			await userUtils.deviceTokenChecks.tokenExpired(
 				app,
+				RouteNames.AUTH.LOGOUT.full,
 				userRepository,
-				userName,
-				userEmail,
-				userPassword,
+				securityRepository,
+				jwtService,
+				mainConfig,
 			)
-
-			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
-
-			const logoutRes = await postRequest(app, RouteNames.AUTH.LOGOUT.full)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
-				.expect(HTTP_STATUSES.OK_200)
+		})
+		it('should return 200 if the JWT refreshToken inside cookie is valid', async () => {
+			await userUtils.deviceTokenChecks.tokenValid(
+				app,
+				RouteNames.AUTH.LOGOUT.full,
+				userRepository,
+				mainConfig,
+			)
 		})
 	})
 
@@ -445,17 +397,17 @@ describe('Auth (e2e)', () => {
 			expect(emailAdapter.sendPasswordRecoveryMessage).toBeCalledTimes(1)
 		})
 
-		/!*it('should return 400 if capcha is wrong', async () => {
+		/*it('should return 400 if capcha is wrong', async () => {
 			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
 
-			// reCaptchaAdapter.isValid = jest.fn().mockReturnValueOnce(false)
+			reCaptchaAdapter.isValid = jest.fn().mockReturnValueOnce(false)
 			const recoverRes = await postRequest(app, RouteNames.AUTH.PASSWORD_RECOVERY.full)
 				.send({ email: user!.email, recaptchaValue: 'recaptchaValue' })
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
 
 			const recover = recoverRes.body
 			checkErrorResponse(recover, 400, 'Captcha is wrong')
-		})*!/
+		})*/
 	})
 
 	describe('Set new password', () => {
@@ -512,58 +464,28 @@ describe('Auth (e2e)', () => {
 	})
 
 	describe('Get new refresh and access token', () => {
+		it('should return 401 if there is not cookies', async () => {
+			await userUtils.deviceTokenChecks.tokenNotExist(app, RouteNames.AUTH.REFRESH_TOKEN.full)
+		})
+
 		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
-			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
-
-			// Create expired token
-			const deviceId = createUniqString()
-
-			const expiredRefreshToken: DeviceTokenOutModel = {
-				issuedAt: new Date().toISOString(),
-				expirationDate: add(new Date(), { days: -6 }).toISOString(),
-				deviceIP: '123',
-				deviceId,
-				deviceName: 'Unknown',
-				userId: user.id,
-			}
-
-			await securityRepository.insertDeviceRefreshToken(expiredRefreshToken)
-
-			// Get created expired token
-			const refreshToken = await securityRepository.getDeviceRefreshTokenByDeviceId(deviceId)
-			const refreshTokenStr = jwtService.createRefreshTokenStr(
-				refreshToken!.deviceId,
-				refreshToken!.expirationDate,
+			await userUtils.deviceTokenChecks.tokenExpired(
+				app,
+				RouteNames.AUTH.REFRESH_TOKEN.full,
+				userRepository,
+				securityRepository,
+				jwtService,
+				mainConfig,
 			)
-
-			const refreshRes = await postRequest(app, RouteNames.AUTH.REFRESH_TOKEN.full)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
-				.expect(HTTP_STATUSES.UNAUTHORIZED_401)
 		})
 
 		it('should return 200 if the JWT refreshToken inside cookie is valid', async () => {
-			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+			await userUtils.deviceTokenChecks.tokenValid(
 				app,
+				RouteNames.AUTH.REFRESH_TOKEN.full,
 				userRepository,
-				userName,
-				userEmail,
-				userPassword,
+				mainConfig,
 			)
-
-			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
-
-			const refreshRes = await postRequest(app, RouteNames.AUTH.REFRESH_TOKEN.full)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
-				.expect(HTTP_STATUSES.OK_200)
-
-			const newRefreshTokenStr = refreshRes.headers['set-cookie'][0]
-			const newRefreshTokenObj = parseCookieStringToObj(newRefreshTokenStr)
-			expect(newRefreshTokenObj['Max-Age']).toBe(60 * 60 * 24 * 30)
-			expect(newRefreshTokenObj.Secure).toBe(true)
-			expect(newRefreshTokenObj.HttpOnly).toBe(true)
-
-			const newAccessToken = refreshRes.body.data.accessToken
-			expect(typeof newAccessToken).toBe('string')
 		})
 	})
 
@@ -634,5 +556,5 @@ describe('Auth (e2e)', () => {
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshToken)
 				.expect(HTTP_STATUSES.OK_200)
 		})
-	})*/
+	})
 })

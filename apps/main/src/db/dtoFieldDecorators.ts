@@ -1,6 +1,7 @@
 import { applyDecorators } from '@nestjs/common'
 import {
 	IsEmail,
+	IsMimeType,
 	IsNumber,
 	IsOptional,
 	IsString,

@@ -1,8 +1,20 @@
 import { INestApplication } from '@nestjs/common'
-import { getRequest, postRequest, userEmail, userName, userPassword } from './common'
+import {
+	checkErrorResponse,
+	getRequest,
+	postRequest,
+	userEmail,
+	userName,
+	userPassword,
+} from './common'
 import RouteNames from '../../src/routes/routesConfig/routeNames'
 import { HTTP_STATUSES } from '../../src/utils/httpStatuses'
 import { UserRepository } from '../../src/repositories/user.repository'
+import { createUniqString, parseCookieStringToObj } from '../../src/utils/stringUtils'
+import { DeviceTokenOutModel } from '../../src/models/auth/auth.output.model'
+import { DevicesRepository } from '../../src/repositories/devices.repository'
+import { JwtAdapterService } from '@app/jwt-adapter'
+import { MainConfigService } from '@app/config'
 
 export const userUtils = {
 	async createUserWithUnconfirmedEmail(
@@ -96,5 +108,71 @@ export const userUtils = {
 		expect(typeof device.title).toBe('string')
 		expect(typeof device.lastActiveDate).toBe('string')
 		expect(typeof device.deviceId).toBe('string')
+	},
+	deviceTokenChecks: {
+		// should return 401 if there is not cookies
+		async tokenNotExist(app: INestApplication, routeUrl: string) {
+			const logoutRes = await postRequest(app, routeUrl).expect(
+				HTTP_STATUSES.UNAUTHORIZED_401,
+			)
+			const logout = logoutRes.body
+
+			checkErrorResponse(logout, 401, 'Refresh token is not valid')
+		},
+		// should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect
+		async tokenExpired(
+			app: INestApplication,
+			routeUrl: string,
+			userRepository: UserRepository,
+			securityRepository: DevicesRepository,
+			jwtService: JwtAdapterService,
+			mainConfig: MainConfigService,
+		) {
+			const user = await userUtils.createUserWithUnconfirmedEmail(app, userRepository)
+			// Create expired token
+			const deviceId = createUniqString()
+
+			const expiredRefreshToken: DeviceTokenOutModel = {
+				issuedAt: new Date().toISOString(),
+				expirationDate: new Date().toISOString(),
+				deviceIP: '123',
+				deviceId,
+				deviceName: 'Unknown',
+				userId: user!.id,
+			}
+
+			await securityRepository.insertDeviceRefreshToken(expiredRefreshToken)
+
+			// Get created expired token
+			const refreshToken = await securityRepository.getDeviceRefreshTokenByDeviceId(deviceId)
+			const refreshTokenStr = jwtService.createRefreshTokenStr(
+				refreshToken!.deviceId,
+				refreshToken!.expirationDate,
+			)
+
+			const logoutRes = await postRequest(app, routeUrl)
+				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
+				.expect(HTTP_STATUSES.UNAUTHORIZED_401)
+		},
+		async tokenValid(
+			app: INestApplication,
+			routeUrl: string,
+			userRepository: UserRepository,
+			mainConfig: MainConfigService,
+		) {
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+				app,
+				userRepository,
+				userName,
+				userEmail,
+				userPassword,
+			)
+
+			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
+
+			await postRequest(app, routeUrl)
+				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
+				.expect(HTTP_STATUSES.OK_200)
+		},
 	},
 }

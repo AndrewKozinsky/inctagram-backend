@@ -47,7 +47,7 @@ export class MainConfigService {
 				},
 			},
 			reCaptcha: {
-				siteKey: '6Ld9TDkqAAAAANasCQUbpTBVD0ZyJhR8WPqks97f', // It's not a secret
+				siteKey: this.configService.get<string>('RECAPTCHA_SITE_KEY') as string,
 				serverKey: this.configService.get<string>('RECAPTCHA_SERVER_KEY') as string,
 			},
 		}
