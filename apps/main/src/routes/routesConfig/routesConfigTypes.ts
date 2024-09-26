@@ -18,7 +18,6 @@ export namespace RoutesConfig {
 	export type Root = Record<RouteName, Route>
 
 	export type Route = {
-		body?: Body
 		response: Response
 	}
 

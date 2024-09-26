@@ -1,9 +1,10 @@
 import { DtoFieldDecorators } from '../../db/dtoFieldDecorators'
 import { bdConfig } from '../../db/dbConfig/dbConfig'
 import { IsIn } from 'class-validator'
-import { ArgumentMetadata, HttpStatus, Injectable, PipeTransform } from '@nestjs/common'
-import { plainToInstance } from 'class-transformer'
-import { ConfirmEmailQueries } from '../auth/auth.input.model'
+import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common'
+import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
+import { CustomException } from '../../infrastructure/exceptionFilters/customException'
+import { HTTP_STATUSES } from '../../utils/httpStatuses'
 
 export class CreateUserDtoModel {
 	@DtoFieldDecorators('name', bdConfig.User.dbFields.name)
@@ -33,15 +34,25 @@ export class ProviderNameQueryModel {
 
 @Injectable()
 export class UploadAvatarFilePipe implements PipeTransform {
-	transform(value: any, metadata: ArgumentMetadata) {
-		return true
-		// return value.size < 5000
+	transform(file: Express.Multer.File, metadata: ArgumentMetadata) {
+		const maxFileSize = 2 * 1024 * 1024
+		const allowedMimeTypes = ['image/png', 'image/jpg', 'image/jpeg', 'image/webp', 'image/gif']
+
+		const errStatusCode = HTTP_STATUSES.BAD_REQUEST_400.toString()
+		let errMessage = ''
+
+		if (!file) {
+			errMessage = ErrorMessage.FileNotFound
+		} else if (!allowedMimeTypes.includes(file.mimetype)) {
+			errMessage = ErrorMessage.FileHasWrongMimeType
+		} else if (file.size > maxFileSize) {
+			errMessage = ErrorMessage.FileIsTooLarge
+		}
+
+		if (errMessage) {
+			throw CustomException(errStatusCode, errMessage)
+		}
+
+		return file
 	}
 }
-/*new ParseFilePipeBuilder()
-	.addFileTypeValidator({ fileType: /(jpg|jpeg|png|webp|gif)$/ })
-	.addMaxSizeValidator({ maxSize: 5000 })
-	.build({
-		fileIsRequired: true,
-		errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-	}),*/

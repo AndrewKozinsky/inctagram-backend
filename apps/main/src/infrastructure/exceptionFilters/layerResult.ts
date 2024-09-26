@@ -23,4 +23,8 @@ export enum ErrorMessage {
 	RefreshTokenIsNotFound = 'Refresh token is not found',
 	UserDoesNotOwnThisDeviceToken = 'User does not own this device token',
 	UserDeviceNotFound = 'User device not found',
+	// FILES
+	FileNotFound = 'File not found',
+	FileHasWrongMimeType = 'File has wrong mime type',
+	FileIsTooLarge = 'File is too large',
 }

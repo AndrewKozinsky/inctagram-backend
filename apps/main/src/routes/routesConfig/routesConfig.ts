@@ -188,12 +188,16 @@ export const routesConfig = {
 	},
 	users: {
 		me: {
-			addAvatar: {
+			setAvatar: {
 				response: [
 					{
 						code: SuccessCode.Ok,
 						description: "User's avatar was added",
 						dataClass: SWEmptyRouteOut,
+					},
+					{
+						code: ErrorCode.BadRequest_400,
+						errors: [ErrorMessage.FileHasWrongMimeType, ErrorMessage.FileIsTooLarge],
 					},
 				],
 			},
