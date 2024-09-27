@@ -28,7 +28,7 @@ export const bdConfig = {
 			recaptchaValue: {
 				type: 'string',
 				minLength: 1,
-				maxLength: 1000,
+				maxLength: 4000,
 				required: true,
 			},
 		},
