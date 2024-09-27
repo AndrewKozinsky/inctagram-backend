@@ -28,11 +28,11 @@ import { ClientProxy } from '@nestjs/microservices'
 export class UserController implements OnModuleInit {
 	constructor(
 		private readonly commandBus: CommandBus,
-		@Inject('FILES_MICROSERVICE') private filesMicroClient: ClientProxy,
+		// @Inject('FILES_MICROSERVICE') private filesMicroClient: ClientProxy,
 	) {}
 
 	async onModuleInit() {
-		await this.filesMicroClient.connect()
+		// await this.filesMicroClient.connect()
 	}
 
 	@ApiConsumes('multipart/form-data')
@@ -60,7 +60,7 @@ export class UserController implements OnModuleInit {
 		avatarFile: Express.Multer.File,
 	): Promise<SWUserMeAddAvatarRouteOut | undefined> {
 		try {
-			this.filesMicroClient.send('plain_text', 'Ping from the producer.')
+			// this.filesMicroClient.send('plain_text', 'Ping from the producer.')
 
 			const commandRes = await this.commandBus.execute<
 				any,

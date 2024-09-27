@@ -18,7 +18,7 @@ const commandHandlers = [SetAvatarToMeHandler]
 @Module({
 	imports: [
 		CqrsModule,
-		ClientsModule.register([
+		/*ClientsModule.register([
 			{
 				name: 'FILES_MICROSERVICE',
 				transport: Transport.TCP,
@@ -27,7 +27,7 @@ const commandHandlers = [SetAvatarToMeHandler]
 					port: 3001, // The consumer listens on port 3001
 				},
 			},
-		]),
+		]),*/
 	],
 	controllers: [UserController],
 	providers: [
