@@ -13,7 +13,7 @@ async function bootstrap() {
 
 	const mainConfig = app.get(MainConfigService)
 	await app.listen(mainConfig.get().mainMicroService.port)
-	console.log('The server has started 🔥')
+	console.log('The server has started 🔥-')
 }
 
 function addSwagger(app: INestApplication<any>) {
