@@ -2,8 +2,8 @@ import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { INestApplication } from '@nestjs/common'
-import { applyAppSettings } from './infrastructure/applyAppSettings'
 import { MainConfigService } from '@app/config'
+import { applyAppSettings } from './infrastructure/applyAppSettings'
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule)
@@ -13,7 +13,7 @@ async function bootstrap() {
 
 	const mainConfig = app.get(MainConfigService)
 	await app.listen(mainConfig.get().mainMicroService.port)
-	console.log('The server has started 🔥-')
+	console.log('The GATEWAY server has started 🔥')
 }
 
 function addSwagger(app: INestApplication<any>) {

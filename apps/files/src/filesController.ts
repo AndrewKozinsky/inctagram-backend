@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common'
+import { Controller } from '@nestjs/common'
 import { FilesService } from './filesService'
 import { MessagePattern } from '@nestjs/microservices'
 
@@ -9,6 +9,6 @@ export class FilesController {
 	@MessagePattern('plain_text')
 	getHello(message: string) {
 		console.log('Received message:', message)
-		return this.filesService.getHello()
+		return 'Hello from consumer'
 	}
 }

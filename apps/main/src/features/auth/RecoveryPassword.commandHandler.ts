@@ -33,6 +33,6 @@ export class RecoveryPasswordHandler
 
 		this.emailAdapter.sendPasswordRecoveryMessage(email, recoveryCode)
 
-		return { recoveryCode }
+		return null
 	}
 }

@@ -61,7 +61,6 @@ import {
 	SWAuthorizeByProviderRouteOut,
 	SWGetNewAccessAndRefreshTokenRouteOut,
 	SWLoginRouteOut,
-	SWPasswordRecoveryRouteOut,
 	SWRegistrationRouteOut,
 } from './swaggerTypes'
 import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
@@ -221,7 +220,7 @@ export class AuthController {
 	@RouteDecorators(routesConfig.passwordRecovery)
 	async passwordRecovery(
 		@Body() body: PasswordRecoveryDtoModel,
-	): Promise<SWPasswordRecoveryRouteOut | undefined> {
+	): Promise<SWEmptyRouteOut | undefined> {
 		try {
 			const isCaptchaValid = await this.reCaptchaAdapter.isValid(body.recaptchaValue)
 

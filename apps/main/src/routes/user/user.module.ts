@@ -16,25 +16,13 @@ const repositories = [DevicesRepository]
 const commandHandlers = [SetAvatarToMeHandler]
 
 @Module({
-	imports: [
-		CqrsModule,
-		/*ClientsModule.register([
-			{
-				name: 'FILES_MICROSERVICE',
-				transport: Transport.TCP,
-				options: {
-					// host: 'localhost',
-					port: 3001, // The consumer listens on port 3001
-				},
-			},
-		]),*/
-	],
+	imports: [CqrsModule],
 	controllers: [UserController],
 	providers: [
 		...services,
 		...repositories,
 		...commandHandlers,
-		/*{
+		{
 			provide: 'FILES_MICROSERVICE',
 			useFactory(mainConfig: MainConfigService) {
 				const { port } = mainConfig.get().filesMicroService
@@ -42,13 +30,13 @@ const commandHandlers = [SetAvatarToMeHandler]
 				return ClientProxyFactory.create({
 					transport: Transport.TCP,
 					options: {
-						host: '127.0.0.1',
+						host: 'localhost',
 						port: port,
 					},
 				})
 			},
 			inject: [MainConfigService],
-		},*/
+		},
 	],
 })
 export class UserModule {}

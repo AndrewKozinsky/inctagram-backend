@@ -1,5 +1,6 @@
 import {
 	Controller,
+	Get,
 	Inject,
 	OnModuleInit,
 	Post,
@@ -28,14 +29,14 @@ import { ClientProxy } from '@nestjs/microservices'
 export class UserController implements OnModuleInit {
 	constructor(
 		private readonly commandBus: CommandBus,
-		// @Inject('FILES_MICROSERVICE') private filesMicroClient: ClientProxy,
+		@Inject('FILES_MICROSERVICE') private filesMicroClient: ClientProxy,
 	) {}
 
 	async onModuleInit() {
-		// await this.filesMicroClient.connect()
+		await this.filesMicroClient.connect()
 	}
 
-	@ApiConsumes('multipart/form-data')
+	/*@ApiConsumes('multipart/form-data')
 	@ApiBody({
 		description: 'File must be loaded to the avatarFile property',
 		type: 'multipart/form-data',
@@ -71,5 +72,15 @@ export class UserController implements OnModuleInit {
 		} catch (err: any) {
 			createFailResp(routesConfig.users.me.setAvatar, err)
 		}
+	}*/
+
+	// DELETE
+	@Get()
+	async setAvatarToMe() {
+		this.filesMicroClient
+			.send('plain_text', 'Ping from the producer.')
+			.subscribe((response) => {
+				console.log('Response from consumer:', response)
+			})
 	}
 }

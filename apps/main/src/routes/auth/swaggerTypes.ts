@@ -84,7 +84,8 @@ export class SWLoginRouteOut {
 	}
 }
 
-export class SWPasswordRecoveryRouteOut {
+// DELETE
+/*export class SWPasswordRecoveryRouteOut {
 	@ApiProperty({ default: 'success' })
 	status: string
 
@@ -92,15 +93,10 @@ export class SWPasswordRecoveryRouteOut {
 	code: number
 
 	@ApiProperty({
-		type: 'object',
-		properties: {
-			recoveryCode: { type: 'string' },
-		},
+		type: 'null',
 	})
-	data: {
-		recoveryCode: string
-	}
-}
+	data: null
+}*/
 
 export class SWGetNewAccessAndRefreshTokenRouteOut {
 	@ApiProperty({ default: 'success' })

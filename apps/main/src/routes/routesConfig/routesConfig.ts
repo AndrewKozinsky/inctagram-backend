@@ -4,7 +4,6 @@ import {
 	SuccessCode,
 } from '../../infrastructure/exceptionFilters/layerResult'
 import { RoutesConfig } from './routesConfigTypes'
-import { RecoveryPasswordOutModel } from '../../models/auth/auth.output.model'
 import {
 	SWAuthorizeByProviderRouteOut,
 	SWGetNewAccessAndRefreshTokenRouteOut,
@@ -103,7 +102,7 @@ export const routesConfig = {
 			{
 				code: SuccessCode.Ok,
 				description: 'Recovery password email was sent',
-				dataClass: RecoveryPasswordOutModel,
+				dataClass: SWEmptyRouteOut,
 			},
 			{
 				code: ErrorCode.BadRequest_400,
