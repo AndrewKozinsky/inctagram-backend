@@ -2,16 +2,17 @@ import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { INestApplication } from '@nestjs/common'
-import { applyAppSettings, globalCatch } from './infrastructure/applyAppSettings'
+import { applyAppSettings } from './infrastructure/applyAppSettings'
+import { MainConfigService } from '@app/config'
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule)
 	await applyAppSettings(app)
 	app.setGlobalPrefix('api/v1')
-	globalCatch()
 	addSwagger(app)
 
-	await app.listen(process.env.MAIN_MICROSERVICE_PORT!)
+	const mainConfig = app.get(MainConfigService)
+	await app.listen(mainConfig.get().mainMicroService.port)
 	console.log('The server has started 🔥')
 }
 

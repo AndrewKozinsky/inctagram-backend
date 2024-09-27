@@ -7,10 +7,9 @@ export class SetAvatarToMeCommand {
 @CommandHandler(SetAvatarToMeCommand)
 export class SetAvatarToMeHandler implements ICommandHandler<SetAvatarToMeCommand> {
 	async execute(command: SetAvatarToMeCommand) {
-		// console.log(command)
-		// const { avatarFile } = command
+		const { avatarFile } = command
 
-		// console.log(avatarFile)
+		const fileBuffer = avatarFile.buffer
 
 		return {
 			avatarUrl: 'avatarUrl',

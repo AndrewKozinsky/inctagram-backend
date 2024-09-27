@@ -8,7 +8,8 @@
   "scripts": {
     "build:main": "nest build",
     "start:main": "nest start",
-    "start:dev": "nest start --watch",
+    "start:main:dev": "nest start main --watch",
+    "start:files:dev": "nest start files --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/apps/main/main",
     "test": "NODE_ENV=TEST jest --config apps/main/src/jest.json --runInBand",
@@ -26,6 +27,7 @@
     "@nestjs/config": "^3.2.3",
     "@nestjs/core": "^10.0.0",
     "@nestjs/cqrs": "^10.2.7",
+    "@nestjs/microservices": "^10.4.4",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/swagger": "^7.4.0",
     "@prisma/client": "^5.19.1",

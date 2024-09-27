@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { INestApplication } from '@nestjs/common'
-import { SecondModule } from '../src/second.module'
+import { FilesModule } from '../src/filesModule'
 
 describe('SecondController (e2e)', () => {
 	let app: INestApplication

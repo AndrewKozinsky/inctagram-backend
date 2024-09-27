@@ -53,7 +53,8 @@ export function applyAppSettings(app: INestApplication) {
 	app.useGlobalFilters(new ErrorExceptionFilter())
 }
 
-export const onUncaughtException = () => {
+// DELETE
+/*export const onUncaughtException = () => {
 	process.on('uncaughtException', (e) => {
 		console.log('!!! Uncaught Exception: ', e)
 	})
@@ -71,4 +72,4 @@ export const onUnhandledRejection = () => {
 export const globalCatch = () => {
 	onUncaughtException()
 	onUnhandledRejection()
-}
+}*/
