@@ -26,6 +26,19 @@ export class MainConfigService {
 					parseInt(this.configService.get<string>('FILES_MICROSERVICE_PORT') || '', 10) ||
 					3001,
 			},
+			// Yandex Cloud
+			s3: {
+				region: 'ru-central1-a',
+				// Адрес сервиса Яндекса
+				endpoint: 'https://storage.yandexcloud.net',
+				// Ключ доступа к учётной записи
+				accessKeyId: 'YCAJEoIX9vzX607TrJy8nGndP',
+				// Секретный ключ доступа к учётной записи
+				secretAccessKey: 'YCOo56MU5FWyHjhS8kmVIbk-T_sr9uXxm9W2SrRE',
+				// Название своей корзины
+				bucket: 'sociable-people',
+				filesRootUrl: 'https://sociable-people.storage.yandexcloud.net',
+			},
 			refreshToken: {
 				name: 'refreshToken',
 				lifeDurationInMs: 1000 * 60 * 60 * 24 * 30, // 30 days

@@ -12,11 +12,11 @@ import { DevicesQueryRepository } from '../../repositories/devices.queryReposito
 import {
 	TerminateAllDeviceRefreshTokensApartThisCommand,
 	TerminateAllDeviceRefreshTokensApartThisHandler,
-} from '../../features/security/TerminateAllDeviceRefreshTokensApartThis.commandHandler'
+} from '../../features/security/TerminateAllDeviceRefreshTokensApartThis.command'
 import {
 	TerminateUserDeviceCommand,
 	TerminateUserDeviceHandler,
-} from '../../features/security/TerminateUserDevice.commandHandler'
+} from '../../features/security/TerminateUserDevice.command'
 import { ApiTags } from '@nestjs/swagger'
 import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
 

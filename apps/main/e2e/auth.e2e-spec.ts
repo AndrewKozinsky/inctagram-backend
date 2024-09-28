@@ -333,12 +333,17 @@ describe('Auth (e2e)', () => {
 
 	describe('User log out', () => {
 		it('should return 401 if there is not cookies', async () => {
-			await userUtils.deviceTokenChecks.tokenNotExist(mainApp, RouteNames.AUTH.LOGOUT.full)
+			await userUtils.deviceTokenChecks.tokenNotExist(
+				mainApp,
+				'post',
+				RouteNames.AUTH.LOGOUT.full,
+			)
 		})
 
 		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
 			await userUtils.deviceTokenChecks.tokenExpired(
 				mainApp,
+				'post',
 				RouteNames.AUTH.LOGOUT.full,
 				userRepository,
 				securityRepository,
@@ -468,6 +473,7 @@ describe('Auth (e2e)', () => {
 		it('should return 401 if there is not cookies', async () => {
 			await userUtils.deviceTokenChecks.tokenNotExist(
 				mainApp,
+				'post',
 				RouteNames.AUTH.REFRESH_TOKEN.full,
 			)
 		})
@@ -475,6 +481,7 @@ describe('Auth (e2e)', () => {
 		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
 			await userUtils.deviceTokenChecks.tokenExpired(
 				mainApp,
+				'post',
 				RouteNames.AUTH.REFRESH_TOKEN.full,
 				userRepository,
 				securityRepository,

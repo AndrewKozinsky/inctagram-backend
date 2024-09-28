@@ -1,11 +1,10 @@
 import { INestApplication, INestMicroservice } from '@nestjs/common'
-import { add } from 'date-fns'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { MainConfigService } from '@app/config'
 import {
 	checkErrorResponse,
 	checkSuccessResponse,
-	getFieldInErrorObject,
+	deleteRequest,
 	getRequest,
 	postRequest,
 	userEmail,
@@ -18,8 +17,7 @@ import { clearAllDB } from './utils/db'
 import { EmailAdapterService } from '@app/email-adapter'
 import { UserRepository } from '../src/repositories/user.repository'
 import { userUtils } from './utils/userUtils'
-import { createUniqString, parseCookieStringToObj } from '../src/utils/stringUtils'
-import { DeviceTokenOutModel } from '../src/models/auth/auth.output.model'
+import { parseCookieStringToObj } from '../src/utils/stringUtils'
 import { GitHubService } from '../src/routes/auth/gitHubService'
 import { GoogleService } from '../src/routes/auth/googleService'
 import { DevicesRepository } from '../src/repositories/devices.repository'
@@ -27,7 +25,7 @@ import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 import path from 'node:path'
 import { createFilesApp, createMainApp } from './utils/createMainApp'
 
-it('123', async () => {
+it.only('123', async () => {
 	expect(2).toBe(2)
 })
 
@@ -77,10 +75,11 @@ describe('Auth (e2e)', () => {
 		await filesApp.close()
 	})
 
-	describe('Add avatar file to me', () => {
+	describe('Add avatar file to the current user', () => {
 		it('should return 401 if there is not cookies', async () => {
 			await userUtils.deviceTokenChecks.tokenNotExist(
 				mainApp,
+				'post',
 				RouteNames.USERS.ME.AVATAR.full,
 			)
 		})
@@ -88,6 +87,7 @@ describe('Auth (e2e)', () => {
 		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
 			await userUtils.deviceTokenChecks.tokenExpired(
 				mainApp,
+				'post',
 				RouteNames.USERS.ME.AVATAR.full,
 				userRepository,
 				securityRepository,
@@ -108,6 +108,7 @@ describe('Auth (e2e)', () => {
 			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
 
 			const addAvatarRes = await postRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
+				.set('authorization', 'Bearer ' + accessToken)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
 
@@ -141,6 +142,7 @@ describe('Auth (e2e)', () => {
 			const bigFilePath = path.join(__dirname, 'utils/files/big-avatar.png')
 
 			const addAvatarRes2 = await postRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
+				.set('authorization', 'Bearer ' + accessToken)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.set('Content-Type', 'multipart/form-data')
 
@@ -150,7 +152,7 @@ describe('Auth (e2e)', () => {
 			checkErrorResponse(addAvatarRes2.body, 400, 'File is too large')
 		})
 
-		it.only('should return 200 if send correct avatar image', async () => {
+		it('should return 200 if send correct avatar image', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
 				mainApp,
 				userRepository,
@@ -159,7 +161,7 @@ describe('Auth (e2e)', () => {
 				userPassword,
 			)
 
-			/*const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
+			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
 
 			const avatarFilePath = path.join(__dirname, 'utils/files/avatar.png')
 
@@ -167,12 +169,124 @@ describe('Auth (e2e)', () => {
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.set('Content-Type', 'multipart/form-data')
 				.attach('avatarFile', avatarFilePath)
-				.expect(HTTP_STATUSES.OK_200)*/
+				.set('authorization', 'Bearer ' + accessToken)
+				.expect(HTTP_STATUSES.OK_200)
+
+			expect(typeof addAvatarRes.body.data.avatarUrl).toBe('string')
+		})
+	})
+
+	describe('Get current user avatar file', () => {
+		it('should return 401 if there is not cookies', async () => {
+			await userUtils.deviceTokenChecks.tokenNotExist(
+				mainApp,
+				'get',
+				RouteNames.USERS.ME.AVATAR.full,
+			)
 		})
 
-		// DELETE
-		/*it.only('should return 200 if send correct avatar image', async () => {
-			await getRequest(mainApp, RouteNames.USERS.value).expect(HTTP_STATUSES.OK_200)
-		})*/
+		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
+			await userUtils.deviceTokenChecks.tokenExpired(
+				mainApp,
+				'get',
+				RouteNames.USERS.ME.AVATAR.full,
+				userRepository,
+				securityRepository,
+				jwtService,
+				mainConfig,
+			)
+		})
+
+		it('should return 200 if the JWT refreshToken inside cookie is valid', async () => {
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+				mainApp,
+				userRepository,
+				userName,
+				userEmail,
+				userPassword,
+			)
+
+			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
+
+			const avatarFilePath = path.join(__dirname, 'utils/files/avatar.png')
+
+			const addAvatarRes = await postRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
+				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
+				.set('Content-Type', 'multipart/form-data')
+				.attach('avatarFile', avatarFilePath)
+				.set('authorization', 'Bearer ' + accessToken)
+				.expect(HTTP_STATUSES.OK_200)
+
+			const getAvatarRes = await getRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
+				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
+				.set('authorization', 'Bearer ' + accessToken)
+				.expect(HTTP_STATUSES.OK_200)
+
+			checkSuccessResponse(getAvatarRes.body, 200, {
+				avatarUrl: 'https://sociable-people.storage.yandexcloud.net/users/1/avatar.png',
+			})
+		})
+	})
+
+	describe('Delete current user avatar file', () => {
+		it('should return 401 if there is not cookies', async () => {
+			await userUtils.deviceTokenChecks.tokenNotExist(
+				mainApp,
+				'delete',
+				RouteNames.USERS.ME.AVATAR.full,
+			)
+		})
+
+		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
+			await userUtils.deviceTokenChecks.tokenExpired(
+				mainApp,
+				'delete',
+				RouteNames.USERS.ME.AVATAR.full,
+				userRepository,
+				securityRepository,
+				jwtService,
+				mainConfig,
+			)
+		})
+
+		it('should return 200 if the JWT refreshToken inside cookie is valid', async () => {
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+				mainApp,
+				userRepository,
+				userName,
+				userEmail,
+				userPassword,
+			)
+
+			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
+
+			const avatarFilePath = path.join(__dirname, 'utils/files/avatar.png')
+
+			// Add avatar
+			const addAvatarRes = await postRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
+				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
+				.set('Content-Type', 'multipart/form-data')
+				.attach('avatarFile', avatarFilePath)
+				.set('authorization', 'Bearer ' + accessToken)
+				.expect(HTTP_STATUSES.OK_200)
+
+			// Delete avatar
+			const deleteAvatarRes = await deleteRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
+				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
+				.set('authorization', 'Bearer ' + accessToken)
+				.expect(HTTP_STATUSES.OK_200)
+
+			checkSuccessResponse(deleteAvatarRes.body, 200, {
+				avatarUrl: null,
+			})
+
+			// Check avatar is gone
+			const getAvatarRes = await getRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
+				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
+				.set('authorization', 'Bearer ' + accessToken)
+				.expect(HTTP_STATUSES.OK_200)
+
+			checkSuccessResponse(getAvatarRes.body, 200, null)
+		})
 	})
 })

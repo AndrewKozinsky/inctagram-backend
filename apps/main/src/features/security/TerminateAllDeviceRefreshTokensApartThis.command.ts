@@ -12,7 +12,6 @@ export class TerminateAllDeviceRefreshTokensApartThisHandler
 	implements ICommandHandler<TerminateAllDeviceRefreshTokensApartThisCommand>
 {
 	constructor(
-		private userRepository: UserRepository,
 		private securityRepository: DevicesRepository,
 		private jwtAdapter: JwtAdapterService,
 	) {}

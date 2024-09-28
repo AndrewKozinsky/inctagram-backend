@@ -1,42 +1,52 @@
 import { Injectable } from '@nestjs/common'
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import { MainConfigService } from '@app/config'
 import { SaveFileInContract } from './contracts/contracts'
 
 @Injectable()
 export class FilesService {
 	s3Client: S3Client
 
-	constructor() {
+	constructor(private mainConfig: MainConfigService) {
+		const { region, endpoint, accessKeyId, secretAccessKey } = this.mainConfig.get().s3
+
 		this.s3Client = new S3Client({
-			region: 'ru-central1-a',
-			// Указать адрес сервиса Яндекса
-			endpoint: 'https://storage.yandexcloud.net',
+			region,
+			endpoint,
 			credentials: {
-				// Указать ключ доступа к учётной записи
-				accessKeyId: 'YCAJEoIX9vzX607TrJy8nGndP',
-				// Указать секретный ключ доступа к учётной записи
-				secretAccessKey: 'YCOo56MU5FWyHjhS8kmVIbk-T_sr9uXxm9W2SrRE',
+				accessKeyId,
+				secretAccessKey,
 			},
 		})
 	}
 
 	async save(fileData: SaveFileInContract) {
-		const uploadRes = await this.s3Client.send(
+		const { bucket } = this.mainConfig.get().s3
+
+		return await this.s3Client.send(
 			// Класс PutObjectCommand создаёт экземпляр класса создающего файл.
 			new PutObjectCommand({
-				// Передам название своей корзины
-				Bucket: 'sociable-people',
-				// Указать путь до файла.
+				Bucket: bucket,
+				// Путь до файла
 				Key: fileData.filePath,
-				// Содержимое файла.
+				// Содержимое файла
 				Body: fileData.fileBuffer,
-				// Чтобы при запросе сохранённого файла в браузере он правильно отображался
-				// нужно задать ContentType, но я не знаю как его получить.
-				// Если не задать, то браузер просто предложит скачать без просмотра.
 				ContentType: fileData.mimetype,
-				// ContentLength
+				ContentLength: fileData.fileSize,
 			}),
 		)
-		return uploadRes
+	}
+
+	async delete(filePath: string) {
+		const { bucket } = this.mainConfig.get().s3
+
+		return await this.s3Client.send(
+			// Класс PutObjectCommand создаёт экземпляр класса создающего файл.
+			new DeleteObjectCommand({
+				Bucket: bucket,
+				// Путь до файла
+				Key: filePath,
+			}),
+		)
 	}
 }

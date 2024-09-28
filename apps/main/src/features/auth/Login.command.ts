@@ -1,7 +1,7 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UserRepository } from '../../repositories/user.repository'
 import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
-import { CreateRefreshTokenCommand } from './CreateRefreshToken.commandHandler'
+import { CreateRefreshTokenCommand } from './CreateRefreshToken.command'
 import { LoginDtoModel } from '../../models/auth/auth.input.model'
 import { UserQueryRepository } from '../../repositories/user.queryRepository'
 

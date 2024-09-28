@@ -6,14 +6,17 @@ import { JwtAdapterService } from '@app/jwt-adapter'
 import { BrowserServiceService } from '@app/browser-service'
 import { DevicesRepository } from '../../repositories/devices.repository'
 import { PrismaService } from '../../db/prisma.service'
-import { SetAvatarToMeHandler } from '../../features/user/SetAvatarToMe.commandHandler'
+import { SetAvatarToMeHandler } from '../../features/user/SetAvatarToMe.command'
 import { MainConfigService } from '@app/config'
+import { UserRepository } from '../../repositories/user.repository'
+import { GetUserAvatarHandler } from '../../features/user/GetUserAvatar.command'
+import { DeleteUserAvatarHandler } from '../../features/user/DeleteUserAvatar.command'
 
 const services = [PrismaService, BrowserServiceService, JwtAdapterService]
 
-const repositories = [DevicesRepository]
+const repositories = [DevicesRepository, UserRepository]
 
-const commandHandlers = [SetAvatarToMeHandler]
+const commandHandlers = [SetAvatarToMeHandler, GetUserAvatarHandler, DeleteUserAvatarHandler]
 
 @Module({
 	imports: [CqrsModule],

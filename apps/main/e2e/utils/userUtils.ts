@@ -1,8 +1,10 @@
 import { INestApplication } from '@nestjs/common'
 import {
 	checkErrorResponse,
+	deleteRequest,
 	getRequest,
 	postRequest,
+	putRequest,
 	userEmail,
 	userName,
 	userPassword,
@@ -111,17 +113,31 @@ export const userUtils = {
 	},
 	deviceTokenChecks: {
 		// should return 401 if there is not cookies
-		async tokenNotExist(app: INestApplication, routeUrl: string) {
-			const logoutRes = await postRequest(app, routeUrl).expect(
-				HTTP_STATUSES.UNAUTHORIZED_401,
-			)
-			const logout = logoutRes.body
+		async tokenNotExist(
+			app: INestApplication,
+			methodType: 'get' | 'post' | 'put' | 'delete',
+			routeUrl: string,
+		) {
+			let reqRes: any = null
 
-			checkErrorResponse(logout, 401, 'Refresh token is not valid')
+			if (methodType === 'get') {
+				reqRes = await getRequest(app, routeUrl).expect(HTTP_STATUSES.UNAUTHORIZED_401)
+			} else if (methodType === 'post') {
+				reqRes = await postRequest(app, routeUrl).expect(HTTP_STATUSES.UNAUTHORIZED_401)
+			} else if (methodType === 'put') {
+				reqRes = await putRequest(app, routeUrl).expect(HTTP_STATUSES.UNAUTHORIZED_401)
+			} else if (methodType === 'delete') {
+				reqRes = await deleteRequest(app, routeUrl).expect(HTTP_STATUSES.UNAUTHORIZED_401)
+			}
+
+			const req = reqRes.body
+
+			checkErrorResponse(req, 401, 'Refresh token is not valid')
 		},
 		// should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect
 		async tokenExpired(
 			app: INestApplication,
+			methodType: 'get' | 'post' | 'put' | 'delete',
 			routeUrl: string,
 			userRepository: UserRepository,
 			securityRepository: DevicesRepository,
@@ -150,9 +166,23 @@ export const userUtils = {
 				refreshToken!.expirationDate,
 			)
 
-			const logoutRes = await postRequest(app, routeUrl)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
-				.expect(HTTP_STATUSES.UNAUTHORIZED_401)
+			if (methodType === 'get') {
+				await getRequest(app, routeUrl)
+					.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
+					.expect(HTTP_STATUSES.UNAUTHORIZED_401)
+			} else if (methodType === 'post') {
+				await postRequest(app, routeUrl)
+					.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
+					.expect(HTTP_STATUSES.UNAUTHORIZED_401)
+			} else if (methodType === 'put') {
+				await putRequest(app, routeUrl)
+					.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
+					.expect(HTTP_STATUSES.UNAUTHORIZED_401)
+			} else if (methodType === 'delete') {
+				await deleteRequest(app, routeUrl)
+					.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
+					.expect(HTTP_STATUSES.UNAUTHORIZED_401)
+			}
 		},
 		async tokenValid(
 			app: INestApplication,

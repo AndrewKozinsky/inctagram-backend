@@ -3,6 +3,7 @@ import { lastValueFrom } from 'rxjs'
 import { Inject } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
 import { FileEventNames, SaveFileInContract } from '../../../../files/src/contracts/contracts'
+import { UserRepository } from '../../repositories/user.repository'
 
 export class SetAvatarToMeCommand {
 	constructor(
@@ -13,30 +14,39 @@ export class SetAvatarToMeCommand {
 
 @CommandHandler(SetAvatarToMeCommand)
 export class SetAvatarToMeHandler implements ICommandHandler<SetAvatarToMeCommand> {
-	constructor(@Inject('FILES_MICROSERVICE') private filesMicroClient: ClientProxy) {}
+	constructor(
+		@Inject('FILES_MICROSERVICE') private filesMicroClient: ClientProxy,
+		private userRepository: UserRepository,
+	) {}
 
 	async execute(command: SetAvatarToMeCommand) {
 		const { userId, avatarFile } = command
-		console.log(avatarFile)
 
-		/*const fileExtension =
+		// Create avatar image dataset
+		const fileExtension =
 			avatarFile.originalname.split('.')[avatarFile.originalname.split('.').length - 1]
-		const filePath = 'users/' + userId + '/avatar.' + fileExtension*/
+		const avatarUrl = 'users/' + userId + '/avatar.' + fileExtension
 
-		/*const setUserAvatarContract: SaveFileInContract = {
+		const setUserAvatarContract: SaveFileInContract = {
 			mimetype: avatarFile.mimetype,
-			filePath,
+			filePath: avatarUrl,
 			fileBuffer: avatarFile.buffer,
+			fileSize: avatarFile.size,
 		}
 
+		// Save file
 		const response = await lastValueFrom(
 			this.filesMicroClient.send(FileEventNames.Save, setUserAvatarContract),
 		)
-		await this.filesMicroClient.close()*/
+		await this.filesMicroClient.close()
+
+		// Set avatar image src to user table in DB
+		await this.userRepository.updateUser(userId, {
+			avatar: avatarUrl,
+		})
 
 		return {
-			// avatarUrl: filePath,
-			avatarUrl: 'filePath',
+			avatarUrl,
 		}
 	}
 }

@@ -66,6 +66,12 @@ export const bdConfig = {
 				example: 'Andrew',
 				required: true,
 			},
+			avatar: {
+				type: 'string',
+				description: "User's avatar image",
+				example: 'https://sociable-people.storage.yandexcloud.net/users/1/avatar.png',
+				required: false,
+			},
 			hashed_password: {
 				type: 'string',
 				description: "Hashed user's password",

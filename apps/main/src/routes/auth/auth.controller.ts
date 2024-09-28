@@ -38,25 +38,22 @@ import { ApiBearerAuth, ApiCookieAuth, ApiTags } from '@nestjs/swagger'
 import {
 	RegByProviderAndLoginCommand,
 	RegByProviderAndLoginHandler,
-} from '../../features/user/RegByGithubAndGetTokens.commandHandler'
+} from '../../features/user/RegByGithubAndGetTokens.command'
 import { AuthService } from './auth.service'
 import {
 	GenerateAccessAndRefreshTokensCommand,
 	GenerateAccessAndRefreshTokensHandler,
-} from '../../features/auth/GenerateAccessAndRefreshTokens.commandHandler'
-import {
-	ConfirmEmailCommand,
-	ConfirmEmailHandler,
-} from '../../features/auth/ConfirmEmail.commandHandler'
-import { LoginCommand, LoginHandler } from '../../features/auth/Login.commandHandler'
-import { ResendConfirmationEmailCommand } from '../../features/auth/ResendConfirmationEmail.commandHandler'
-import { LogoutCommand, LogoutHandler } from '../../features/auth/Logout.commandHandler'
+} from '../../features/auth/GenerateAccessAndRefreshTokens.command'
+import { ConfirmEmailCommand, ConfirmEmailHandler } from '../../features/auth/ConfirmEmail.command'
+import { LoginCommand, LoginHandler } from '../../features/auth/Login.command'
+import { ResendConfirmationEmailCommand } from '../../features/auth/ResendConfirmationEmail.command'
+import { LogoutCommand, LogoutHandler } from '../../features/auth/Logout.command'
 import {
 	RecoveryPasswordCommand,
 	RecoveryPasswordHandler,
-} from '../../features/auth/RecoveryPassword.commandHandler'
-import { SetNewPasswordCommand } from '../../features/auth/SetNewPassword.commandHandler'
-import { CreateUserCommand, CreateUserHandler } from '../../features/user/CreateUser.commandHandler'
+} from '../../features/auth/RecoveryPassword.command'
+import { SetNewPasswordCommand } from '../../features/auth/SetNewPassword.command'
+import { CreateUserCommand, CreateUserHandler } from '../../features/user/CreateUser.command'
 import {
 	SWAuthorizeByProviderRouteOut,
 	SWGetNewAccessAndRefreshTokenRouteOut,

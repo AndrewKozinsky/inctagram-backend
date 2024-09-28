@@ -10,6 +10,7 @@ import {
 	SWGetUserDevicesRouteOut,
 	SWLoginRouteOut,
 	SWRegistrationRouteOut,
+	SWUserMeGetAvatarRouteOut,
 } from '../auth/swaggerTypes'
 import { SWEmptyRouteOut } from './swaggerTypesCommon'
 
@@ -197,6 +198,24 @@ export const routesConfig = {
 					{
 						code: ErrorCode.BadRequest_400,
 						errors: [ErrorMessage.FileHasWrongMimeType, ErrorMessage.FileIsTooLarge],
+					},
+				],
+			},
+			getAvatar: {
+				response: [
+					{
+						code: SuccessCode.Ok,
+						description: "User's avatar url",
+						dataClass: SWUserMeGetAvatarRouteOut,
+					},
+				],
+			},
+			deleteAvatar: {
+				response: [
+					{
+						code: SuccessCode.Ok,
+						description: "User's avatar was deleted",
+						dataClass: SWEmptyRouteOut,
 					},
 				],
 			},

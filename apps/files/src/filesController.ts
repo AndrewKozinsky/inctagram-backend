@@ -8,7 +8,12 @@ export class FilesController {
 	constructor(private readonly filesService: FilesService) {}
 
 	@MessagePattern(FileEventNames.Save)
-	async save(contractIn: SaveFileInContract) {
-		return await this.filesService.save(contractIn)
+	async save(fileData: SaveFileInContract) {
+		return await this.filesService.save(fileData)
+	}
+
+	@MessagePattern(FileEventNames.Delete)
+	async delete(filePath: string) {
+		return await this.filesService.delete(filePath)
 	}
 }

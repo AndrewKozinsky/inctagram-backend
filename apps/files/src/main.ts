@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core'
 import { MicroserviceOptions, Transport } from '@nestjs/microservices'
-import { FilesModule } from './filesModule'
 import { MainConfigService } from '@app/config'
+import { FilesModule } from './filesModule'
 import { AppModule } from '../../main/src/app.module'
 
 async function bootstrap() {
@@ -15,7 +15,7 @@ async function bootstrap() {
 			transport: Transport.TCP,
 			options: {
 				host: 'localhost',
-				port: port,
+				port,
 			},
 		},
 	)

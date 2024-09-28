@@ -14,6 +14,10 @@ export function getRequest(app: INestApplication, url: string) {
 	return request(app.getHttpServer()).get('/' + url)
 }
 
+export function putRequest(app: INestApplication, url: string) {
+	return request(app.getHttpServer()).put('/' + url)
+}
+
 export function deleteRequest(app: INestApplication, url: string) {
 	return request(app.getHttpServer()).delete('/' + url)
 }
@@ -59,6 +63,6 @@ export function checkSuccessResponse(resObj: any, code: number, data?: any) {
 	expect(resObj.code).toBe(code)
 
 	if (data) {
-		expect(resObj.data).toBe(data)
+		expect(resObj.data).toEqual(data)
 	}
 }

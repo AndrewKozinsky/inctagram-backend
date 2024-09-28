@@ -2,6 +2,7 @@ export type UserServiceModel = {
 	id: number
 	email: string
 	name: string | null
+	avatar: string | null
 	hashedPassword: string
 	emailConfirmationCode: string | null
 	confirmationCodeExpirationDate: string | null

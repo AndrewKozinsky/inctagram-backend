@@ -9,7 +9,7 @@ import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
 import {
 	GenerateAllCountriesAndCitiesCommand,
 	GenerateAllCountriesAndCitiesHandler,
-} from '../../features/countries/GenerateAllCountriesAndCities.commandHandler'
+} from '../../features/countries/GenerateAllCountriesAndCities.command'
 
 @ApiTags('Auth')
 @Controller(RouteNames.COUNTRIES.value)

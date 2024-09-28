@@ -77,7 +77,6 @@ export class GoogleService {
 			})
 				.then((res) => res.json())
 				.then((data) => {
-					console.log(data.emailAddresses[0].metadata)
 					resolve(data)
 					/*
 					{

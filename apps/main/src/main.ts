@@ -1,8 +1,8 @@
 import { NestFactory } from '@nestjs/core'
-import { AppModule } from './app.module'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { INestApplication } from '@nestjs/common'
 import { MainConfigService } from '@app/config'
+import { AppModule } from './app.module'
 import { applyAppSettings } from './infrastructure/applyAppSettings'
 
 async function bootstrap() {

@@ -3,7 +3,7 @@ const { randomBytes } = require('node:crypto')
 import { GitHubService } from '../../routes/auth/gitHubService'
 import { CreateUserDtoModel, OAuthProviderName } from '../../models/user/user.input.model'
 import { UserRepository } from '../../repositories/user.repository'
-import { CreateRefreshTokenCommand } from '../auth/CreateRefreshToken.commandHandler'
+import { CreateRefreshTokenCommand } from '../auth/CreateRefreshToken.command'
 import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { GoogleService } from '../../routes/auth/googleService'
 import { UserQueryRepository } from '../../repositories/user.queryRepository'
@@ -24,7 +24,7 @@ export class RegByProviderAndLoginHandler implements ICommandHandler<RegByProvid
 	constructor(
 		private userRepository: UserRepository,
 		private userQueryRepository: UserQueryRepository,
-		private readonly commandBus: CommandBus,
+		private commandBus: CommandBus,
 		private gitHubService: GitHubService,
 		private googleService: GoogleService,
 	) {}

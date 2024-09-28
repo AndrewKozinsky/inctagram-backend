@@ -160,3 +160,21 @@ export class SWUserMeAddAvatarRouteOut {
 		avatarUrl: string
 	}
 }
+
+export class SWUserMeGetAvatarRouteOut {
+	@ApiProperty({ default: 'success' })
+	status: string
+
+	@ApiProperty()
+	code: number
+
+	@ApiProperty({
+		type: 'object',
+		properties: {
+			avatarUrl: { type: 'string' },
+		},
+	})
+	data: {
+		avatarUrl: string
+	}
+}

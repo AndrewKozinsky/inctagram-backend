@@ -188,6 +188,7 @@ export class UserRepository {
 			id: dbUser.id,
 			email: dbUser.email,
 			name: dbUser.name,
+			avatar: dbUser.avatar,
 			hashedPassword: dbUser.hashed_password,
 			emailConfirmationCode: dbUser.email_confirmation_code,
 			confirmationCodeExpirationDate: dbUser.email_confirmation_code_expiration_date,

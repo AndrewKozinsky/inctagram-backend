@@ -3,7 +3,7 @@ import { CqrsModule } from '@nestjs/cqrs'
 import { CountryController } from './country.controller'
 import { CountryRepository } from '../../repositories/country.repository'
 import { CityRepository } from '../../repositories/city.repository'
-import { GenerateAllCountriesAndCitiesCommand } from '../../features/countries/GenerateAllCountriesAndCities.commandHandler'
+import { GenerateAllCountriesAndCitiesCommand } from '../../features/countries/GenerateAllCountriesAndCities.command'
 import { CountryService } from './country.service'
 
 const services = [CountryService]
