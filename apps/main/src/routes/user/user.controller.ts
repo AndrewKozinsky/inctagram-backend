@@ -1,13 +1,14 @@
 import {
 	Controller,
-	Get,
 	Inject,
 	OnModuleInit,
 	Post,
+	Req,
 	UploadedFile,
 	UseGuards,
 	UseInterceptors,
 } from '@nestjs/common'
+import { Request } from 'express'
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCookieAuth, ApiTags } from '@nestjs/swagger'
 import { CommandBus } from '@nestjs/cqrs'
 import { FileInterceptor } from '@nestjs/platform-express'
@@ -59,14 +60,13 @@ export class UserController implements OnModuleInit {
 	async setAvatarToMe(
 		@UploadedFile(new UploadAvatarFilePipe())
 		avatarFile: Express.Multer.File,
+		@Req() req: Request,
 	): Promise<SWUserMeAddAvatarRouteOut | undefined> {
 		try {
-			// this.filesMicroClient.send('plain_text', 'Ping from the producer.')
-
 			const commandRes = await this.commandBus.execute<
 				any,
 				ReturnType<typeof SetAvatarToMeHandler.prototype.execute>
-			>(new SetAvatarToMeCommand(avatarFile))
+			>(new SetAvatarToMeCommand(req.user.id, avatarFile))
 
 			return createSuccessResp(routesConfig.users.me.setAvatar, commandRes)
 		} catch (err: any) {
@@ -75,12 +75,14 @@ export class UserController implements OnModuleInit {
 	}*/
 
 	// DELETE
-	@Get()
-	async setAvatarToMe() {
-		this.filesMicroClient
-			.send('plain_text', 'Ping from the producer.')
-			.subscribe((response) => {
-				console.log('Response from consumer:', response)
-			})
+	@Post([RouteNames.USERS.ME.value, RouteNames.USERS.ME.AVATAR.value].join('/'))
+	@RouteDecorators(routesConfig.users.me.setAvatar)
+	@UseInterceptors(FileInterceptor('avatarFile'))
+	setAvatarToMe(
+		@UploadedFile(new UploadAvatarFilePipe())
+		avatarFile: Express.Multer.File,
+		@Req() req: Request,
+	): SWUserMeAddAvatarRouteOut {
+		return createSuccessResp(routesConfig.users.me.setAvatar, { avatarUrl: 'ee' })
 	}
 }

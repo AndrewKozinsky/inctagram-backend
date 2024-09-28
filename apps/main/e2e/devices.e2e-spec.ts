@@ -1,33 +1,27 @@
 import { INestApplication } from '@nestjs/common'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { MainConfigService } from '@app/config'
-import {
-	createTestApp,
-	deleteRequest,
-	getRequest,
-	userEmail,
-	userName,
-	userPassword,
-} from './utils/common'
+import { deleteRequest, getRequest, userEmail, userName, userPassword } from './utils/common'
 import RouteNames from '../src/routes/routesConfig/routeNames'
 import { HTTP_STATUSES } from '../src/utils/httpStatuses'
 import { clearAllDB } from './utils/db'
 import { EmailAdapterService } from '@app/email-adapter'
 import { UserRepository } from '../src/repositories/user.repository'
 import { userUtils } from './utils/userUtils'
-import { createUniqString, parseCookieStringToObj } from '../src/utils/stringUtils'
+import { createUniqString } from '../src/utils/stringUtils'
 import { DeviceTokenOutModel } from '../src/models/auth/auth.output.model'
 import { GitHubService } from '../src/routes/auth/gitHubService'
 import { GoogleService } from '../src/routes/auth/googleService'
 import { DevicesRepository } from '../src/repositories/devices.repository'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
+import { createMainApp } from './utils/createMainApp'
 
 it.only('123', async () => {
 	expect(2).toBe(2)
 })
 
 describe('Auth (e2e)', () => {
-	let app: INestApplication
+	let mainApp: INestApplication
 	let emailAdapter: EmailAdapterService
 	let gitHubService: GitHubService
 	let googleService: GoogleService
@@ -39,27 +33,27 @@ describe('Auth (e2e)', () => {
 	let mainConfig: MainConfigService
 
 	beforeAll(async () => {
-		const createAppRes = await createTestApp(
+		const createMainAppRes = await createMainApp(
 			emailAdapter,
 			gitHubService,
 			googleService,
 			reCaptchaAdapter,
 		)
-		app = createAppRes.app
+		mainApp = createMainAppRes.mainApp
 
-		emailAdapter = createAppRes.emailAdapter
-		gitHubService = createAppRes.gitHubService
-		googleService = createAppRes.googleService
-		reCaptchaAdapter = createAppRes.reCaptchaAdapter
+		emailAdapter = createMainAppRes.emailAdapter
+		gitHubService = createMainAppRes.gitHubService
+		googleService = createMainAppRes.googleService
+		reCaptchaAdapter = createMainAppRes.reCaptchaAdapter
 
-		userRepository = await app.resolve(UserRepository)
-		securityRepository = await app.resolve(DevicesRepository)
-		jwtService = await app.resolve(JwtAdapterService)
-		mainConfig = await app.resolve(MainConfigService)
+		userRepository = await mainApp.resolve(UserRepository)
+		securityRepository = await mainApp.resolve(DevicesRepository)
+		jwtService = await mainApp.resolve(JwtAdapterService)
+		mainConfig = await mainApp.resolve(MainConfigService)
 	})
 
 	beforeEach(async () => {
-		await clearAllDB(app)
+		await clearAllDB(mainApp)
 	})
 
 	afterEach(() => {
@@ -68,14 +62,14 @@ describe('Auth (e2e)', () => {
 
 	describe('Getting all user devices', () => {
 		it('should forbid a request if there is not refresh token', async () => {
-			await getRequest(app, RouteNames.SECURITY.DEVICES.full).expect(
+			await getRequest(mainApp, RouteNames.SECURITY.DEVICES.full).expect(
 				HTTP_STATUSES.UNAUTHORIZED_401,
 			)
 		})
 
 		it('should return an array of devices data if a refreshToken inside cookie is valid', async () => {
 			const [accessToken1, refreshToken1] = await userUtils.createUserAndLogin(
-				app,
+				mainApp,
 				userRepository,
 				userName,
 				userEmail,
@@ -83,7 +77,7 @@ describe('Auth (e2e)', () => {
 			)
 			const refreshToken1Str = userUtils.convertCookieRefreshTokenToTokenStr(refreshToken1)
 
-			const getUserDevicesRes1 = await getRequest(app, RouteNames.SECURITY.DEVICES.full)
+			const getUserDevicesRes1 = await getRequest(mainApp, RouteNames.SECURITY.DEVICES.full)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshToken1Str)
 				.expect(HTTP_STATUSES.OK_200)
 
@@ -93,13 +87,13 @@ describe('Auth (e2e)', () => {
 			// Second login
 
 			const [accessToken2, refreshToken2] = await userUtils.loginUser(
-				app,
+				mainApp,
 				userEmail,
 				userPassword,
 			)
 			const refreshToken2Str = userUtils.convertCookieRefreshTokenToTokenStr(refreshToken2)
 
-			const getUserDevicesRes2 = await getRequest(app, RouteNames.SECURITY.DEVICES.full)
+			const getUserDevicesRes2 = await getRequest(mainApp, RouteNames.SECURITY.DEVICES.full)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshToken2Str)
 				.expect(HTTP_STATUSES.OK_200)
 
@@ -110,13 +104,13 @@ describe('Auth (e2e)', () => {
 
 	describe('Terminate specified device session', () => {
 		it('should forbid a request from a user without a device refresh token', async () => {
-			await deleteRequest(app, RouteNames.SECURITY.DEVICES.DEVICE_ID('999').full).expect(
+			await deleteRequest(mainApp, RouteNames.SECURITY.DEVICES.DEVICE_ID('999').full).expect(
 				HTTP_STATUSES.UNAUTHORIZED_401,
 			)
 		})
 
 		it('should forbid a request from a user with an expired device refresh token', async () => {
-			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
+			const user = await userUtils.createUserWithConfirmedEmail(mainApp, userRepository)
 			const userId = user.id
 
 			// Create expired token
@@ -136,14 +130,14 @@ describe('Auth (e2e)', () => {
 			// Get created expired token
 			const refreshToken = await securityRepository.getDeviceRefreshTokenByDeviceId(deviceId)
 
-			await deleteRequest(app, RouteNames.SECURITY.DEVICES.DEVICE_ID('999').full)
+			await deleteRequest(mainApp, RouteNames.SECURITY.DEVICES.DEVICE_ID('999').full)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshToken)
 				.expect(HTTP_STATUSES.UNAUTHORIZED_401)
 		})
 
 		it('should return 404 if client tries to terminate a non existed device', async () => {
 			const [accessToken, refreshToken] = await userUtils.createUserAndLogin(
-				app,
+				mainApp,
 				userRepository,
 				userName,
 				userEmail,
@@ -151,7 +145,7 @@ describe('Auth (e2e)', () => {
 			)
 			const refreshTokenStr = userUtils.convertCookieRefreshTokenToTokenStr(refreshToken)
 
-			await deleteRequest(app, RouteNames.SECURITY.DEVICES.DEVICE_ID('999').full)
+			await deleteRequest(mainApp, RouteNames.SECURITY.DEVICES.DEVICE_ID('999').full)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
 				.expect(HTTP_STATUSES.NOT_FOUNT_404)
 		})
@@ -159,7 +153,7 @@ describe('Auth (e2e)', () => {
 		it('should return 403 if a client tries to terminate a device which does not belong to him', async () => {
 			// Create a user 1
 			const [accessToken1, refreshToken1] = await userUtils.createUserAndLogin(
-				app,
+				mainApp,
 				userRepository,
 				userName,
 				userEmail,
@@ -175,23 +169,27 @@ describe('Auth (e2e)', () => {
 			const email2 = 'email-2@email.ru'
 
 			await userUtils.createUserWithConfirmedEmail(
-				app,
+				mainApp,
 				userRepository,
 				userName2,
 				email2,
 				password2,
 			)
-			const [accessToken2, refreshToken2] = await userUtils.loginUser(app, email2, password2)
+			const [accessToken2, refreshToken2] = await userUtils.loginUser(
+				mainApp,
+				email2,
+				password2,
+			)
 			const refreshToken2Str = userUtils.convertCookieRefreshTokenToTokenStr(refreshToken2)
 
-			await deleteRequest(app, RouteNames.SECURITY.DEVICES.DEVICE_ID(deviceId).full)
+			await deleteRequest(mainApp, RouteNames.SECURITY.DEVICES.DEVICE_ID(deviceId).full)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshToken2Str)
 				.expect(HTTP_STATUSES.UNAUTHORIZED_401)
 		})
 
 		it('should return 204 if a client tries to terminate his device', async () => {
 			const [accessToken1, refreshToken1] = await userUtils.createUserAndLogin(
-				app,
+				mainApp,
 				userRepository,
 				userName,
 				userEmail,
@@ -201,7 +199,10 @@ describe('Auth (e2e)', () => {
 
 			const deviceId = jwtService.getRefreshTokenDataFromTokenStr(refreshTokenStr)!.deviceId
 
-			return await deleteRequest(app, RouteNames.SECURITY.DEVICES.DEVICE_ID(deviceId).full)
+			return await deleteRequest(
+				mainApp,
+				RouteNames.SECURITY.DEVICES.DEVICE_ID(deviceId).full,
+			)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
 				.expect(HTTP_STATUSES.OK_200)
 		})
@@ -209,13 +210,13 @@ describe('Auth (e2e)', () => {
 
 	describe('Terminate this device session', () => {
 		it('should forbid a request from a user without a device refresh token', async () => {
-			return deleteRequest(app, RouteNames.SECURITY.DEVICES.full).expect(
+			return deleteRequest(mainApp, RouteNames.SECURITY.DEVICES.full).expect(
 				HTTP_STATUSES.UNAUTHORIZED_401,
 			)
 		})
 
 		it('should forbid a request from a user with an expired device refresh token', async () => {
-			const user = await userUtils.createUserWithConfirmedEmail(app, userRepository)
+			const user = await userUtils.createUserWithConfirmedEmail(mainApp, userRepository)
 			const userId = user.id
 
 			// Create expired token
@@ -235,14 +236,14 @@ describe('Auth (e2e)', () => {
 			// Get created expired token
 			const refreshToken = securityRepository.getDeviceRefreshTokenByDeviceId(deviceId)
 
-			return deleteRequest(app, RouteNames.SECURITY.DEVICES.full)
+			return deleteRequest(mainApp, RouteNames.SECURITY.DEVICES.full)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshToken)
 				.expect(HTTP_STATUSES.UNAUTHORIZED_401)
 		})
 
 		it('should return 204 if a client tries to terminate current device', async () => {
 			const [accessToken, refreshToken] = await userUtils.createUserAndLogin(
-				app,
+				mainApp,
 				userRepository,
 				userName,
 				userEmail,
@@ -252,7 +253,7 @@ describe('Auth (e2e)', () => {
 			const deviceRefreshTokenStr =
 				userUtils.convertCookieRefreshTokenToTokenStr(refreshToken)
 
-			return await deleteRequest(app, RouteNames.SECURITY.DEVICES.full)
+			return await deleteRequest(mainApp, RouteNames.SECURITY.DEVICES.full)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + deviceRefreshTokenStr)
 				.expect(HTTP_STATUSES.OK_200)
 		})

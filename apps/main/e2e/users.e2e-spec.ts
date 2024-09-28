@@ -1,11 +1,10 @@
-import { INestApplication } from '@nestjs/common'
+import { INestApplication, INestMicroservice } from '@nestjs/common'
 import { add } from 'date-fns'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { MainConfigService } from '@app/config'
 import {
 	checkErrorResponse,
 	checkSuccessResponse,
-	createTestApp,
 	getFieldInErrorObject,
 	getRequest,
 	postRequest,
@@ -26,60 +25,69 @@ import { GoogleService } from '../src/routes/auth/googleService'
 import { DevicesRepository } from '../src/repositories/devices.repository'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 import path from 'node:path'
-import { readFile } from 'node:fs/promises'
+import { createFilesApp, createMainApp } from './utils/createMainApp'
 
 it('123', async () => {
 	expect(2).toBe(2)
 })
 
-/*describe('Auth (e2e)', () => {
-	let app: INestApplication = 3 as any
+describe('Auth (e2e)', () => {
+	let filesApp: INestMicroservice = 1 as any
+	let mainApp: INestApplication = 1 as any
+
 	let emailAdapter: EmailAdapterService
 	let gitHubService: GitHubService
 	let googleService: GoogleService
 	let reCaptchaAdapter: ReCaptchaAdapterService
-
 	let userRepository: UserRepository
 	let securityRepository: DevicesRepository
 	let jwtService: JwtAdapterService
 	let mainConfig: MainConfigService
 
 	beforeAll(async () => {
-		const createAppRes = await createTestApp(
+		const createFilesAppRes = await createFilesApp()
+		filesApp = createFilesAppRes.filesApp
+
+		const createMainAppRes = await createMainApp(
 			emailAdapter,
 			gitHubService,
 			googleService,
 			reCaptchaAdapter,
 		)
-		app = createAppRes.app
 
-		emailAdapter = createAppRes.emailAdapter
-		gitHubService = createAppRes.gitHubService
-		googleService = createAppRes.googleService
-		reCaptchaAdapter = createAppRes.reCaptchaAdapter
+		mainApp = createMainAppRes.mainApp
 
-		userRepository = await app.resolve(UserRepository)
-		securityRepository = await app.resolve(DevicesRepository)
-		jwtService = await app.resolve(JwtAdapterService)
-		mainConfig = await app.resolve(MainConfigService)
+		emailAdapter = createMainAppRes.emailAdapter
+		gitHubService = createMainAppRes.gitHubService
+		googleService = createMainAppRes.googleService
+		reCaptchaAdapter = createMainAppRes.reCaptchaAdapter
+
+		userRepository = await mainApp.resolve(UserRepository)
+		securityRepository = await mainApp.resolve(DevicesRepository)
+		jwtService = await mainApp.resolve(JwtAdapterService)
+		mainConfig = await mainApp.resolve(MainConfigService)
 	})
 
 	beforeEach(async () => {
-		await clearAllDB(app)
+		await clearAllDB(mainApp)
 	})
 
-	afterEach(() => {
+	afterEach(async () => {
 		jest.clearAllMocks()
+		await filesApp.close()
 	})
 
 	describe('Add avatar file to me', () => {
 		it('should return 401 if there is not cookies', async () => {
-			await userUtils.deviceTokenChecks.tokenNotExist(app, RouteNames.USERS.ME.AVATAR.full)
+			await userUtils.deviceTokenChecks.tokenNotExist(
+				mainApp,
+				RouteNames.USERS.ME.AVATAR.full,
+			)
 		})
 
 		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
 			await userUtils.deviceTokenChecks.tokenExpired(
-				app,
+				mainApp,
 				RouteNames.USERS.ME.AVATAR.full,
 				userRepository,
 				securityRepository,
@@ -90,7 +98,7 @@ it('123', async () => {
 
 		it('should return 400 if the JWT refreshToken inside cookie is valid, but avatar was not send', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
-				app,
+				mainApp,
 				userRepository,
 				userName,
 				userEmail,
@@ -99,7 +107,7 @@ it('123', async () => {
 
 			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
 
-			const addAvatarRes = await postRequest(app, RouteNames.USERS.ME.AVATAR.full)
+			const addAvatarRes = await postRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
 
@@ -108,7 +116,7 @@ it('123', async () => {
 
 		it('should return 400 if the JWT refreshToken inside cookie is valid, but send wrong file', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
-				app,
+				mainApp,
 				userRepository,
 				userName,
 				userEmail,
@@ -120,7 +128,7 @@ it('123', async () => {
 			// Send file in invalid format
 			const textFilePath = path.join(__dirname, 'utils/files/text.txt')
 
-			const addAvatarRes1 = await postRequest(app, RouteNames.USERS.ME.AVATAR.full)
+			const addAvatarRes1 = await postRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.set('Content-Type', 'multipart/form-data')
 
@@ -132,7 +140,7 @@ it('123', async () => {
 			// Send too large image
 			const bigFilePath = path.join(__dirname, 'utils/files/big-avatar.png')
 
-			const addAvatarRes2 = await postRequest(app, RouteNames.USERS.ME.AVATAR.full)
+			const addAvatarRes2 = await postRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.set('Content-Type', 'multipart/form-data')
 
@@ -144,22 +152,27 @@ it('123', async () => {
 
 		it.only('should return 200 if send correct avatar image', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
-				app,
+				mainApp,
 				userRepository,
 				userName,
 				userEmail,
 				userPassword,
 			)
 
-			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
+			/*const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
 
 			const avatarFilePath = path.join(__dirname, 'utils/files/avatar.png')
 
-			const addAvatarRes = await postRequest(app, RouteNames.USERS.ME.AVATAR.full)
+			const addAvatarRes = await postRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.set('Content-Type', 'multipart/form-data')
 				.attach('avatarFile', avatarFilePath)
-				.expect(HTTP_STATUSES.OK_200)
+				.expect(HTTP_STATUSES.OK_200)*/
 		})
+
+		// DELETE
+		/*it.only('should return 200 if send correct avatar image', async () => {
+			await getRequest(mainApp, RouteNames.USERS.value).expect(HTTP_STATUSES.OK_200)
+		})*/
 	})
-})*/
+})
