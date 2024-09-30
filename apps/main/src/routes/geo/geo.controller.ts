@@ -1,9 +1,9 @@
 import { Controller, Get, Param, Query } from '@nestjs/common'
 import { CommandBus } from '@nestjs/cqrs'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiQuery, ApiTags } from '@nestjs/swagger'
 import RouteNames from '../routesConfig/routeNames'
 import { RouteDecorators } from '../routesConfig/routesDecorators'
-import { countryRoutesConfig } from './countryRoutesConfig'
+import { geoRoutesConfig } from './geoRoutesConfig'
 import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
 import {
 	GetCountriesCommand,
@@ -26,21 +26,21 @@ import { GetCityCommand, GetCityHandler } from '../../features/countries/GetCity
 
 @ApiTags('Geo')
 @Controller(RouteNames.GEO.value)
-export class CountryController {
+export class GeoController {
 	constructor(private commandBus: CommandBus) {}
 
 	@Get(RouteNames.GEO.COUNTRIES.value)
-	@RouteDecorators(countryRoutesConfig.getCountries)
+	@RouteDecorators(geoRoutesConfig.getCountries)
 	async getCountries(): Promise<undefined | SWGetCountriesRouteOut> {
 		try {
-			const countries = await this.commandBus.execute<
+			const res = await this.commandBus.execute<
 				any,
 				ReturnType<typeof GetCountriesHandler.prototype.execute>
 			>(new GetCountriesCommand())
 
-			return createSuccessResp(countryRoutesConfig.getCountries, { countries })
+			return createSuccessResp(geoRoutesConfig.getCountries, res)
 		} catch (err: any) {
-			createFailResp(countryRoutesConfig.getCountries, err)
+			createFailResp(geoRoutesConfig.getCountries, err)
 		}
 	}
 
@@ -51,20 +51,40 @@ export class CountryController {
 			RouteNames.GEO.COUNTRIES.COUNTRY_ID('').CITIES.value,
 		].join('/'),
 	)
-	@RouteDecorators(countryRoutesConfig.getCountryCities)
+	@RouteDecorators(geoRoutesConfig.getCountryCities)
+	@ApiQuery({
+		name: 'searchNameTerm',
+		required: false,
+		type: String,
+		description: 'Filter city name by first characters',
+	})
+	@ApiQuery({
+		name: 'pageNumber',
+		required: false,
+		type: Number,
+		description: 'Page number',
+		example: 1,
+	})
+	@ApiQuery({
+		name: 'pageSize',
+		required: false,
+		type: Number,
+		description: 'Count of cities',
+		example: 10,
+	})
 	async getCountryCities(
 		@Query(new GetCountryCitiesQueriesPipe()) query: GetCountryCitiesQueries,
 		@Param('countryCode') countryCode: string,
 	): Promise<undefined | SWGetCountryCitiesRouteOut> {
 		try {
-			const cities = await this.commandBus.execute<
+			const res = await this.commandBus.execute<
 				any,
 				ReturnType<typeof GetCountryCitiesHandler.prototype.execute>
 			>(new GetCountryCitiesCommand(countryCode, query))
 
-			return createSuccessResp(countryRoutesConfig.getCountryCities, { cities })
+			return createSuccessResp(geoRoutesConfig.getCountryCities, res)
 		} catch (err: any) {
-			createFailResp(countryRoutesConfig.getCountryCities, err)
+			createFailResp(geoRoutesConfig.getCountryCities, err)
 		}
 	}
 
@@ -76,7 +96,7 @@ export class CountryController {
 			':cityId',
 		].join('/'),
 	)
-	@RouteDecorators(countryRoutesConfig.getCity)
+	@RouteDecorators(geoRoutesConfig.getCity)
 	async getCity(
 		@Param('countryCode') countryCode: string,
 		@Param('cityId') cityId: number,
@@ -87,9 +107,9 @@ export class CountryController {
 				ReturnType<typeof GetCityHandler.prototype.execute>
 			>(new GetCityCommand(countryCode, cityId))
 
-			return createSuccessResp(countryRoutesConfig.getCity, city)
+			return createSuccessResp(geoRoutesConfig.getCity, city)
 		} catch (err: any) {
-			createFailResp(countryRoutesConfig.getCity, err)
+			createFailResp(geoRoutesConfig.getCity, err)
 		}
 	}
 }

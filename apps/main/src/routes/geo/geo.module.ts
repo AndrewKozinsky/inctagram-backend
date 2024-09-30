@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common'
 import { CqrsModule } from '@nestjs/cqrs'
-import { CountryController } from './country.controller'
+import { GeoController } from './geo.controller'
 import { GetCountriesHandler } from '../../features/countries/GetCountriesCommand'
-import { CountryService } from './country.service'
+import { GeoService } from './geo.service'
 import { GetCountryCitiesHandler } from '../../features/countries/GetCountryCitiesCommand'
 import { GetCityHandler } from '../../features/countries/GetCityCommand'
 
-const services = [CountryService]
+const services = [GeoService]
 
 const repositories: any[] = []
 
@@ -14,7 +14,7 @@ const commandHandlers = [GetCountriesHandler, GetCountryCitiesHandler, GetCityHa
 
 @Module({
 	imports: [CqrsModule],
-	controllers: [CountryController],
+	controllers: [GeoController],
 	providers: [...services, ...repositories, ...commandHandlers],
 })
-export class CountryModule {}
+export class GeoModule {}

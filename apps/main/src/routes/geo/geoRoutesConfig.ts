@@ -2,7 +2,7 @@ import { SuccessCode } from '../../infrastructure/exceptionFilters/layerResult'
 import { RoutesConfig } from '../routesConfig/routesConfigTypes'
 import { SWGetCityRouteOut, SWGetCountriesRouteOut } from './swaggerTypes'
 
-export const countryRoutesConfig = {
+export const geoRoutesConfig = {
 	getCountries: {
 		response: [
 			{

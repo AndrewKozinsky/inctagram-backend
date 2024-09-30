@@ -20,7 +20,7 @@ import {
 	ResendConfirmationEmailDtoModel,
 } from '../../models/auth/auth.input.model'
 import { RouteDecorators } from '../routesConfig/routesDecorators'
-import { countryRoutesConfig } from '../country/countryRoutesConfig'
+import { geoRoutesConfig } from '../geo/geoRoutesConfig'
 import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
 import { LoginOutModel } from '../../models/auth/auth.output.model'
 import { ApiBearerAuth, ApiCookieAuth, ApiTags } from '@nestjs/swagger'

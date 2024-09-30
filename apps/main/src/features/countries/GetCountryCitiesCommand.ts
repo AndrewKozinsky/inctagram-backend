@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
-import { CountryService } from '../../routes/country/country.service'
+import { GeoService } from '../../routes/geo/geo.service'
 import { GetCountryCitiesQueries } from '../../models/geo/geo.input.model'
 
 export class GetCountryCitiesCommand {
@@ -11,7 +11,7 @@ export class GetCountryCitiesCommand {
 
 @CommandHandler(GetCountryCitiesCommand)
 export class GetCountryCitiesHandler implements ICommandHandler<GetCountryCitiesCommand> {
-	constructor(private countryService: CountryService) {}
+	constructor(private countryService: GeoService) {}
 
 	async execute(command: GetCountryCitiesCommand) {
 		const { countryCode, query } = command

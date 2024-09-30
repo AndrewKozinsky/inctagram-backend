@@ -29,7 +29,7 @@ let countriesCache: { code: string; name: string }[] = []
 const citiesCache: { [countryCode: string]: { id: number; name: string }[] } = {}
 
 @Injectable()
-export class CountryService {
+export class GeoService {
 	constructor(private mainConfig: MainConfigService) {}
 
 	async fetchCountriesAndCache() {
@@ -78,12 +78,12 @@ export class CountryService {
 		})
 	}
 
-	async getAllCountries(): Promise<Country[]> {
+	async getAllCountries() {
 		if (!countriesCache.length) {
 			await this.fetchCountriesAndCache()
 		}
 
-		return countriesCache
+		return { countries: countriesCache }
 	}
 
 	async getCountryCities(countryCode: string, query: GetCountryCitiesQueries) {
@@ -92,13 +92,25 @@ export class CountryService {
 		}
 
 		const cities = citiesCache[countryCode]
+		if (!cities) {
+			return {
+				cities: [],
+				total: 0,
+			}
+		}
+
 		const { searchNameTerm = '', pageSize = 10, pageNumber = 1 } = query
 
 		const citiesFilteredByName = cities.filter((city) =>
 			city.name.toLowerCase().startsWith(searchNameTerm.toLowerCase()),
 		)
 
-		return citiesFilteredByName.splice((pageNumber - 1) * pageSize, pageSize)
+		const citiesOnPage = citiesFilteredByName.splice((pageNumber - 1) * pageSize, pageSize)
+
+		return {
+			cities: citiesOnPage,
+			total: citiesFilteredByName.length,
+		}
 	}
 
 	async getCityById(countryCode: string, cityId: number) {
@@ -107,6 +119,9 @@ export class CountryService {
 		}
 
 		const cities = citiesCache[countryCode]
+		if (!cities) {
+			return null
+		}
 
 		const city = cities.find((city) => city.id === cityId)
 		return city ? city : null

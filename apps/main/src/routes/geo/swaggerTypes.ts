@@ -37,8 +37,9 @@ export class SWGetCountryCitiesRouteOut {
 	@ApiProperty({
 		type: 'object',
 		properties: {
-			countries: {
+			cities: {
 				type: 'array',
+				nullable: true,
 				items: {
 					type: 'object',
 					properties: {
@@ -47,10 +48,12 @@ export class SWGetCountryCitiesRouteOut {
 					},
 				},
 			},
+			total: { type: 'number' },
 		},
 	})
 	data: {
-		cities: { id: number; name: string }[]
+		cities: { id: number; name: string }[] | null
+		total: number
 	}
 }
 
@@ -65,6 +68,7 @@ export class SWGetCityRouteOut {
 		type: 'object',
 		nullable: true,
 		properties: {
+			id: { type: 'number' },
 			name: { type: 'string' },
 		},
 	})
