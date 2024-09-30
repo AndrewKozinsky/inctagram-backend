@@ -35,7 +35,7 @@ export class UserRepository {
 		try {
 			const user = await this.prisma.user.findFirst({
 				where: {
-					OR: [{ email: args.email }, { name: args.name }],
+					OR: [{ email: args.email }, { user_name: args.name }],
 				},
 			})
 
@@ -130,7 +130,7 @@ export class UserRepository {
 
 		const newUserParams: any = {
 			email: dto.email,
-			name: dto.name,
+			name: dto.userName,
 			hashed_password: await this.hashAdapter.hashString(dto.password),
 			email_confirmation_code: createUniqString(),
 			email_confirmation_code_expiration_date: add(new Date(), {
@@ -187,7 +187,7 @@ export class UserRepository {
 		return {
 			id: dbUser.id,
 			email: dbUser.email,
-			name: dbUser.name,
+			userName: dbUser.user_name,
 			avatar: dbUser.avatar,
 			hashedPassword: dbUser.hashed_password,
 			emailConfirmationCode: dbUser.email_confirmation_code,

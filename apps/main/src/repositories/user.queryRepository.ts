@@ -28,7 +28,7 @@ export class UserQueryRepository {
 		return {
 			id: dbUser.id,
 			email: dbUser.email,
-			name: dbUser.name,
+			name: dbUser.user_name,
 		}
 	}
 }

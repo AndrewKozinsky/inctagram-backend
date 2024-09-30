@@ -10,14 +10,16 @@ export class FilesService {
 	constructor(private mainConfig: MainConfigService) {
 		const { region, endpoint, accessKeyId, secretAccessKey } = this.mainConfig.get().s3
 
-		this.s3Client = new S3Client({
-			region,
-			endpoint,
-			credentials: {
-				accessKeyId,
-				secretAccessKey,
+		this.s3Client = new S3Client([
+			{
+				region,
+				endpoint,
+				credentials: {
+					accessKeyId,
+					secretAccessKey,
+				},
 			},
-		})
+		])
 	}
 
 	async save(fileData: SaveFileInContract) {

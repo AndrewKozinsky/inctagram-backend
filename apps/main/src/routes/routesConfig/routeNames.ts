@@ -51,26 +51,27 @@ export const RouteNames = {
 			},
 		},
 	},
-	COUNTRIES: {
-		value: 'countries',
-		COUNTRY_ID(countryId: string) {
-			return {
-				value: countryId,
-				full: 'countries/' + countryId,
-				CITIES: {
-					value: 'cities',
-					COUNTRY_ID(citiesId: string) {
-						return {
-							value: citiesId,
-							full: 'countries/' + countryId + 'cities/' + citiesId,
-						}
+	GEO: {
+		value: 'geo',
+		COUNTRIES: {
+			value: 'countries',
+			full: 'geo/countries',
+			COUNTRY_ID(countryCode: string) {
+				return {
+					value: countryCode,
+					full: 'geo/countries/' + countryCode,
+					CITIES: {
+						value: 'cities',
+						full: 'geo/countries/' + countryCode + '/cities',
+						CITY_ID(countryCode: string, cityId: string) {
+							return {
+								value: cityId,
+								full: 'geo/countries/' + countryCode + '/cities/' + cityId,
+							}
+						},
 					},
-				},
-			}
-		},
-		ALL: {
-			value: 'all',
-			full: 'countries/all',
+				}
+			},
 		},
 	},
 	TESTING: {

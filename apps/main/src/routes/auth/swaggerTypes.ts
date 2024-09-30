@@ -84,20 +84,6 @@ export class SWLoginRouteOut {
 	}
 }
 
-// DELETE
-/*export class SWPasswordRecoveryRouteOut {
-	@ApiProperty({ default: 'success' })
-	status: string
-
-	@ApiProperty()
-	code: number
-
-	@ApiProperty({
-		type: 'null',
-	})
-	data: null
-}*/
-
 export class SWGetNewAccessAndRefreshTokenRouteOut {
 	@ApiProperty({ default: 'success' })
 	status: string
@@ -114,33 +100,6 @@ export class SWGetNewAccessAndRefreshTokenRouteOut {
 	data: {
 		accessToken: string
 	}
-}
-
-export class SWGetUserDevicesRouteOut {
-	@ApiProperty({ default: 'success' })
-	status: string
-
-	@ApiProperty()
-	code: number
-
-	@ApiProperty({
-		type: 'array',
-		items: {
-			type: 'object',
-			properties: {
-				ip: { type: 'string' },
-				title: { type: 'string' },
-				lastActiveDate: { type: 'string' },
-				deviceId: { type: 'string' },
-			},
-		},
-	})
-	data: {
-		ip: string
-		title: string
-		lastActiveDate: string
-		deviceId: string
-	}[]
 }
 
 export class SWUserMeAddAvatarRouteOut {

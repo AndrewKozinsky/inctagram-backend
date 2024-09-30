@@ -23,7 +23,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 
 		const existingUser = await this.userRepository.getUserByEmailOrName({
 			email: createUserDto.email,
-			name: createUserDto.name,
+			name: createUserDto.userName,
 		})
 
 		if (existingUser) {

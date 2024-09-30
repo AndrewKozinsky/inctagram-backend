@@ -32,12 +32,15 @@ export class MainConfigService {
 				// Адрес сервиса Яндекса
 				endpoint: 'https://storage.yandexcloud.net',
 				// Ключ доступа к учётной записи
-				accessKeyId: 'YCAJEoIX9vzX607TrJy8nGndP',
+				accessKeyId: this.configService.get<string>('S3_ACCESS_KEY_ID'),
 				// Секретный ключ доступа к учётной записи
-				secretAccessKey: 'YCOo56MU5FWyHjhS8kmVIbk-T_sr9uXxm9W2SrRE',
+				secretAccessKey: this.configService.get<string>('S3_SECRET_ACCESS_KEY_ID'),
 				// Название своей корзины
 				bucket: 'sociable-people',
 				filesRootUrl: 'https://sociable-people.storage.yandexcloud.net',
+			},
+			countryStateCity: {
+				apiKey: 'ajVyS0t2bjI4dzZHU3hUclA4Rjg4YUdLeDJLbkpDN2dCZnZRNDBJdA==',
 			},
 			refreshToken: {
 				name: 'refreshToken',

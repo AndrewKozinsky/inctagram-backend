@@ -1,13 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing'
+import { EmailAdapterService } from '@app/email-adapter'
+import { Transport } from '@nestjs/microservices'
 import { AppModule } from '../../src/app.module'
 import { applyAppSettings } from '../../src/infrastructure/applyAppSettings'
-import { EmailAdapterService } from '@app/email-adapter'
 import { GitHubService } from '../../src/routes/auth/gitHubService'
 import { GoogleService } from '../../src/routes/auth/googleService'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 import { userEmail, userName } from './common'
 import { FilesModule } from '../../../files/src/filesModule'
-import { Transport } from '@nestjs/microservices'
 
 export async function createFilesApp() {
 	const moduleFixture: TestingModule = await Test.createTestingModule({

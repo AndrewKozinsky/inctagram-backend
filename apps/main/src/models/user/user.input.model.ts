@@ -7,8 +7,8 @@ import { CustomException } from '../../infrastructure/exceptionFilters/customExc
 import { HTTP_STATUSES } from '../../utils/httpStatuses'
 
 export class CreateUserDtoModel {
-	@DtoFieldDecorators('name', bdConfig.User.dbFields.name)
-	name: string
+	@DtoFieldDecorators('name', bdConfig.User.dbFields.user_name)
+	userName: string
 
 	@DtoFieldDecorators('password', bdConfig.User.dtoProps.password)
 	password: string

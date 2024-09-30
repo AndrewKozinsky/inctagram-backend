@@ -54,22 +54,66 @@ export const bdConfig = {
 				description: 'Google ID if user used this way or null',
 				required: false,
 			},
-			name: {
+			user_name: {
 				type: 'string',
 				unique: true,
 				minLength: 6,
 				maxLength: 30,
 				match: /^[A-Za-z0-9_-]+$/,
-				matchErrorMessage:
-					'Password must contain only letters, numbers and !"#$%&\'()*+,\\-./:;<=>?@[\\\\\\]^_{|}~ symbols',
-				description: "User's name",
-				example: 'Andrew',
+				matchErrorMessage: 'Name must contain only letters, numbers and _ - symbols',
+				description: 'Username',
+				example: 'AndrewKozinsky',
 				required: true,
+			},
+			first_name: {
+				type: 'string',
+				minLength: 1,
+				maxLength: 30,
+				match: /^[A-Za-z-]+$/,
+				matchErrorMessage: 'First name must contain only letters, numbers and _ - symbols',
+				description: "User's first name",
+				example: 'Andrew',
+				required: false,
+			},
+			last_name: {
+				type: 'string',
+				minLength: 1,
+				maxLength: 30,
+				match: /^[A-Za-z-]+$/,
+				matchErrorMessage: 'First name must contain only letters, numbers and _ - symbols',
+				description: "User's first name",
+				example: 'Andrew',
+				required: false,
 			},
 			avatar: {
 				type: 'string',
 				description: "User's avatar image",
 				example: 'https://sociable-people.storage.yandexcloud.net/users/1/avatar.png',
+				required: false,
+			},
+			date_of_birth: {
+				type: 'string',
+				description: "User's date of birth",
+				example: '2024-09-29T09:18:40.523Z',
+				required: false,
+			},
+			country_code: {
+				type: 'string',
+				description: 'Code of the country. RU for Russia',
+				required: false,
+			},
+			city_id: {
+				type: 'number',
+				description: 'Id of the city',
+				required: false,
+			},
+			about_me: {
+				type: 'string',
+				minLength: 1,
+				maxLength: 1000,
+				description: 'A text about me',
+				example:
+					'I am a hard-working and driven individual who isn’t afraid to face a challenge.',
 				required: false,
 			},
 			hashed_password: {
@@ -150,7 +194,8 @@ export const bdConfig = {
 			},
 		},
 	},
-	Country: {
+	// DELETE
+	/*Country: {
 		dtoProps: {},
 		dbFields: {
 			id: {
@@ -166,8 +211,9 @@ export const bdConfig = {
 				type: 'oneToMany',
 			},
 		},
-	},
-	City: {
+	},*/
+	// DELETE
+	/*City: {
 		dtoProps: {},
 		dbFields: {
 			id: {
@@ -186,5 +232,5 @@ export const bdConfig = {
 				foreignField: 'id',
 			},
 		},
-	},
+	},*/
 } satisfies BdConfig.Root

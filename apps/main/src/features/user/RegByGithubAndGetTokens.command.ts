@@ -101,7 +101,7 @@ export class RegByProviderAndLoginHandler implements ICommandHandler<RegByProvid
 
 		const createUserDto: CreateUserDtoModel & { githubId?: number; googleId?: number } = {
 			email: arg.email,
-			name: uniqueName,
+			userName: uniqueName,
 			password,
 		}
 

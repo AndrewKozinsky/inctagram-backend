@@ -10,6 +10,7 @@ import { AuthService } from './routes/auth/auth.service'
 import { ReCaptchaAdapterModule } from '@app/re-captcha-adapter'
 import { DevicesModule } from './routes/devices/devices.module'
 import { UserModule } from './routes/user/user.module'
+import { CountryModule } from './routes/country/country.module'
 
 @Module({
 	imports: [
@@ -23,6 +24,7 @@ import { UserModule } from './routes/user/user.module'
 		AuthModule,
 		DevicesModule,
 		UserModule,
+		CountryModule,
 	],
 	controllers: [],
 	providers: [AuthService],

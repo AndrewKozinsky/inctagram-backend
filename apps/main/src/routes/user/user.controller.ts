@@ -16,7 +16,6 @@ import { CommandBus } from '@nestjs/cqrs'
 import { FileInterceptor } from '@nestjs/platform-express'
 import RouteNames from '../routesConfig/routeNames'
 import { RouteDecorators } from '../routesConfig/routesDecorators'
-import { routesConfig } from '../routesConfig/routesConfig'
 import { SWUserMeAddAvatarRouteOut, SWUserMeGetAvatarRouteOut } from '../auth/swaggerTypes'
 import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
 import { CheckDeviceRefreshTokenGuard } from '../../infrastructure/guards/checkDeviceRefreshToken.guard'
@@ -36,6 +35,7 @@ import {
 	DeleteUserAvatarCommand,
 	DeleteUserAvatarHandler,
 } from '../../features/user/DeleteUserAvatar.command'
+import { usersRoutesConfig } from './usersRoutesConfig'
 
 @ApiTags('User')
 @Controller(RouteNames.USERS.value)
@@ -68,7 +68,7 @@ export class UserController implements OnModuleInit {
 	@UseGuards(CheckAccessTokenGuard)
 	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Post([RouteNames.USERS.ME.value, RouteNames.USERS.ME.AVATAR.value].join('/'))
-	@RouteDecorators(routesConfig.users.me.setAvatar)
+	@RouteDecorators(usersRoutesConfig.me.setAvatar)
 	@UseInterceptors(FileInterceptor('avatarFile'))
 	async setMyAvatar(
 		@UploadedFile(new UploadAvatarFilePipe())
@@ -81,16 +81,16 @@ export class UserController implements OnModuleInit {
 				ReturnType<typeof SetAvatarToMeHandler.prototype.execute>
 			>(new SetAvatarToMeCommand(req.user.id, avatarFile))
 
-			return createSuccessResp(routesConfig.users.me.setAvatar, commandRes)
+			return createSuccessResp(usersRoutesConfig.me.setAvatar, commandRes)
 		} catch (err: any) {
-			createFailResp(routesConfig.users.me.setAvatar, err)
+			createFailResp(usersRoutesConfig.me.setAvatar, err)
 		}
 	}
 
 	@UseGuards(CheckAccessTokenGuard)
 	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Get([RouteNames.USERS.ME.value, RouteNames.USERS.ME.AVATAR.value].join('/'))
-	@RouteDecorators(routesConfig.users.me.getAvatar)
+	@RouteDecorators(usersRoutesConfig.me.getAvatar)
 	async getMyAvatar(@Req() req: Request): Promise<SWUserMeGetAvatarRouteOut | undefined> {
 		try {
 			const commandRes = await this.commandBus.execute<
@@ -98,16 +98,16 @@ export class UserController implements OnModuleInit {
 				ReturnType<typeof GetUserAvatarHandler.prototype.execute>
 			>(new GetUserAvatarCommand(req.user.id))
 
-			return createSuccessResp(routesConfig.users.me.getAvatar, commandRes)
+			return createSuccessResp(usersRoutesConfig.me.getAvatar, commandRes)
 		} catch (err: any) {
-			createFailResp(routesConfig.users.me.getAvatar, err)
+			createFailResp(usersRoutesConfig.me.getAvatar, err)
 		}
 	}
 
 	@UseGuards(CheckAccessTokenGuard)
 	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Delete([RouteNames.USERS.ME.value, RouteNames.USERS.ME.AVATAR.value].join('/'))
-	@RouteDecorators(routesConfig.users.me.deleteAvatar)
+	@RouteDecorators(usersRoutesConfig.me.deleteAvatar)
 	async deleteMyAvatar(@Req() req: Request): Promise<SWEmptyRouteOut | undefined> {
 		try {
 			await this.commandBus.execute<
@@ -115,9 +115,9 @@ export class UserController implements OnModuleInit {
 				ReturnType<typeof DeleteUserAvatarHandler.prototype.execute>
 			>(new DeleteUserAvatarCommand(req.user.id))
 
-			return createSuccessResp(routesConfig.users.me.deleteAvatar, null)
+			return createSuccessResp(usersRoutesConfig.me.deleteAvatar, null)
 		} catch (err: any) {
-			createFailResp(routesConfig.users.me.deleteAvatar, err)
+			createFailResp(usersRoutesConfig.me.deleteAvatar, err)
 		}
 	}
 }
