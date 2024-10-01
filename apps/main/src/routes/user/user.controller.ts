@@ -1,4 +1,5 @@
 import {
+	Body,
 	Controller,
 	Delete,
 	Get,
@@ -16,10 +17,13 @@ import { CommandBus } from '@nestjs/cqrs'
 import { FileInterceptor } from '@nestjs/platform-express'
 import RouteNames from '../routesConfig/routeNames'
 import { RouteDecorators } from '../routesConfig/routesDecorators'
-import { SWUserMeAddAvatarRouteOut, SWUserMeGetAvatarRouteOut } from '../auth/swaggerTypes'
 import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
 import { CheckDeviceRefreshTokenGuard } from '../../infrastructure/guards/checkDeviceRefreshToken.guard'
-import { UploadAvatarFilePipe } from '../../models/user/user.input.model'
+import {
+	CreateUserDtoModel,
+	EditMyProfileDtoModel,
+	UploadAvatarFilePipe,
+} from '../../models/user/user.input.model'
 import {
 	SetAvatarToMeCommand,
 	SetAvatarToMeHandler,
@@ -36,6 +40,17 @@ import {
 	DeleteUserAvatarHandler,
 } from '../../features/user/DeleteUserAvatar.command'
 import { usersRoutesConfig } from './usersRoutesConfig'
+import {
+	SWEditUserProfileRouteOut,
+	SWUserMeAddAvatarRouteOut,
+	SWUserMeGetAvatarRouteOut,
+} from './swaggerTypes'
+import {
+	EditMyProfileCommand,
+	EditMyProfileHandler,
+} from '../../features/user/EditMyProfile.command'
+import { lastValueFrom } from 'rxjs'
+import { FileEventNames } from '../../../../files/src/contracts/contracts'
 
 @ApiTags('User')
 @Controller(RouteNames.USERS.value)
@@ -116,6 +131,26 @@ export class UserController implements OnModuleInit {
 			>(new DeleteUserAvatarCommand(req.user.id))
 
 			return createSuccessResp(usersRoutesConfig.me.deleteAvatar, null)
+		} catch (err: any) {
+			createFailResp(usersRoutesConfig.me.deleteAvatar, err)
+		}
+	}
+
+	@UseGuards(CheckAccessTokenGuard)
+	@UseGuards(CheckDeviceRefreshTokenGuard)
+	@Post(RouteNames.USERS.ME.value)
+	@RouteDecorators(usersRoutesConfig.me.editProfile)
+	async editMyProfile(
+		@Req() req: Request,
+		@Body() body: EditMyProfileDtoModel,
+	): Promise<SWEditUserProfileRouteOut | undefined> {
+		try {
+			const res = await this.commandBus.execute<
+				any,
+				ReturnType<typeof EditMyProfileHandler.prototype.execute>
+			>(new EditMyProfileCommand(req.user.id, body))
+
+			return createSuccessResp(usersRoutesConfig.me.editProfile, res)
 		} catch (err: any) {
 			createFailResp(usersRoutesConfig.me.deleteAvatar, err)
 		}

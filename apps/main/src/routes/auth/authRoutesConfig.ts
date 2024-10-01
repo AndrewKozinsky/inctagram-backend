@@ -8,7 +8,6 @@ import {
 	SWGetNewAccessAndRefreshTokenRouteOut,
 	SWLoginRouteOut,
 	SWRegistrationRouteOut,
-	SWUserMeGetAvatarRouteOut,
 } from '../auth/swaggerTypes'
 import { SWGetUserDevicesRouteOut } from '../devices/swaggerTypes'
 import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'

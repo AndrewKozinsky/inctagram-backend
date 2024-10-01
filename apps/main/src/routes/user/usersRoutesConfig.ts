@@ -3,9 +3,9 @@ import {
 	ErrorMessage,
 	SuccessCode,
 } from '../../infrastructure/exceptionFilters/layerResult'
-import { SWUserMeGetAvatarRouteOut } from '../auth/swaggerTypes'
 import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
 import { RoutesConfig } from '../routesConfig/routesConfigTypes'
+import { SWEditUserProfileRouteOut, SWUserMeGetAvatarRouteOut } from './swaggerTypes'
 
 export const usersRoutesConfig = {
 	me: {
@@ -62,6 +62,15 @@ export const usersRoutesConfig = {
 						ErrorMessage.AccessTokenIsNotValid,
 						ErrorMessage.RefreshTokenIsNotValid,
 					],
+				},
+			],
+		},
+		editProfile: {
+			response: [
+				{
+					code: SuccessCode.Ok,
+					description: "User's avatar was filled in",
+					dataClass: SWEditUserProfileRouteOut,
 				},
 			],
 		},

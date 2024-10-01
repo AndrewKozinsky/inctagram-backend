@@ -56,3 +56,26 @@ export class UploadAvatarFilePipe implements PipeTransform {
 		return file
 	}
 }
+
+export class EditMyProfileDtoModel {
+	@DtoFieldDecorators('userName', bdConfig.User.dbFields.user_name)
+	userName: string
+
+	@DtoFieldDecorators('firstName', bdConfig.User.dbFields.first_name)
+	firstName: string
+
+	@DtoFieldDecorators('lastName', bdConfig.User.dbFields.last_name)
+	lastName: string
+
+	@DtoFieldDecorators('dateOfBirth', bdConfig.User.dbFields.date_of_birth)
+	dateOfBirth: string
+
+	@DtoFieldDecorators('countryCode', bdConfig.User.dbFields.country_code)
+	countryCode: string
+
+	@DtoFieldDecorators('cityId', bdConfig.User.dbFields.city_id)
+	cityId: number
+
+	@DtoFieldDecorators('aboutMe', bdConfig.User.dbFields.about_me)
+	aboutMe: string
+}

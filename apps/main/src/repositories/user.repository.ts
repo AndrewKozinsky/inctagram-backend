@@ -17,6 +17,18 @@ export class UserRepository {
 		private jwtAdapter: JwtAdapterService,
 	) {}
 
+	async getUserById(id: number) {
+		const user = await this.prisma.user.findUnique({
+			where: { id },
+		})
+
+		if (!user) {
+			return null
+		}
+
+		return this.mapDbUserToServiceUser(user)
+	}
+
 	async getUserByEmail(email: string) {
 		try {
 			const user = await this.prisma.user.findUnique({
@@ -47,18 +59,6 @@ export class UserRepository {
 		}
 	}
 
-	async getUserById(id: number) {
-		const user = await this.prisma.user.findUnique({
-			where: { id },
-		})
-
-		if (!user) {
-			return null
-		}
-
-		return this.mapDbUserToServiceUser(user)
-	}
-
 	async getUserByEmailAndPassword(email: string, password: string) {
 		const user = await this.prisma.user.findUnique({
 			where: { email },
@@ -67,6 +67,16 @@ export class UserRepository {
 
 		const isPasswordMath = await this.hashAdapter.compare(password, user.hashed_password)
 		if (!isPasswordMath) return null
+
+		return this.mapDbUserToServiceUser(user)
+	}
+
+	async getUserByUserName(userName: string) {
+		const user = await this.prisma.user.findFirst({
+			where: { user_name: userName },
+		})
+
+		if (!user) return null
 
 		return this.mapDbUserToServiceUser(user)
 	}

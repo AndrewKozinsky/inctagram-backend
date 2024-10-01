@@ -194,43 +194,4 @@ export const bdConfig = {
 			},
 		},
 	},
-	// DELETE
-	/*Country: {
-		dtoProps: {},
-		dbFields: {
-			id: {
-				type: 'index',
-			},
-			name: {
-				type: 'string',
-				description: 'Country name',
-				required: true,
-				unique: true,
-			},
-			City: {
-				type: 'oneToMany',
-			},
-		},
-	},*/
-	// DELETE
-	/*City: {
-		dtoProps: {},
-		dbFields: {
-			id: {
-				type: 'index',
-			},
-			name: {
-				type: 'string',
-				description: 'City name',
-				required: true,
-				unique: true,
-			},
-			country_id: {
-				type: 'manyToOne',
-				thisField: 'country_id',
-				foreignTable: 'Country',
-				foreignField: 'id',
-			},
-		},
-	},*/
 } satisfies BdConfig.Root
