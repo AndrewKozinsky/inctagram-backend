@@ -14,6 +14,7 @@ export class RegByProviderAndLoginCommand {
 			clientIP: string
 			clientName: string
 			providerCode: string
+			providerState: string
 			providerName: OAuthProviderName
 		},
 	) {}
@@ -30,11 +31,11 @@ export class RegByProviderAndLoginHandler implements ICommandHandler<RegByProvid
 	) {}
 
 	async execute(command: RegByProviderAndLoginCommand) {
-		const { providerCode, providerName, clientIP, clientName } = command.args
+		const { providerCode, providerState, providerName, clientIP, clientName } = command.args
 
 		let userInfo
 		if (providerName === 'github') {
-			userInfo = await this.gitHubService.getUserDataByOAuthCode(providerCode)
+			userInfo = await this.gitHubService.getUserDataByOAuthCode(providerCode, providerState)
 		} else if (providerName === 'google') {
 			userInfo = await this.googleService.getUserDataByOAuthCode(providerCode)
 		}

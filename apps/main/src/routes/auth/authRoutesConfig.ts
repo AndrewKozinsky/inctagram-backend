@@ -34,6 +34,10 @@ export const authRoutesConfig = {
 				description: 'Registration and login by GitHub',
 				dataClass: SWAuthorizeByProviderRouteOut,
 			},
+			{
+				code: ErrorCode.BadRequest_400,
+				errors: [ErrorMessage.UserNotFound],
+			},
 		],
 	},
 	emailConfirmation: {

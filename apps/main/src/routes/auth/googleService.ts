@@ -30,6 +30,8 @@ export class GoogleService {
 
 	async getUserDataByOAuthCode(code: string) {
 		const accessToken = await this.getAccessToken(code)
+		if (!accessToken) return null
+
 		return await this.getUserByAccessCode(accessToken)
 	}
 
@@ -53,6 +55,7 @@ export class GoogleService {
 			})
 				.then((res) => res.json())
 				.then((data) => {
+					console.log({ data })
 					resolve(data.access_token)
 					/*
 					* {
