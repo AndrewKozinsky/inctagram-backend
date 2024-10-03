@@ -6,7 +6,7 @@ import { applyAppSettings } from '../../src/infrastructure/applyAppSettings'
 import { GitHubService } from '../../src/routes/auth/gitHubService'
 import { GoogleService } from '../../src/routes/auth/googleService'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
-import { userEmail, userName } from './common'
+import { defUserEmail, defUserName } from './common'
 import { FilesModule } from '../../../files/src/filesModule'
 
 export async function createFilesApp() {
@@ -18,7 +18,7 @@ export async function createFilesApp() {
 		transport: Transport.TCP,
 		options: {
 			host: 'localhost',
-			port: 3001,
+			port: 3002,
 		},
 	})
 	await filesApp.listen()
@@ -45,16 +45,16 @@ export async function createMainApp(
 		.useValue({
 			getUserDataByOAuthCode: jest.fn().mockResolvedValue({
 				providerId: 1,
-				name: userName,
-				email: userEmail,
+				name: defUserName,
+				email: defUserEmail,
 			}),
 		})
 		.overrideProvider(GoogleService)
 		.useValue({
 			getUserDataByOAuthCode: jest.fn().mockResolvedValue({
 				providerId: 1,
-				name: userName,
-				email: userEmail,
+				name: defUserName,
+				email: defUserEmail,
 			}),
 		})
 		.overrideProvider(ReCaptchaAdapterService)

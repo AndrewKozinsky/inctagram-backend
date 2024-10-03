@@ -7,6 +7,7 @@ import { PrismaService } from '../db/prisma.service'
 import { CreateUserDtoModel } from '../models/user/user.input.model'
 import { UserServiceModel } from '../models/user/user.service.model'
 import { UserOutModel } from '../models/user/user.out.model'
+import { ApiProperty } from '@nestjs/swagger'
 
 @Injectable()
 export class UserQueryRepository {
@@ -28,7 +29,14 @@ export class UserQueryRepository {
 		return {
 			id: dbUser.id,
 			email: dbUser.email,
-			name: dbUser.user_name,
+			userName: dbUser.user_name,
+			firstName: dbUser.first_name,
+			lastName: dbUser.last_name,
+			dateOfBirth: dbUser.date_of_birth,
+			countryCode: dbUser.country_code,
+			cityId: dbUser.city_id,
+			aboutMe: dbUser.about_me,
+			avatar: dbUser.avatar,
 		}
 	}
 }

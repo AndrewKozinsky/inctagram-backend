@@ -7,9 +7,10 @@ import {
 	deleteRequest,
 	getRequest,
 	postRequest,
-	userEmail,
-	userName,
-	userPassword,
+	defUserEmail,
+	defUserName,
+	defUserPassword,
+	patchRequest,
 } from './utils/common'
 import RouteNames from '../src/routes/routesConfig/routeNames'
 import { HTTP_STATUSES } from '../src/utils/httpStatuses'
@@ -25,7 +26,7 @@ import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 import path from 'node:path'
 import { createFilesApp, createMainApp } from './utils/createMainApp'
 
-it.only('123', async () => {
+it('123', async () => {
 	expect(2).toBe(2)
 })
 
@@ -100,9 +101,9 @@ describe('Auth (e2e)', () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
 				mainApp,
 				userRepository,
-				userName,
-				userEmail,
-				userPassword,
+				defUserName,
+				defUserEmail,
+				defUserPassword,
 			)
 
 			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
@@ -119,9 +120,9 @@ describe('Auth (e2e)', () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
 				mainApp,
 				userRepository,
-				userName,
-				userEmail,
-				userPassword,
+				defUserName,
+				defUserEmail,
+				defUserPassword,
 			)
 
 			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
@@ -156,9 +157,9 @@ describe('Auth (e2e)', () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
 				mainApp,
 				userRepository,
-				userName,
-				userEmail,
-				userPassword,
+				defUserName,
+				defUserEmail,
+				defUserPassword,
 			)
 
 			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
@@ -201,9 +202,9 @@ describe('Auth (e2e)', () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
 				mainApp,
 				userRepository,
-				userName,
-				userEmail,
-				userPassword,
+				defUserName,
+				defUserEmail,
+				defUserPassword,
 			)
 
 			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
@@ -253,9 +254,9 @@ describe('Auth (e2e)', () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
 				mainApp,
 				userRepository,
-				userName,
-				userEmail,
-				userPassword,
+				defUserName,
+				defUserEmail,
+				defUserPassword,
 			)
 
 			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
@@ -287,6 +288,203 @@ describe('Auth (e2e)', () => {
 				.expect(HTTP_STATUSES.OK_200)
 
 			checkSuccessResponse(getAvatarRes.body, 200, null)
+		})
+	})
+
+	describe('Update user profile', () => {
+		it('should return 401 if there is not cookies', async () => {
+			await userUtils.deviceTokenChecks.tokenNotExist(
+				mainApp,
+				'put',
+				RouteNames.USERS.ME.full,
+			)
+		})
+
+		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
+			await userUtils.deviceTokenChecks.tokenExpired(
+				mainApp,
+				'put',
+				RouteNames.USERS.ME.full,
+				userRepository,
+				securityRepository,
+				jwtService,
+				mainConfig,
+			)
+		})
+
+		it('should return 200 if all data is correct', async () => {
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+				mainApp,
+				userRepository,
+				defUserName,
+				defUserEmail,
+				defUserPassword,
+			)
+			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
+
+			// ============================
+
+			// Update profile first time
+			const updateProfileBody_1 = {
+				userName: 'my-new-userName',
+				firstName: 'my-new-firstName',
+				lastName: 'my-new-lastName',
+				dateOfBirth: new Date().toISOString(),
+				countryCode: 'ru',
+				cityId: 200,
+				aboutMe: 'my new text about me',
+			}
+
+			const updateProfileRes_1 = await patchRequest(mainApp, RouteNames.USERS.ME.full)
+				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
+				.set('authorization', 'Bearer ' + accessToken)
+				.send(updateProfileBody_1)
+				.expect(HTTP_STATUSES.OK_200)
+
+			const updateProfile_1 = updateProfileRes_1.body
+			checkSuccessResponse(updateProfile_1, 200)
+			userUtils.checkUserOutModel(updateProfile_1.data)
+
+			// Check if user properties was changed
+			const getProfileRes_1 = await getRequest(mainApp, RouteNames.USERS.ME.full)
+				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
+				.set('authorization', 'Bearer ' + accessToken)
+				.expect(HTTP_STATUSES.OK_200)
+
+			const updatedUser_1 = getProfileRes_1.body.data
+			expect(updatedUser_1.id).toBe(1)
+			expect(updatedUser_1.email).toBe('mail@email.com')
+			expect(updatedUser_1.userName).toBe('my-new-userName')
+			expect(updatedUser_1.firstName).toBe('my-new-firstName')
+			expect(updatedUser_1.lastName).toBe('my-new-lastName')
+			expect(typeof updatedUser_1.dateOfBirth).toBe('string')
+			expect(updatedUser_1.countryCode).toBe('ru')
+			expect(updatedUser_1.cityId).toBe(200)
+			expect(updatedUser_1.aboutMe).toBe('my new text about me')
+
+			// ============================
+
+			// Update profile second time with null values
+			const updateProfileBody_2 = {
+				userName: 'my-new-userName',
+				firstName: null,
+				lastName: null,
+				dateOfBirth: null,
+				countryCode: null,
+				cityId: null,
+				aboutMe: null,
+			}
+
+			const updateProfileRes_2 = await patchRequest(mainApp, RouteNames.USERS.ME.full)
+				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
+				.set('authorization', 'Bearer ' + accessToken)
+				.send(updateProfileBody_2)
+				.expect(HTTP_STATUSES.OK_200)
+
+			const updateProfile_2 = updateProfileRes_2.body
+			checkSuccessResponse(updateProfile_2, 200)
+			userUtils.checkUserOutModel(updateProfile_2.data)
+
+			// Check if user properties was changed
+			const getProfileRes_2 = await getRequest(mainApp, RouteNames.USERS.ME.full)
+				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
+				.set('authorization', 'Bearer ' + accessToken)
+				.expect(HTTP_STATUSES.OK_200)
+
+			const updatedUser_2 = getProfileRes_2.body.data
+			expect(updatedUser_2.id).toBe(1)
+			expect(updatedUser_2.email).toBe('mail@email.com')
+			expect(updatedUser_2.userName).toBe('my-new-userName')
+			expect(updatedUser_2.firstName).toBe(null)
+			expect(updatedUser_2.lastName).toBe(null)
+			expect(updatedUser_2.dateOfBirth).toBe(null)
+			expect(updatedUser_2.countryCode).toBe(null)
+			expect(updatedUser_2.cityId).toBe(null)
+			expect(updatedUser_2.aboutMe).toBe(null)
+		})
+	})
+
+	describe('Get user profile', () => {
+		it('should return 401 if there is not cookies', async () => {
+			await userUtils.deviceTokenChecks.tokenNotExist(
+				mainApp,
+				'get',
+				RouteNames.USERS.ME.full,
+			)
+		})
+
+		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
+			await userUtils.deviceTokenChecks.tokenExpired(
+				mainApp,
+				'get',
+				RouteNames.USERS.ME.full,
+				userRepository,
+				securityRepository,
+				jwtService,
+				mainConfig,
+			)
+		})
+
+		it.only('should return 200 if all data is correct', async () => {
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+				mainApp,
+				userRepository,
+				defUserName,
+				defUserEmail,
+				defUserPassword,
+			)
+			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
+
+			// Get user profile
+			const getProfileRes_1 = await getRequest(mainApp, RouteNames.USERS.ME.full)
+				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
+				.set('authorization', 'Bearer ' + accessToken)
+				.expect(HTTP_STATUSES.OK_200)
+
+			const updatedUser_1 = getProfileRes_1.body.data
+			expect(updatedUser_1.id).toBe(1)
+			expect(updatedUser_1.email).toBe(defUserEmail)
+			expect(updatedUser_1.userName).toBe(defUserName)
+			expect(updatedUser_1.firstName).toBe(null)
+			expect(updatedUser_1.lastName).toBe(null)
+			expect(updatedUser_1.dateOfBirth).toBe(null)
+			expect(updatedUser_1.countryCode).toBe(null)
+			expect(updatedUser_1.cityId).toBe(null)
+			expect(updatedUser_1.aboutMe).toBe(null)
+
+			// Update user profile
+			const updateProfileBody_1 = {
+				userName: 'my-new-userName',
+				firstName: 'my-new-firstName',
+				lastName: 'my-new-lastName',
+				dateOfBirth: new Date().toISOString(),
+				countryCode: 'ru',
+				cityId: 200,
+				aboutMe: 'my new text about me',
+			}
+
+			const updateProfileRes = await patchRequest(mainApp, RouteNames.USERS.ME.full)
+				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
+				.set('authorization', 'Bearer ' + accessToken)
+				.send(updateProfileBody_1)
+				.expect(HTTP_STATUSES.OK_200)
+
+			// Get user properties again
+			const getProfileRes_2 = await getRequest(mainApp, RouteNames.USERS.ME.full)
+				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
+				.set('authorization', 'Bearer ' + accessToken)
+				.expect(HTTP_STATUSES.OK_200)
+
+			const updatedUser_2 = getProfileRes_2.body.data
+			expect(updatedUser_2.id).toBe(1)
+			expect(updatedUser_2.email).toBe('mail@email.com')
+			expect(updatedUser_2.userName).toBe('my-new-userName')
+			expect(updatedUser_2.firstName).toBe('my-new-firstName')
+			expect(updatedUser_2.lastName).toBe('my-new-lastName')
+			expect(typeof updatedUser_2.dateOfBirth).toBe('string')
+			expect(updatedUser_2.countryCode).toBe('ru')
+			expect(updatedUser_2.cityId).toBe(200)
+			expect(updatedUser_2.aboutMe).toBe('my new text about me')
 		})
 	})
 })

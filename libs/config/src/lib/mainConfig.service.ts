@@ -22,9 +22,7 @@ export class MainConfigService {
 					3000,
 			},
 			filesMicroService: {
-				port:
-					parseInt(this.configService.get<string>('FILES_MICROSERVICE_PORT') || '', 10) ||
-					3001,
+				port: parseInt(this.configService.get<string>('FILES_MICROSERVICE_PORT') || '', 10),
 			},
 			// Yandex Cloud
 			s3: {

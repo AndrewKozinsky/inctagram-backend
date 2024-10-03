@@ -5,7 +5,7 @@ import {
 } from '../../infrastructure/exceptionFilters/layerResult'
 import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
 import { RoutesConfig } from '../routesConfig/routesConfigTypes'
-import { SWEditUserProfileRouteOut, SWUserMeGetAvatarRouteOut } from './swaggerTypes'
+import { SWUserProfileRouteOut, SWUserMeGetAvatarRouteOut } from './swaggerTypes'
 
 export const usersRoutesConfig = {
 	me: {
@@ -69,8 +69,17 @@ export const usersRoutesConfig = {
 			response: [
 				{
 					code: SuccessCode.Ok,
-					description: "User's avatar was filled in",
-					dataClass: SWEditUserProfileRouteOut,
+					description: "Edit user's profile",
+					dataClass: SWUserProfileRouteOut,
+				},
+			],
+		},
+		getProfile: {
+			response: [
+				{
+					code: SuccessCode.Ok,
+					description: "Get user's profile",
+					dataClass: SWUserProfileRouteOut,
 				},
 			],
 		},

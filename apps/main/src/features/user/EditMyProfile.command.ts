@@ -2,6 +2,8 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UserRepository } from '../../repositories/user.repository'
 import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { EditMyProfileDtoModel } from '../../models/user/user.input.model'
+import { UserQueryRepository } from '../../repositories/user.queryRepository'
+import { UserOutModel } from '../../models/user/user.out.model'
 
 export class EditMyProfileCommand {
 	constructor(
@@ -12,14 +14,17 @@ export class EditMyProfileCommand {
 
 @CommandHandler(EditMyProfileCommand)
 export class EditMyProfileHandler implements ICommandHandler<EditMyProfileCommand> {
-	constructor(private userRepository: UserRepository) {}
+	constructor(
+		private userRepository: UserRepository,
+		private userQueryRepository: UserQueryRepository,
+	) {}
 
 	async execute(command: EditMyProfileCommand) {
 		const { userId, bodyDto } = command
 
 		// Check user_name property is unique
 		const userWithPassesUserName = await this.userRepository.getUserByUserName(bodyDto.userName)
-		if (userWithPassesUserName) {
+		if (userWithPassesUserName && userWithPassesUserName.id !== userId) {
 			throw new Error(ErrorMessage.UserNameIsExists)
 		}
 
@@ -28,8 +33,8 @@ export class EditMyProfileHandler implements ICommandHandler<EditMyProfileComman
 		const updateUserObj: UpdateUserSecondArgType = {
 			user_name: bodyDto.userName,
 			first_name: bodyDto.firstName,
-			last_name: bodyDto.userName,
-			// dateOfBirth: bodyDto.userName,
+			last_name: bodyDto.lastName,
+			date_of_birth: bodyDto.dateOfBirth ? new Date(bodyDto.dateOfBirth).toISOString() : null,
 			country_code: bodyDto.countryCode,
 			city_id: bodyDto.cityId,
 			about_me: bodyDto.aboutMe,
@@ -37,17 +42,7 @@ export class EditMyProfileHandler implements ICommandHandler<EditMyProfileComman
 
 		await this.userRepository.updateUser(userId, updateUserObj)
 
-		return {
-			id: 0,
-			email: '0',
-			user_name: 'string',
-			first_name: null,
-			last_name: null,
-			avatar: null,
-			date_of_birth: null,
-			country_code: null,
-			city_id: null,
-			about_me: null,
-		}
+		const user = await this.userQueryRepository.getUserById(userId)
+		return user as UserOutModel
 	}
 }

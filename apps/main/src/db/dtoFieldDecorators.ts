@@ -1,7 +1,7 @@
 import { applyDecorators } from '@nestjs/common'
 import {
+	IsDateString,
 	IsEmail,
-	IsMimeType,
 	IsNumber,
 	IsOptional,
 	IsString,
@@ -71,6 +71,22 @@ export function DtoFieldDecorators(
 
 			decorators.push(Matches(updatedFieldConf.match, { message: errMessage }))
 		}
+
+		if (!updatedFieldConf.required) {
+			decorators.push(IsOptional())
+		}
+	}
+	if (updatedFieldConf.type === 'dateString') {
+		decorators.push(
+			IsDateString(
+				{},
+				{
+					message:
+						name +
+						' must be a date string in ISO format. Example: 2024-09-29T09:18:40.523Z. Use new Date().toISOString() to do it',
+				},
+			),
+		)
 
 		if (!updatedFieldConf.required) {
 			decorators.push(IsOptional())

@@ -3,8 +3,11 @@ import {
 	Controller,
 	Delete,
 	Get,
+	HttpCode,
+	HttpStatus,
 	Inject,
 	OnModuleInit,
+	Patch,
 	Post,
 	Req,
 	UploadedFile,
@@ -19,11 +22,7 @@ import RouteNames from '../routesConfig/routeNames'
 import { RouteDecorators } from '../routesConfig/routesDecorators'
 import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
 import { CheckDeviceRefreshTokenGuard } from '../../infrastructure/guards/checkDeviceRefreshToken.guard'
-import {
-	CreateUserDtoModel,
-	EditMyProfileDtoModel,
-	UploadAvatarFilePipe,
-} from '../../models/user/user.input.model'
+import { EditMyProfileDtoModel, UploadAvatarFilePipe } from '../../models/user/user.input.model'
 import {
 	SetAvatarToMeCommand,
 	SetAvatarToMeHandler,
@@ -41,7 +40,7 @@ import {
 } from '../../features/user/DeleteUserAvatar.command'
 import { usersRoutesConfig } from './usersRoutesConfig'
 import {
-	SWEditUserProfileRouteOut,
+	SWUserProfileRouteOut,
 	SWUserMeAddAvatarRouteOut,
 	SWUserMeGetAvatarRouteOut,
 } from './swaggerTypes'
@@ -49,8 +48,7 @@ import {
 	EditMyProfileCommand,
 	EditMyProfileHandler,
 } from '../../features/user/EditMyProfile.command'
-import { lastValueFrom } from 'rxjs'
-import { FileEventNames } from '../../../../files/src/contracts/contracts'
+import { GetMyProfileCommand, GetMyProfileHandler } from '../../features/user/GetMyProfile.command'
 
 @ApiTags('User')
 @Controller(RouteNames.USERS.value)
@@ -138,12 +136,12 @@ export class UserController implements OnModuleInit {
 
 	@UseGuards(CheckAccessTokenGuard)
 	@UseGuards(CheckDeviceRefreshTokenGuard)
-	@Post(RouteNames.USERS.ME.value)
+	@Patch(RouteNames.USERS.ME.value)
 	@RouteDecorators(usersRoutesConfig.me.editProfile)
 	async editMyProfile(
 		@Req() req: Request,
 		@Body() body: EditMyProfileDtoModel,
-	): Promise<SWEditUserProfileRouteOut | undefined> {
+	): Promise<SWUserProfileRouteOut | undefined> {
 		try {
 			const res = await this.commandBus.execute<
 				any,
@@ -153,6 +151,23 @@ export class UserController implements OnModuleInit {
 			return createSuccessResp(usersRoutesConfig.me.editProfile, res)
 		} catch (err: any) {
 			createFailResp(usersRoutesConfig.me.deleteAvatar, err)
+		}
+	}
+
+	@UseGuards(CheckAccessTokenGuard)
+	@UseGuards(CheckDeviceRefreshTokenGuard)
+	@Get(RouteNames.USERS.ME.value)
+	@RouteDecorators(usersRoutesConfig.me.getProfile)
+	async getMyProfile(@Req() req: Request): Promise<SWUserProfileRouteOut | undefined> {
+		try {
+			const res = await this.commandBus.execute<
+				any,
+				ReturnType<typeof GetMyProfileHandler.prototype.execute>
+			>(new GetMyProfileCommand(req.user.id))
+
+			return createSuccessResp(usersRoutesConfig.me.getProfile, res)
+		} catch (err: any) {
+			createFailResp(usersRoutesConfig.me.getProfile, err)
 		}
 	}
 }

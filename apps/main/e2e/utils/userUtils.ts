@@ -5,9 +5,9 @@ import {
 	getRequest,
 	postRequest,
 	putRequest,
-	userEmail,
-	userName,
-	userPassword,
+	defUserEmail,
+	defUserName,
+	defUserPassword,
 } from './common'
 import RouteNames from '../../src/routes/routesConfig/routeNames'
 import { HTTP_STATUSES } from '../../src/utils/httpStatuses'
@@ -22,16 +22,16 @@ export const userUtils = {
 	async createUserWithUnconfirmedEmail(
 		app: INestApplication,
 		userRepository: UserRepository,
-		name?: string,
+		userName?: string,
 		email?: string,
 		password?: string,
 	) {
-		const fixedUserName = name ?? userName
-		const fixedEmail = email ?? userEmail
-		const fixedPassword = password ?? userPassword
+		const fixedUserName = userName ?? defUserName
+		const fixedEmail = email ?? defUserEmail
+		const fixedPassword = password ?? defUserPassword
 
 		const firstRegRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
-			.send({ name: fixedUserName, email: fixedEmail, password: fixedPassword })
+			.send({ userName: fixedUserName, email: fixedEmail, password: fixedPassword })
 			.expect(HTTP_STATUSES.CREATED_201)
 
 		const userId = firstRegRes.body.data.id
@@ -95,7 +95,13 @@ export const userUtils = {
 	checkUserOutModel(user: any) {
 		expect(typeof user.id).toBe('number')
 		expect(typeof user.email).toBe('string')
-		expect(typeof user.name).toBe('string')
+		expect(typeof user.userName).toBe('string')
+		this.checkNullOrString(user.firstName)
+		this.checkNullOrString(user.lastName)
+		this.checkNullOrString(user.dateOfBirth)
+		this.checkNullOrString(user.countryCode)
+		this.checkNullOrNumber(user.cityId)
+		this.checkNullOrString(user.aboutMe)
 
 		expect(user.hashedPassword).toBeUndefined()
 		expect(user.emailConfirmationCode).toBeUndefined()
@@ -193,9 +199,9 @@ export const userUtils = {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
 				app,
 				userRepository,
-				userName,
-				userEmail,
-				userPassword,
+				defUserName,
+				defUserEmail,
+				defUserPassword,
 			)
 
 			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
@@ -204,5 +210,11 @@ export const userUtils = {
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.expect(HTTP_STATUSES.OK_200)
 		},
+	},
+	checkNullOrString(data: any) {
+		expect(data === null || typeof data === 'string').toBe(true)
+	},
+	checkNullOrNumber(data: any) {
+		expect(data === null || typeof data === 'number').toBe(true)
 	},
 }

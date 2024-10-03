@@ -1,7 +1,13 @@
 import { INestApplication } from '@nestjs/common'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { MainConfigService } from '@app/config'
-import { deleteRequest, getRequest, userEmail, userName, userPassword } from './utils/common'
+import {
+	deleteRequest,
+	getRequest,
+	defUserEmail,
+	defUserName,
+	defUserPassword,
+} from './utils/common'
 import RouteNames from '../src/routes/routesConfig/routeNames'
 import { HTTP_STATUSES } from '../src/utils/httpStatuses'
 import { clearAllDB } from './utils/db'
@@ -71,9 +77,9 @@ describe('Auth (e2e)', () => {
 			const [accessToken1, refreshToken1] = await userUtils.createUserAndLogin(
 				mainApp,
 				userRepository,
-				userName,
-				userEmail,
-				userPassword,
+				defUserName,
+				defUserEmail,
+				defUserPassword,
 			)
 			const refreshToken1Str = userUtils.convertCookieRefreshTokenToTokenStr(refreshToken1)
 
@@ -88,8 +94,8 @@ describe('Auth (e2e)', () => {
 
 			const [accessToken2, refreshToken2] = await userUtils.loginUser(
 				mainApp,
-				userEmail,
-				userPassword,
+				defUserEmail,
+				defUserPassword,
 			)
 			const refreshToken2Str = userUtils.convertCookieRefreshTokenToTokenStr(refreshToken2)
 
@@ -139,9 +145,9 @@ describe('Auth (e2e)', () => {
 			const [accessToken, refreshToken] = await userUtils.createUserAndLogin(
 				mainApp,
 				userRepository,
-				userName,
-				userEmail,
-				userPassword,
+				defUserName,
+				defUserEmail,
+				defUserPassword,
 			)
 			const refreshTokenStr = userUtils.convertCookieRefreshTokenToTokenStr(refreshToken)
 
@@ -155,9 +161,9 @@ describe('Auth (e2e)', () => {
 			const [accessToken1, refreshToken1] = await userUtils.createUserAndLogin(
 				mainApp,
 				userRepository,
-				userName,
-				userEmail,
-				userPassword,
+				defUserName,
+				defUserEmail,
+				defUserPassword,
 			)
 			const refreshToken1Str = userUtils.convertCookieRefreshTokenToTokenStr(refreshToken1)
 
@@ -191,9 +197,9 @@ describe('Auth (e2e)', () => {
 			const [accessToken1, refreshToken1] = await userUtils.createUserAndLogin(
 				mainApp,
 				userRepository,
-				userName,
-				userEmail,
-				userPassword,
+				defUserName,
+				defUserEmail,
+				defUserPassword,
 			)
 			const refreshTokenStr = userUtils.convertCookieRefreshTokenToTokenStr(refreshToken1)
 
@@ -245,9 +251,9 @@ describe('Auth (e2e)', () => {
 			const [accessToken, refreshToken] = await userUtils.createUserAndLogin(
 				mainApp,
 				userRepository,
-				userName,
-				userEmail,
-				userPassword,
+				defUserName,
+				defUserEmail,
+				defUserPassword,
 			)
 
 			const deviceRefreshTokenStr =

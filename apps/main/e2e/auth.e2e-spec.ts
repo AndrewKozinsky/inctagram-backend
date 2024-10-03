@@ -7,9 +7,9 @@ import {
 	getFieldInErrorObject,
 	getRequest,
 	postRequest,
-	userEmail,
-	userName,
-	userPassword,
+	defUserEmail,
+	defUserName,
+	defUserPassword,
 } from './utils/common'
 import RouteNames from '../src/routes/routesConfig/routeNames'
 import { HTTP_STATUSES } from '../src/utils/httpStatuses'
@@ -95,14 +95,14 @@ describe('Auth (e2e)', () => {
 
 		it('should return 201 if tries to register an user with existed, but unconfirmed email', async () => {
 			await postRequest(mainApp, RouteNames.AUTH.REGISTRATION.full)
-				.send({ name: userName, password: userPassword, email: userEmail })
+				.send({ name: defUserName, password: defUserPassword, email: defUserEmail })
 				.expect(HTTP_STATUSES.CREATED_201)
 
 			await postRequest(mainApp, RouteNames.AUTH.REGISTRATION.full)
 				.send({
-					name: userName,
-					password: userPassword,
-					email: userEmail,
+					name: defUserName,
+					password: defUserPassword,
+					email: defUserEmail,
 				})
 				.expect(HTTP_STATUSES.CREATED_201)
 		})
@@ -112,7 +112,7 @@ describe('Auth (e2e)', () => {
 			expect(emailAdapter.sendEmailConfirmationMessage).toBeCalledTimes(1)
 
 			const secondRegRes = await postRequest(mainApp, RouteNames.AUTH.REGISTRATION.full)
-				.send({ name: userName, password: userPassword, email: userEmail })
+				.send({ name: defUserName, password: defUserPassword, email: defUserEmail })
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
 
 			const secondReg = secondRegRes.body
@@ -122,7 +122,7 @@ describe('Auth (e2e)', () => {
 
 		it('should return 201 if dto has correct values', async () => {
 			const registrationRes = await postRequest(mainApp, RouteNames.AUTH.REGISTRATION.full)
-				.send({ name: userName, password: userPassword, email: userEmail })
+				.send({ name: defUserName, password: defUserPassword, email: defUserEmail })
 				.expect(HTTP_STATUSES.CREATED_201)
 
 			expect(emailAdapter.sendEmailConfirmationMessage).toBeCalledTimes(1)
@@ -130,7 +130,7 @@ describe('Auth (e2e)', () => {
 
 		it('should return 400 if they try to register a user with a verified email', async () => {
 			const registrationRes = await postRequest(mainApp, RouteNames.AUTH.REGISTRATION.full)
-				.send({ name: userName, password: userPassword, email: userEmail })
+				.send({ name: defUserName, password: defUserPassword, email: defUserEmail })
 				.expect(HTTP_STATUSES.CREATED_201)
 
 			// Make email verified
@@ -138,9 +138,9 @@ describe('Auth (e2e)', () => {
 
 			await postRequest(mainApp, RouteNames.AUTH.REGISTRATION.full)
 				.send({
-					name: userName,
-					password: userPassword,
-					email: userEmail,
+					name: defUserName,
+					password: defUserPassword,
+					email: defUserEmail,
 				})
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
 		})
@@ -248,7 +248,7 @@ describe('Auth (e2e)', () => {
 			const user = await userUtils.createUserWithConfirmedEmail(mainApp, userRepository)
 
 			const loginRes = await postRequest(mainApp, RouteNames.AUTH.LOGIN.full)
-				.send({ password: 'mywrongpassword', email: userEmail })
+				.send({ password: 'mywrongpassword', email: defUserEmail })
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
 
 			const login = loginRes.body
@@ -260,7 +260,7 @@ describe('Auth (e2e)', () => {
 			const user = await userUtils.createUserWithUnconfirmedEmail(mainApp, userRepository)
 
 			const loginRes = await postRequest(mainApp, RouteNames.AUTH.LOGIN.full)
-				.send({ password: userPassword, email: userEmail })
+				.send({ password: defUserPassword, email: defUserEmail })
 				.expect(HTTP_STATUSES.FORBIDDEN_403)
 
 			const login = loginRes.body
@@ -271,7 +271,7 @@ describe('Auth (e2e)', () => {
 			const user = await userUtils.createUserWithConfirmedEmail(mainApp, userRepository)
 
 			const loginRes = await postRequest(mainApp, RouteNames.AUTH.LOGIN.full)
-				.send({ password: userPassword, email: userEmail })
+				.send({ password: defUserPassword, email: defUserEmail })
 				.expect(HTTP_STATUSES.OK_200)
 
 			const login = loginRes.body
@@ -322,7 +322,7 @@ describe('Auth (e2e)', () => {
 				mainApp,
 				RouteNames.AUTH.CONFIRM_EMAIL_RESENDING.full,
 			)
-				.send({ email: userEmail })
+				.send({ email: defUserEmail })
 				.expect(HTTP_STATUSES.OK_200)
 			const resend = resendConfirmEmailRes.body
 
@@ -380,7 +380,7 @@ describe('Auth (e2e)', () => {
 
 		it('should return 400 if email is not registered and email is not be sent', async () => {
 			const recoverRes = await postRequest(mainApp, RouteNames.AUTH.PASSWORD_RECOVERY.full)
-				.send({ email: userEmail, recaptchaValue: 'recaptchaValue' })
+				.send({ email: defUserEmail, recaptchaValue: 'recaptchaValue' })
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
 
 			const recover = recoverRes.body
@@ -464,7 +464,7 @@ describe('Auth (e2e)', () => {
 
 			// Try login with the new password
 			await postRequest(mainApp, RouteNames.AUTH.LOGIN.full)
-				.send({ password: myNewPassword, email: userEmail })
+				.send({ password: myNewPassword, email: defUserEmail })
 				.expect(HTTP_STATUSES.OK_200)
 		})
 	})

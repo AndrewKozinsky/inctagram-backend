@@ -2,9 +2,9 @@ import { agent as request } from 'supertest'
 import { INestApplication } from '@nestjs/common'
 
 export const adminAuthorizationValue = 'Basic YWRtaW46cXdlcnR5'
-export const userName = 'my-user-name'
-export const userEmail = 'mail@email.com'
-export const userPassword = 'password'
+export const defUserName = 'my-user-name'
+export const defUserEmail = 'mail@email.com'
+export const defUserPassword = 'password'
 
 export function postRequest(app: INestApplication, url: string) {
 	return request(app.getHttpServer()).post('/' + url)
@@ -16,6 +16,10 @@ export function getRequest(app: INestApplication, url: string) {
 
 export function putRequest(app: INestApplication, url: string) {
 	return request(app.getHttpServer()).put('/' + url)
+}
+
+export function patchRequest(app: INestApplication, url: string) {
+	return request(app.getHttpServer()).patch('/' + url)
 }
 
 export function deleteRequest(app: INestApplication, url: string) {

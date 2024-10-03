@@ -1,13 +1,13 @@
 import { DtoFieldDecorators } from '../../db/dtoFieldDecorators'
 import { bdConfig } from '../../db/dbConfig/dbConfig'
-import { IsIn } from 'class-validator'
+import { IsIn, Validate, ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator'
 import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common'
 import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { CustomException } from '../../infrastructure/exceptionFilters/customException'
 import { HTTP_STATUSES } from '../../utils/httpStatuses'
 
 export class CreateUserDtoModel {
-	@DtoFieldDecorators('name', bdConfig.User.dbFields.user_name)
+	@DtoFieldDecorators('user_name', bdConfig.User.dbFields.user_name)
 	userName: string
 
 	@DtoFieldDecorators('password', bdConfig.User.dtoProps.password)
@@ -62,20 +62,20 @@ export class EditMyProfileDtoModel {
 	userName: string
 
 	@DtoFieldDecorators('firstName', bdConfig.User.dbFields.first_name)
-	firstName: string
+	firstName: null | string
 
 	@DtoFieldDecorators('lastName', bdConfig.User.dbFields.last_name)
-	lastName: string
+	lastName: null | string
 
 	@DtoFieldDecorators('dateOfBirth', bdConfig.User.dbFields.date_of_birth)
-	dateOfBirth: string
+	dateOfBirth: null | string
 
 	@DtoFieldDecorators('countryCode', bdConfig.User.dbFields.country_code)
-	countryCode: string
+	countryCode: null | string
 
 	@DtoFieldDecorators('cityId', bdConfig.User.dbFields.city_id)
-	cityId: number
+	cityId: null | number
 
 	@DtoFieldDecorators('aboutMe', bdConfig.User.dbFields.about_me)
-	aboutMe: string
+	aboutMe: null | string
 }

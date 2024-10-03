@@ -9,6 +9,7 @@ import {
 	ApiUnauthorizedResponse,
 } from '@nestjs/swagger'
 import { RoutesConfig } from './routesConfigTypes'
+import { CustomException } from '../../infrastructure/exceptionFilters/customException'
 
 export function RouteDecorators(routeConfig: RoutesConfig.Route) {
 	const decorators: any[] = []
@@ -59,7 +60,7 @@ export function RouteDecorators(routeConfig: RoutesConfig.Route) {
 				break
 			}
 			default: {
-				throw new Error('Unknown route decorator code')
+				throw CustomException('500', 'Unknown route decorator code')
 			}
 		}
 	})

@@ -7,9 +7,9 @@ import {
 	deleteRequest,
 	getRequest,
 	postRequest,
-	userEmail,
-	userName,
-	userPassword,
+	defUserEmail,
+	defUserName,
+	defUserPassword,
 } from './utils/common'
 import RouteNames from '../src/routes/routesConfig/routeNames'
 import { HTTP_STATUSES } from '../src/utils/httpStatuses'

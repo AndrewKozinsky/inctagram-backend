@@ -10,6 +10,7 @@ export namespace BdConfig {
 	export type Field =
 		| IndexField
 		| StringField
+		| DateStringField
 		| BooleanField
 		| EmailField
 		| NumberField
@@ -39,6 +40,10 @@ export namespace BdConfig {
 		maxLength?: number
 		match?: RegExp
 		matchErrorMessage?: string
+	}
+
+	export type DateStringField = FieldCommonProps & {
+		type: 'dateString'
 	}
 
 	export type BooleanField = FieldCommonProps & {

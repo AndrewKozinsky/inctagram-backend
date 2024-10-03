@@ -12,13 +12,27 @@ export class SWRegistrationRouteOut {
 		properties: {
 			id: { type: 'number' },
 			email: { type: 'string' },
-			name: { type: 'string' },
+			userName: { type: 'string' },
+			firstName: { type: 'string', nullable: true },
+			lastName: { type: 'string', nullable: true },
+			dateOfBirth: { type: 'string', nullable: true },
+			countryCode: { type: 'string', nullable: true },
+			cityId: { type: 'number', nullable: true },
+			aboutMe: { type: 'string', nullable: true },
+			avatar: { type: 'string', nullable: true },
 		},
 	})
 	data: {
 		id: number
 		email: string
-		name: string
+		userName: string
+		firstName: null | string
+		lastName: null | string
+		dateOfBirth: null | string
+		countryCode: null | string
+		cityId: null | number
+		aboutMe: null | string
+		avatar: null | string
 	}
 }
 
@@ -38,7 +52,13 @@ export class SWAuthorizeByProviderRouteOut {
 				properties: {
 					id: { type: 'number' },
 					email: { type: 'string' },
-					name: { type: 'string' },
+					userName: { type: 'string' },
+					firstName: { type: 'string', nullable: true },
+					lastName: { type: 'string', nullable: true },
+					dateOfBirth: { type: 'string', nullable: true },
+					countryCode: { type: 'string', nullable: true },
+					cityId: { type: 'number', nullable: true },
+					aboutMe: { type: 'string', nullable: true },
 				},
 			},
 		},
@@ -48,7 +68,13 @@ export class SWAuthorizeByProviderRouteOut {
 		user: {
 			id: number
 			email: string
-			name: string
+			userName: string
+			firstName: null | string
+			lastName: null | string
+			dateOfBirth: null | string
+			countryCode: null | string
+			cityId: null | number
+			aboutMe: null | string
 		}
 	}
 }
@@ -69,7 +95,13 @@ export class SWLoginRouteOut {
 				properties: {
 					id: { type: 'number' },
 					email: { type: 'string' },
-					name: { type: 'string' },
+					userName: { type: 'string' },
+					firstName: { type: 'string', nullable: true },
+					lastName: { type: 'string', nullable: true },
+					dateOfBirth: { type: 'string', nullable: true },
+					countryCode: { type: 'string', nullable: true },
+					cityId: { type: 'number', nullable: true },
+					aboutMe: { type: 'string', nullable: true },
 				},
 			},
 		},
@@ -79,7 +111,13 @@ export class SWLoginRouteOut {
 		user: {
 			id: number
 			email: string
-			name: string
+			userName: string
+			firstName: null | string
+			lastName: null | string
+			dateOfBirth: null | string
+			countryCode: null | string
+			cityId: null | number
+			aboutMe: null | string
 		}
 	}
 }
