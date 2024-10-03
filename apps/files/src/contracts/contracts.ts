@@ -1,6 +1,10 @@
 export enum FileEventNames {
-	Save = 'save',
-	Delete = 'delete',
+	SaveUserAvatar = 'saveUserAvatar',
+}
+
+export type SaveUserAvatarInContract = {
+	userId: number
+	avatarFile: Express.Multer.File
 }
 
 export type SaveFileInContract = {

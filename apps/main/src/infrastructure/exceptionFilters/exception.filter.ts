@@ -35,7 +35,7 @@ export class ErrorExceptionFilter implements ExceptionFilter {
 	extractErrorCodeAndMessageFromStr(
 		errObj: PlainErrorResponse | HTTPErrorResponse,
 	): FailResponse {
-		console.log(errObj)
+		// console.log(errObj)
 		let code = 0
 		let message = ''
 		let wrongFields: undefined | { field: string; message: string }[] = undefined

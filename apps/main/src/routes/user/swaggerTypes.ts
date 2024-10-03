@@ -10,11 +10,11 @@ export class SWUserMeAddAvatarRouteOut {
 	@ApiProperty({
 		type: 'object',
 		properties: {
-			avatarUrl: { type: 'string' },
+			avatarUrl: { type: 'string', nullable: true },
 		},
 	})
 	data: {
-		avatarUrl: string
+		avatarUrl: null | string
 	}
 }
 

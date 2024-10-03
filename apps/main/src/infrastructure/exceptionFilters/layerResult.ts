@@ -29,4 +29,5 @@ export enum ErrorMessage {
 	FileNotFound = 'File not found',
 	FileHasWrongMimeType = 'File has wrong mime type',
 	FileIsTooLarge = 'File is too large',
+	CannotSaveFile = 'Cannot save file',
 }

@@ -17,6 +17,7 @@ model User {
 	first_name	String?
 	last_name	String?
 	avatar	String?
+	date_of_birth	String?
 	country_code	String?
 	city_id	Int?
 	about_me	String?

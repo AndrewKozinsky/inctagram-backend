@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import { MainConfigService } from '@app/config'
-import { SaveFileInContract } from './contracts/contracts'
+import { SaveFileInContract, SaveUserAvatarInContract } from './contracts/contracts'
+import { ErrorMessage } from '../../main/src/infrastructure/exceptionFilters/layerResult'
 
 @Injectable()
 export class FilesService {
@@ -20,6 +21,29 @@ export class FilesService {
 				},
 			},
 		])
+	}
+
+	async saveUserAvatar(saveUserAvatarInContract: SaveUserAvatarInContract) {
+		const { userId, avatarFile } = saveUserAvatarInContract
+
+		// Create avatar image dataset
+		const fileExtension =
+			avatarFile.originalname.split('.')[avatarFile.originalname.split('.').length - 1]
+		const avatarUrl = 'users/' + userId + '/avatar.' + fileExtension
+
+		const setUserAvatarContract: SaveFileInContract = {
+			mimetype: avatarFile.mimetype,
+			filePath: avatarUrl,
+			fileBuffer: avatarFile.buffer,
+			fileSize: avatarFile.size,
+		}
+
+		try {
+			await this.save(setUserAvatarContract)
+			return avatarUrl
+		} catch (error: any) {
+			throw new Error(ErrorMessage.CannotSaveFile)
+		}
 	}
 
 	async save(fileData: SaveFileInContract) {
