@@ -18,6 +18,7 @@ import { Request } from 'express'
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCookieAuth, ApiTags } from '@nestjs/swagger'
 import { CommandBus } from '@nestjs/cqrs'
 import { FileInterceptor } from '@nestjs/platform-express'
+import { ClientProxy } from '@nestjs/microservices'
 import RouteNames from '../routesConfig/routeNames'
 import { RouteDecorators } from '../routesConfig/routesDecorators'
 import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
@@ -27,7 +28,6 @@ import {
 	SetAvatarToMeCommand,
 	SetAvatarToMeHandler,
 } from '../../features/user/SetAvatarToMe.command'
-import { ClientProxy } from '@nestjs/microservices'
 import { CheckAccessTokenGuard } from '../../infrastructure/guards/checkAccessToken.guard'
 import {
 	GetUserAvatarCommand,

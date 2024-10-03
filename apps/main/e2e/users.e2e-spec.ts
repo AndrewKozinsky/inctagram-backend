@@ -1,6 +1,7 @@
-import { INestApplication, INestMicroservice } from '@nestjs/common'
+import { INestApplication } from '@nestjs/common'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { MainConfigService } from '@app/config'
+import path from 'node:path'
 import {
 	checkErrorResponse,
 	checkSuccessResponse,
@@ -23,15 +24,13 @@ import { GitHubService } from '../src/routes/auth/gitHubService'
 import { GoogleService } from '../src/routes/auth/googleService'
 import { DevicesRepository } from '../src/repositories/devices.repository'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
-import path from 'node:path'
-import { createFilesApp, createMainApp } from './utils/createMainApp'
+import { createMainApp } from './utils/createMainApp'
 
 it('123', async () => {
 	expect(2).toBe(2)
 })
 
 describe('Auth (e2e)', () => {
-	let filesApp: INestMicroservice = 1 as any
 	let mainApp: INestApplication = 1 as any
 
 	let emailAdapter: EmailAdapterService
@@ -44,9 +43,6 @@ describe('Auth (e2e)', () => {
 	let mainConfig: MainConfigService
 
 	beforeAll(async () => {
-		const createFilesAppRes = await createFilesApp()
-		filesApp = createFilesAppRes.filesApp
-
 		const createMainAppRes = await createMainApp(
 			emailAdapter,
 			gitHubService,
@@ -73,11 +69,10 @@ describe('Auth (e2e)', () => {
 
 	afterEach(async () => {
 		jest.clearAllMocks()
-		await filesApp.close()
 	})
 
 	describe('Add avatar file to the current user', () => {
-		it('should return 401 if there is not cookies', async () => {
+		it.only('should return 401 if there is not cookies', async () => {
 			await userUtils.deviceTokenChecks.tokenNotExist(
 				mainApp,
 				'post',
@@ -425,7 +420,7 @@ describe('Auth (e2e)', () => {
 			)
 		})
 
-		it.only('should return 200 if all data is correct', async () => {
+		it('should return 200 if all data is correct', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
 				mainApp,
 				userRepository,

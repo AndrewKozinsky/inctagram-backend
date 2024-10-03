@@ -1,0 +1,22 @@
+{
+	"moduleFileExtensions": [
+		"js",
+		"json",
+		"ts"
+	],
+	"rootDir": ".",
+	"testEnvironment": "node",
+	"testRegex": ".e2e-spec.ts$",
+	"transform": {
+		"^.+\\.(t|j)s$": "ts-jest"
+	},
+	"moduleNameMapper": {
+		"^@app/config(.*)$": "<rootDir>/../../../libs/config/src",
+		"^@app/server-helper(.*)$": "<rootDir>/../../../libs/server-helper/src",
+		"^@app/email-adapter(.*)$": "<rootDir>/../../../libs/email-adapter/src",
+		"^@app/hash-adapter(.*)$": "<rootDir>/../../../libs/hash-adapter/src",
+		"^@app/browser-service(.*)$": "<rootDir>/../../../libs/browser-service/src",
+		"^@app/jwt-adapter(.*)$": "<rootDir>/../../../libs/jwt-adapter/src",
+		"^@app/re-captcha-adapter(.*)$": "<rootDir>/../../../libs/re-captcha-adapter/src"
+	}
+}

@@ -16,21 +16,18 @@ import { HTTP_STATUSES } from '../src/utils/httpStatuses'
 import { clearAllDB } from './utils/db'
 import { EmailAdapterService } from '@app/email-adapter'
 import { UserRepository } from '../src/repositories/user.repository'
-import { userUtils } from './utils/userUtils'
-import { parseCookieStringToObj } from '../src/utils/stringUtils'
 import { GitHubService } from '../src/routes/auth/gitHubService'
 import { GoogleService } from '../src/routes/auth/googleService'
 import { DevicesRepository } from '../src/repositories/devices.repository'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
-import path from 'node:path'
-import { createFilesApp, createMainApp } from './utils/createMainApp'
+import { createMainApp } from './utils/createMainApp'
 
 it.only('123', async () => {
 	expect(2).toBe(2)
 })
 
 describe('Auth (e2e)', () => {
-	let filesApp: INestMicroservice = 1 as any
+	const filesApp: INestMicroservice = 1 as any
 	let mainApp: INestApplication = 1 as any
 
 	let emailAdapter: EmailAdapterService
@@ -43,9 +40,6 @@ describe('Auth (e2e)', () => {
 	let mainConfig: MainConfigService
 
 	beforeAll(async () => {
-		const createFilesAppRes = await createFilesApp()
-		filesApp = createFilesAppRes.filesApp
-
 		const createMainAppRes = await createMainApp(
 			emailAdapter,
 			gitHubService,
