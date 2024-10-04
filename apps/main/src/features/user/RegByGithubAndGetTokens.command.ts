@@ -65,7 +65,7 @@ export class RegByProviderAndLoginHandler implements ICommandHandler<RegByProvid
 		else if (!userWithThisEmail) {
 			const args: any = {
 				email: userInfo.email,
-				name: userInfo.name,
+				userName: userInfo.name,
 			}
 
 			if (providerName === 'github') {
@@ -93,11 +93,11 @@ export class RegByProviderAndLoginHandler implements ICommandHandler<RegByProvid
 
 	async createNewUser(arg: {
 		email: string
-		name: null | string
+		userName: null | string
 		githubId?: number
 		googleId?: number
 	}) {
-		const uniqueName = await this.chooseUniqueName(arg.name)
+		const uniqueName = await this.chooseUniqueName(arg.userName)
 		const password = randomBytes(4).toString('hex')
 
 		const createUserDto: CreateUserDtoModel & { githubId?: number; googleId?: number } = {
@@ -134,8 +134,8 @@ export class RegByProviderAndLoginHandler implements ICommandHandler<RegByProvid
 	async addProviderIdToExistingUser(
 		userId: number,
 		provider: {
-			github_id?: number
-			google_id?: number
+			github_id?: string
+			google_id?: string
 		},
 	) {
 		const updater: any = {

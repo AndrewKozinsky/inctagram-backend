@@ -1,6 +1,6 @@
 import { DtoFieldDecorators } from '../../db/dtoFieldDecorators'
 import { bdConfig } from '../../db/dbConfig/dbConfig'
-import { IsIn, Validate, ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator'
+import { IsIn } from 'class-validator'
 import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common'
 import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { CustomException } from '../../infrastructure/exceptionFilters/customException'
@@ -35,8 +35,9 @@ export class ProviderNameQueryModel {
 @Injectable()
 export class UploadAvatarFilePipe implements PipeTransform {
 	transform(file: Express.Multer.File, metadata: ArgumentMetadata) {
-		const maxFileSize = 2 * 1024 * 1024
-		const allowedMimeTypes = ['image/png', 'image/jpg', 'image/jpeg', 'image/webp', 'image/gif']
+		const maxFileSize = 10 * 1024 * 1024
+		// const allowedMimeTypes = ['image/png', 'image/jpg', 'image/jpeg', 'image/webp', 'image/gif']
+		const allowedMimeTypes = ['image/png', 'image/jpg', 'image/jpeg']
 
 		const errStatusCode = HTTP_STATUSES.BAD_REQUEST_400.toString()
 		let errMessage = ''

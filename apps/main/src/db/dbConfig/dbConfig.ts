@@ -43,13 +43,13 @@ export const bdConfig = {
 				required: true,
 			},
 			github_id: {
-				type: 'number',
+				type: 'string',
 				unique: true,
 				description: 'Github ID if user used this way or null',
 				required: false,
 			},
 			google_id: {
-				type: 'number',
+				type: 'string',
 				unique: true,
 				description: 'Google ID if user used this way or null',
 				required: false,
@@ -68,9 +68,9 @@ export const bdConfig = {
 			first_name: {
 				type: 'string',
 				minLength: 1,
-				maxLength: 30,
-				match: /^[A-Za-z-]+$/,
-				matchErrorMessage: 'First name must contain only letters, numbers and _ - symbols',
+				maxLength: 50,
+				match: /^[A-Za-zА-Яа-я]+$/,
+				matchErrorMessage: 'First name must contain only letters',
 				description: "User's first name",
 				example: 'Andrew',
 				required: false,
@@ -78,9 +78,9 @@ export const bdConfig = {
 			last_name: {
 				type: 'string',
 				minLength: 1,
-				maxLength: 30,
-				match: /^[A-Za-z-]+$/,
-				matchErrorMessage: 'Last name must contain only letters, numbers and _ - symbols',
+				maxLength: 50,
+				match: /^[A-Za-zА-Яа-я]+$/,
+				matchErrorMessage: 'Last name must contain only letters',
 				description: "User's last name",
 				example: 'Andrew',
 				required: false,
@@ -110,7 +110,7 @@ export const bdConfig = {
 			about_me: {
 				type: 'string',
 				minLength: 1,
-				maxLength: 1000,
+				maxLength: 200,
 				description: 'A text about me',
 				example:
 					'I am a hard-working and driven individual who isn’t afraid to face a challenge.',

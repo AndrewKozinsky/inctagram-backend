@@ -4,7 +4,7 @@ import { MainConfigService } from '@app/config'
 type UserMetaInfo =
 	| {
 			login: string // 'AndrewKozinsky'
-			id: number // 14260404
+			id: string // 14260404
 			name: null | string // 'Andrew Kozinsky'
 	  }
 	| {
@@ -17,7 +17,7 @@ type UserEmailInfo = {
 }
 
 export type UserInfoFromProvider = {
-	providerId: number
+	providerId: string
 	name: null | string
 	email: string
 }
@@ -90,7 +90,7 @@ export class GitHubService {
 		})
 
 		return {
-			providerId: userMetaInfo.id,
+			providerId: userMetaInfo.id.toString(),
 			name: userMetaInfo.name,
 			email: userEmailInfo.email,
 		}

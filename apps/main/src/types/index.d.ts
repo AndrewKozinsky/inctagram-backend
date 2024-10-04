@@ -1,5 +1,6 @@
 import { UserServiceModel } from '../models/service/users.service.model'
 import { DeviceTokenOutModel } from '../models/auth/auth.output.model'
+import * as express from 'express'
 
 declare global {
 	namespace Express {

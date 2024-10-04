@@ -112,6 +112,7 @@ export class AuthController {
 				}),
 			)
 			const { refreshTokenStr, user } = authData
+			console.log({ authData })
 
 			this.authService.setRefreshTokenInCookie(res, refreshTokenStr)
 
