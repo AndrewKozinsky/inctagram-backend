@@ -27,7 +27,6 @@ it.only('123', async () => {
 })
 
 describe('Auth (e2e)', () => {
-	const filesApp: INestMicroservice = 1 as any
 	let mainApp: INestApplication = 1 as any
 
 	let emailAdapter: EmailAdapterService
@@ -66,15 +65,13 @@ describe('Auth (e2e)', () => {
 
 	afterEach(async () => {
 		jest.clearAllMocks()
-		await filesApp.close()
 	})
 
 	describe('Get all countries', () => {
 		it('should return status 200 and a list of all countries', async () => {
-			const getCountriesRes = await getRequest(
-				mainApp,
-				RouteNames.GEO.COUNTRIES.value,
-			).expect(HTTP_STATUSES.OK_200)
+			const getCountriesRes = await getRequest(mainApp, RouteNames.GEO.COUNTRIES.full).expect(
+				HTTP_STATUSES.OK_200,
+			)
 
 			const countriesRes = getCountriesRes.body
 			checkSuccessResponse(countriesRes, 200)

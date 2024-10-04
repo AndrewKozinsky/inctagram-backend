@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common'
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common'
 import { CommandBus } from '@nestjs/cqrs'
 import { ApiQuery, ApiTags } from '@nestjs/swagger'
 import RouteNames from '../routesConfig/routeNames'
@@ -23,6 +23,7 @@ import {
 	GetCountryCitiesQueriesPipe,
 } from '../../models/geo/geo.input.model'
 import { GetCityCommand, GetCityHandler } from '../../features/countries/GetCityCommand'
+import { CheckAccessTokenGuard } from '../../infrastructure/guards/checkAccessToken.guard'
 
 @ApiTags('Geo')
 @Controller(RouteNames.GEO.value)

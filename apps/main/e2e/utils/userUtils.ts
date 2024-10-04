@@ -8,6 +8,7 @@ import {
 	defUserEmail,
 	defUserName,
 	defUserPassword,
+	patchRequest,
 } from './common'
 import RouteNames from '../../src/routes/routesConfig/routeNames'
 import { HTTP_STATUSES } from '../../src/utils/httpStatuses'
@@ -121,7 +122,7 @@ export const userUtils = {
 		// should return 401 if there is not cookies
 		async tokenNotExist(
 			app: INestApplication,
-			methodType: 'get' | 'post' | 'put' | 'delete',
+			methodType: 'get' | 'post' | 'put' | 'patch' | 'delete',
 			routeUrl: string,
 		) {
 			let reqRes: any = null
@@ -132,6 +133,8 @@ export const userUtils = {
 				reqRes = await postRequest(app, routeUrl).expect(HTTP_STATUSES.UNAUTHORIZED_401)
 			} else if (methodType === 'put') {
 				reqRes = await putRequest(app, routeUrl).expect(HTTP_STATUSES.UNAUTHORIZED_401)
+			} else if (methodType === 'patch') {
+				reqRes = await patchRequest(app, routeUrl).expect(HTTP_STATUSES.UNAUTHORIZED_401)
 			} else if (methodType === 'delete') {
 				reqRes = await deleteRequest(app, routeUrl).expect(HTTP_STATUSES.UNAUTHORIZED_401)
 			}
@@ -143,7 +146,7 @@ export const userUtils = {
 		// should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect
 		async tokenExpired(
 			app: INestApplication,
-			methodType: 'get' | 'post' | 'put' | 'delete',
+			methodType: 'get' | 'post' | 'put' | 'patch' | 'delete',
 			routeUrl: string,
 			userRepository: UserRepository,
 			securityRepository: DevicesRepository,
@@ -182,6 +185,10 @@ export const userUtils = {
 					.expect(HTTP_STATUSES.UNAUTHORIZED_401)
 			} else if (methodType === 'put') {
 				await putRequest(app, routeUrl)
+					.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
+					.expect(HTTP_STATUSES.UNAUTHORIZED_401)
+			} else if (methodType === 'patch') {
+				await patchRequest(app, routeUrl)
 					.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
 					.expect(HTTP_STATUSES.UNAUTHORIZED_401)
 			} else if (methodType === 'delete') {

@@ -74,16 +74,17 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return an array of devices data if a refreshToken inside cookie is valid', async () => {
-			const [accessToken1, refreshToken1] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshToken] = await userUtils.createUserAndLogin(
 				mainApp,
 				userRepository,
 				defUserName,
 				defUserEmail,
 				defUserPassword,
 			)
-			const refreshToken1Str = userUtils.convertCookieRefreshTokenToTokenStr(refreshToken1)
+			const refreshToken1Str = userUtils.convertCookieRefreshTokenToTokenStr(refreshToken)
 
 			const getUserDevicesRes1 = await getRequest(mainApp, RouteNames.SECURITY.DEVICES.full)
+				.set('authorization', 'Bearer ' + accessToken)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshToken1Str)
 				.expect(HTTP_STATUSES.OK_200)
 
@@ -194,14 +195,14 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 204 if a client tries to terminate his device', async () => {
-			const [accessToken1, refreshToken1] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshToken] = await userUtils.createUserAndLogin(
 				mainApp,
 				userRepository,
 				defUserName,
 				defUserEmail,
 				defUserPassword,
 			)
-			const refreshTokenStr = userUtils.convertCookieRefreshTokenToTokenStr(refreshToken1)
+			const refreshTokenStr = userUtils.convertCookieRefreshTokenToTokenStr(refreshToken)
 
 			const deviceId = jwtService.getRefreshTokenDataFromTokenStr(refreshTokenStr)!.deviceId
 
@@ -209,6 +210,7 @@ describe('Auth (e2e)', () => {
 				mainApp,
 				RouteNames.SECURITY.DEVICES.DEVICE_ID(deviceId).full,
 			)
+				.set('authorization', 'Bearer ' + accessToken)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
 				.expect(HTTP_STATUSES.OK_200)
 		})
