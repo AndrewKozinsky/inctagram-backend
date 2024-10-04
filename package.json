@@ -26,7 +26,8 @@
 		"migrate:generate-types": "prisma generate",
 		"generatePrismaFile": "ts-node apps/main/src/db/prismaGenerator/generatePrismaSchemaFile.ts",
 
-		"test:e2e": "NODE_ENV=TEST jest --config apps/main/e2e/jest-e2e.json --runInBand"
+		"test:e2e": "NODE_ENV=TEST jest --config apps/main/e2e/jest-e2e.json --runInBand",
+		"test": "NODE_ENV=TEST jest --config apps/main/src/jest.json --runInBand"
 	},
 	"dependencies": {
 		"@aws-sdk/client-s3": "^3.658.0",
