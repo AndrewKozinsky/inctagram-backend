@@ -1,9 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UserRepository } from '../../repositories/user.repository'
-import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { EditMyProfileDtoModel } from '../../models/user/user.input.model'
 import { UserQueryRepository } from '../../repositories/user.queryRepository'
 import { UserOutModel } from '../../models/user/user.out.model'
+import { ErrorMessage } from '@app/server-helper'
 
 export class EditMyProfileCommand {
 	constructor(

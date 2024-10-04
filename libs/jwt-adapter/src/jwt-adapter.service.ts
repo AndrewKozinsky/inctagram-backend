@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common'
 import jwt, { decode } from 'jsonwebtoken'
-import { ServerHelperService } from '@app/server-helper'
 import { add, addMilliseconds } from 'date-fns'
 import { MainConfigService } from '@app/config'
 import { DeviceTokenServiceModel } from '../../../apps/main/src/models/auth/auth.service.model'
@@ -8,10 +7,7 @@ import { createUniqString } from '../../../apps/main/src/utils/stringUtils'
 
 @Injectable()
 export class JwtAdapterService {
-	constructor(
-		private serverHelper: ServerHelperService,
-		private mainConfig: MainConfigService,
-	) {}
+	constructor(private mainConfig: MainConfigService) {}
 
 	createAccessTokenStr(userId: number) {
 		return jwt.sign({ userId }, this.mainConfig.get().jwt.secret, {

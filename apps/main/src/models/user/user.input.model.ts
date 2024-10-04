@@ -2,9 +2,9 @@ import { DtoFieldDecorators } from '../../db/dtoFieldDecorators'
 import { bdConfig } from '../../db/dbConfig/dbConfig'
 import { IsIn } from 'class-validator'
 import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common'
-import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { CustomException } from '../../infrastructure/exceptionFilters/customException'
 import { HTTP_STATUSES } from '../../utils/httpStatuses'
+import { ErrorMessage } from '@app/server-helper'
 
 export class CreateUserDtoModel {
 	@DtoFieldDecorators('user_name', bdConfig.User.dbFields.user_name)

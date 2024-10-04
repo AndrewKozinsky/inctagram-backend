@@ -2,12 +2,11 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { lastValueFrom } from 'rxjs'
 import { Inject } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
-import {
-	FileEventNames,
-	SaveFileInContract,
-	SaveUserAvatarInContract,
-} from '../../../../files/src/contracts/contracts'
 import { UserRepository } from '../../repositories/user.repository'
+import {
+	FileMS_EventNames,
+	FileMS_SaveUserAvatarInContract,
+} from '@app/server-helper/contracts/fileMS.contracts'
 
 export class SetAvatarToMeCommand {
 	constructor(
@@ -30,9 +29,9 @@ export class SetAvatarToMeHandler implements ICommandHandler<SetAvatarToMeComman
 
 		// Save file
 		try {
-			const sendingDataContract: SaveUserAvatarInContract = { userId, avatarFile }
+			const sendingDataContract: FileMS_SaveUserAvatarInContract = { userId, avatarFile }
 			avatarUrl = await lastValueFrom(
-				this.filesMicroClient.send(FileEventNames.SaveUserAvatar, sendingDataContract),
+				this.filesMicroClient.send(FileMS_EventNames.SaveUserAvatar, sendingDataContract),
 			)
 
 			// Set avatar image src to user table in DB

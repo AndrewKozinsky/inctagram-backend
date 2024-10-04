@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { DevicesRepository } from '../../repositories/devices.repository'
-import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
+import { ErrorMessage } from '@app/server-helper'
 
 export class TerminateUserDeviceCommand {
 	constructor(

@@ -1,8 +1,4 @@
-import {
-	ErrorCode,
-	ErrorMessage,
-	SuccessCode,
-} from '../../infrastructure/exceptionFilters/layerResult'
+import { ErrorCode, SuccessCode } from '../../infrastructure/exceptionFilters/layerResult'
 import {
 	SWAuthorizeByProviderRouteOut,
 	SWGetNewAccessAndRefreshTokenRouteOut,
@@ -12,6 +8,7 @@ import {
 import { SWGetUserDevicesRouteOut } from '../devices/swaggerTypes'
 import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
 import { RoutesConfig } from '../routesConfig/routesConfigTypes'
+import { ErrorMessage } from '@app/server-helper'
 
 export const authRoutesConfig = {
 	registration: {

@@ -1,9 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UserRepository } from '../../repositories/user.repository'
 import { EmailAdapterService } from '@app/email-adapter'
-import { ServerHelperService } from '@app/server-helper'
 import { createUniqString } from '../../utils/stringUtils'
-import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
+import { ErrorMessage } from '@app/server-helper'
 
 export class RecoveryPasswordCommand {
 	constructor(public readonly email: string) {}

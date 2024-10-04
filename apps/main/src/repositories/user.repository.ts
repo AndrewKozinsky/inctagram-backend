@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { User } from '@prisma/client'
 import { add } from 'date-fns'
-import { ServerHelperService } from '@app/server-helper'
 import { HashAdapterService } from '@app/hash-adapter'
 import { PrismaService } from '../db/prisma.service'
 import { CreateUserDtoModel } from '../models/user/user.input.model'

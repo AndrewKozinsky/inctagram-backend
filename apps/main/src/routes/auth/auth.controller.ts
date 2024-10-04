@@ -9,7 +9,7 @@ import {
 	SetNewPasswordDtoModel,
 } from '../../models/user/user.input.model'
 import RouteNames from '../routesConfig/routeNames'
-import { ServerHelperService } from '@app/server-helper'
+import { ErrorMessage } from '@app/server-helper'
 import { BrowserServiceService } from '@app/browser-service'
 import { CheckDeviceRefreshTokenGuard } from '../../infrastructure/guards/checkDeviceRefreshToken.guard'
 import {
@@ -20,7 +20,6 @@ import {
 	ResendConfirmationEmailDtoModel,
 } from '../../models/auth/auth.input.model'
 import { RouteDecorators } from '../routesConfig/routesDecorators'
-import { geoRoutesConfig } from '../geo/geoRoutesConfig'
 import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
 import { LoginOutModel } from '../../models/auth/auth.output.model'
 import { ApiBearerAuth, ApiCookieAuth, ApiTags } from '@nestjs/swagger'
@@ -49,7 +48,6 @@ import {
 	SWLoginRouteOut,
 	SWRegistrationRouteOut,
 } from './swaggerTypes'
-import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
 import { CheckAccessTokenGuard } from '../../infrastructure/guards/checkAccessToken.guard'
@@ -60,7 +58,6 @@ import { authRoutesConfig } from './authRoutesConfig'
 export class AuthController {
 	constructor(
 		private readonly commandBus: CommandBus,
-		private readonly serverHelper: ServerHelperService,
 		private readonly browserService: BrowserServiceService,
 		private mainConfig: MainConfigService,
 		private jwtAdapter: JwtAdapterService,
@@ -206,7 +203,7 @@ export class AuthController {
 			res.status(HttpStatus.OK)
 			res.send(createSuccessResp(authRoutesConfig.logout, null))
 		} catch (err: unknown) {
-			this.serverHelper.convertLayerErrToHttpErr(err)
+			createFailResp(authRoutesConfig.logout, err)
 		}
 	}
 

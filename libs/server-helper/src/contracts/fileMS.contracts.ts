@@ -1,13 +1,13 @@
-export enum FileEventNames {
+export enum FileMS_EventNames {
 	SaveUserAvatar = 'saveUserAvatar',
 }
 
-export type SaveUserAvatarInContract = {
+export type FileMS_SaveUserAvatarInContract = {
 	userId: number
 	avatarFile: Express.Multer.File
 }
 
-export type SaveFileInContract = {
+export type FileMS_SaveFileInContract = {
 	mimetype: string
 	filePath: string
 	fileBuffer: Buffer

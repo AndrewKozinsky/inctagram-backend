@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UserRepository } from '../../repositories/user.repository'
-import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
+import { ErrorMessage } from '@app/server-helper'
 
 export class DeleteUserAvatarCommand {
 	constructor(public userId: number) {}

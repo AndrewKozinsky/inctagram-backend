@@ -1,11 +1,8 @@
-import {
-	ErrorCode,
-	ErrorMessage,
-	SuccessCode,
-} from '../../infrastructure/exceptionFilters/layerResult'
+import { ErrorCode, SuccessCode } from '../../infrastructure/exceptionFilters/layerResult'
 import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
 import { RoutesConfig } from '../routesConfig/routesConfigTypes'
 import { SWUserProfileRouteOut, SWUserMeGetAvatarRouteOut } from './swaggerTypes'
+import { ErrorMessage } from '@app/server-helper'
 
 export const usersRoutesConfig = {
 	me: {
