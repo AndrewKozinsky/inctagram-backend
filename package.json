@@ -9,22 +9,24 @@
 		"start:main": "nest start",
 		"start:main:dev": "nest start main --watch",
 		"test:main:e2e": "NODE_ENV=TEST jest --config apps/main/e2e/jest-e2e.json --runInBand",
-		"test:main:watch": "NODE_ENV=TEST jest --config apps/main/src/jest.json --watch --runInBand",
-		"build:main": "nest build",
+		"test:main:module:watch": "NODE_ENV=TEST jest --config apps/main/src/jest.json --watch --runInBand",
+		"test:main:module": "NODE_ENV=TEST jest --config apps/main/src/jest.json --runInBand",
+		"build:main": "nest build main",
 		"start:main:prod": "node dist/apps/main/main",
+
 		"start:files": "nest start files",
 		"start:files:dev": "nest start files --watch",
 		"test:files:e2e": "NODE_ENV=TEST jest --config apps/files/e2e/jest-e2e.json --runInBand",
-		"test:files:watch": "NODE_ENV=TEST jest --config apps/files/src/jest.json --watch --runInBand",
-		"build:files": "nest build",
+		"test:files:module:watch": "NODE_ENV=TEST jest --config apps/files/src/jest.json --watch --runInBand",
+		"build:files": "nest build files",
 		"start:files:prod": "node dist/apps/files/main",
-		"start:debug": "nest start --debug --watch",
-		"test": "NODE_ENV=TEST jest --config apps/main/src/jest.json --runInBand",
-		"test:cov": "NODE_ENV=TEST jest --coverage",
+
 		"migrate:dev": "prisma migrate dev",
 		"migrate:deploy": "prisma migrate deploy",
 		"migrate:generate-types": "prisma generate",
-		"generatePrismaFile": "ts-node apps/main/src/db/prismaGenerator/generatePrismaSchemaFile.ts"
+		"generatePrismaFile": "ts-node apps/main/src/db/prismaGenerator/generatePrismaSchemaFile.ts",
+
+		"test:e2e": "NODE_ENV=TEST jest --config apps/main/e2e/jest-e2e.json --runInBand"
 	},
 	"dependencies": {
 		"@aws-sdk/client-s3": "^3.658.0",
