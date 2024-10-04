@@ -27,16 +27,16 @@ spec:
                  secretKeyRef:
                    name: inctagram-backend-main-production-config-secret
                    key: MAIN_MICROSERVICE_PORT
-             - name: OAUT_GITHUB_CLIENT_ID
+             - name: OAUT_GITHUB_CLIENT_ID_LOCAL_TO_LOCAL
                valueFrom:
                  secretKeyRef:
                    name: inctagram-backend-main-production-config-secret
-                   key: OAUT_GITHUB_CLIENT_ID
-             - name: OAUT_GITHUB_CLIENT_SECRET
+                   key: OAUT_GITHUB_CLIENT_ID_LOCAL_TO_LOCAL
+             - name: OAUT_GITHUB_CLIENT_SECRET_LOCAL_TO_LOCAL
                valueFrom:
                  secretKeyRef:
                    name: inctagram-backend-main-production-config-secret
-                   key: OAUT_GITHUB_CLIENT_SECRET
+                   key: OAUT_GITHUB_CLIENT_SECRET_LOCAL_TO_LOCAL
              - name: OAUT_GOOGLE_CLIENT_ID
                valueFrom:
                  secretKeyRef:

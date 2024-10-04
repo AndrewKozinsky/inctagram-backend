@@ -26,19 +26,28 @@ export type UserInfoFromProvider = {
 export class GitHubService {
 	constructor(private mainConfig: MainConfigService) {}
 
-	async getUserDataByOAuthCode(code: string, state: string) {
-		const accessToken = await this.getAccessToken(code, state)
+	async getUserDataByOAuthCode(code: string) {
+		const accessToken = await this.getAccessToken(code)
 		if (!accessToken) return null
 
 		return await this.getUserByAccessCode(accessToken)
 	}
 
-	async getAccessToken(code: string, state: string): Promise<string> {
+	async getAccessToken(code: string): Promise<string> {
+		const client_id =
+			this.mainConfig.get().mode === 'TEST'
+				? this.mainConfig.get().oauth.githubLocalToLocal.clientId
+				: this.mainConfig.get().oauth.githubProdToProd.clientId
+
+		const client_secret =
+			this.mainConfig.get().mode === 'TEST'
+				? this.mainConfig.get().oauth.githubLocalToLocal.clientSecret
+				: this.mainConfig.get().oauth.githubProdToProd.clientSecret
+
 		const params = new URLSearchParams({
-			client_id: this.mainConfig.get().oauth.github.clientId,
-			client_secret: this.mainConfig.get().oauth.github.clientSecret,
+			client_id,
+			client_secret,
 			code,
-			state,
 		}).toString()
 
 		const myHeaders = new Headers()

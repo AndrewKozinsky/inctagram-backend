@@ -8,6 +8,6 @@ export type UserServiceModel = {
 	confirmationCodeExpirationDate: string | null
 	isEmailConfirmed: boolean
 	passwordRecoveryCode: string | null
-	githubId: number | null
-	googleId: number | null
+	githubId: string | null
+	googleId: string | null
 }

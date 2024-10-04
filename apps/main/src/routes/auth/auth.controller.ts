@@ -93,7 +93,6 @@ export class AuthController {
 		@Res() res: Response,
 		@Query() query: ProviderNameQueryModel,
 		@Query('code') providerCode: string,
-		@Query('state') providerState: string,
 	) {
 		try {
 			const clientIP = this.browserService.getClientIP(req)
@@ -107,12 +106,10 @@ export class AuthController {
 					clientIP,
 					clientName,
 					providerCode,
-					providerState,
 					providerName: query.provider,
 				}),
 			)
 			const { refreshTokenStr, user } = authData
-			console.log({ authData })
 
 			this.authService.setRefreshTokenInCookie(res, refreshTokenStr)
 

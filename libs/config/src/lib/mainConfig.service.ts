@@ -17,9 +17,7 @@ export class MainConfigService {
 				host: this.configService.get<string>('DATABASE_URL'),
 			},
 			mainMicroService: {
-				port:
-					parseInt(this.configService.get<string>('MAIN_MICROSERVICE_PORT') || '', 10) ||
-					3000,
+				port: parseInt(this.configService.get<string>('MAIN_MICROSERVICE_PORT') || '', 10),
 			},
 			filesMicroService: {
 				port: parseInt(this.configService.get<string>('FILES_MICROSERVICE_PORT') || '', 10),
@@ -52,10 +50,20 @@ export class MainConfigService {
 				secret: 'secret',
 			},
 			oauth: {
-				github: {
-					clientId: this.configService.get<string>('OAUT_GITHUB_CLIENT_ID') as string,
+				githubLocalToLocal: {
+					clientId: this.configService.get<string>(
+						'OAUT_GITHUB_CLIENT_ID_LOCAL_TO_LOCAL',
+					) as string,
 					clientSecret: this.configService.get<string>(
-						'OAUT_GITHUB_CLIENT_SECRET',
+						'OAUT_GITHUB_CLIENT_SECRET_LOCAL_TO_LOCAL',
+					) as string,
+				},
+				githubProdToProd: {
+					clientId: this.configService.get<string>(
+						'OAUT_GITHUB_CLIENT_ID_PROD_TO_PROD',
+					) as string,
+					clientSecret: this.configService.get<string>(
+						'OAUT_GITHUB_CLIENT_SECRET_PROD_TO_PROD',
 					) as string,
 				},
 				google: {

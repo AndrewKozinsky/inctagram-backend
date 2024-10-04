@@ -36,12 +36,17 @@ export class GoogleService {
 	}
 
 	async getAccessToken(code: string): Promise<string> {
+		const redirect_uri =
+			this.mainConfig.get().mode === 'TEST'
+				? 'http://localhost:3000/google'
+				: 'https://sociable-people.com/google'
+
 		const params = new URLSearchParams({
 			client_id: this.mainConfig.get().oauth.google.clientId,
 			client_secret: this.mainConfig.get().oauth.google.clientSecret,
 			code,
 			grant_type: 'authorization_code',
-			redirect_uri: 'http://localhost:3001/google',
+			redirect_uri,
 		}).toString()
 
 		const myHeaders = new Headers()

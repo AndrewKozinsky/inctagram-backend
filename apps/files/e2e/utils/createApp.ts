@@ -11,7 +11,7 @@ export async function createFilesApp() {
 		transport: Transport.TCP,
 		options: {
 			host: 'localhost',
-			port: 3002,
+			port: 5002,
 		},
 	})
 	await filesApp.listen()
