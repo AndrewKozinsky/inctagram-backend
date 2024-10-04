@@ -38,12 +38,14 @@ const commandHandlers = [
 			provide: 'FILES_MICROSERVICE',
 			useFactory(mainConfig: MainConfigService) {
 				const { port } = mainConfig.get().filesMicroService
+				// TODO Вместо '0.0.0.0' указать сервис в Кубернетесе!!!
+				const host = mainConfig.get().mode === 'TEST' ? 'localhost' : '0.0.0.0'
 
 				return ClientProxyFactory.create({
 					transport: Transport.TCP,
 					options: {
-						host: 'localhost',
-						port: port,
+						host,
+						port,
 					},
 				})
 			},
