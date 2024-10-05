@@ -26,7 +26,7 @@ import { DevicesRepository } from '../src/repositories/devices.repository'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 import { createMainApp } from './utils/createMainApp'
 
-it.only('123', async () => {
+it('123', async () => {
 	expect(2).toBe(2)
 })
 
@@ -64,6 +64,10 @@ describe('Auth (e2e)', () => {
 	})
 
 	beforeEach(async () => {
+		await clearAllDB(mainApp)
+	})
+
+	afterAll(async () => {
 		await clearAllDB(mainApp)
 	})
 

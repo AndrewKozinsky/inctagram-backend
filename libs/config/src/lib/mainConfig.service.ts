@@ -10,8 +10,8 @@ export class MainConfigService {
 			mode: this.configService.get<string>('MODE'),
 			site: {
 				name: 'Inctagram',
-				domain: 'sociable-people.com',
-				domainApi: 'sociable-people.com/api/v1',
+				domainApi: 'main.sociable-people.com',
+				domainApiWithPostfix: 'main.sociable-people.com/api/v1',
 			},
 			db: {
 				host: this.configService.get<string>('DATABASE_URL'),

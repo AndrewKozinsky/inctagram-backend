@@ -38,8 +38,10 @@ const commandHandlers = [
 			provide: 'FILES_MICROSERVICE',
 			useFactory(mainConfig: MainConfigService) {
 				const { port } = mainConfig.get().filesMicroService
-				// TODO Вместо '0.0.0.0' указать сервис в Кубернетесе!!!
-				const host = mainConfig.get().mode === 'TEST' ? 'localhost' : '0.0.0.0'
+				const host =
+					mainConfig.get().mode === 'TEST'
+						? 'localhost'
+						: 'inctagram-backend-files-service'
 
 				return ClientProxyFactory.create({
 					transport: Transport.TCP,

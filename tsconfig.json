@@ -63,7 +63,4 @@
       ]
     },
   },
-	"files": [
-		"apps/main/src/types/index.d.ts"
-	]
 }
