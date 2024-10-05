@@ -4,7 +4,7 @@ import { IsIn } from 'class-validator'
 import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common'
 import { CustomException } from '../../infrastructure/exceptionFilters/customException'
 import { HTTP_STATUSES } from '../../utils/httpStatuses'
-import { ErrorMessage } from '@app/server-helper'
+import { ErrorMessage } from '@app/shared'
 
 export class CreateUserDtoModel {
 	@DtoFieldDecorators('user_name', bdConfig.User.dbFields.user_name)

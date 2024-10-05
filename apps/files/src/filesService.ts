@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import { MainConfigService } from '@app/config'
-import { ErrorMessage } from '@app/server-helper'
+import { ErrorMessage } from '@app/shared'
 import {
 	FileMS_SaveFileInContract,
 	FileMS_SaveUserAvatarInContract,
-} from '@app/server-helper/contracts/fileMS.contracts'
+} from '@app/shared/contracts/fileMS.contracts'
 
 @Injectable()
 export class FilesService {

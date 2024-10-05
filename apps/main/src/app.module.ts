@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common'
 import { MainConfigModule } from '@app/config'
 import { AuthModule } from './routes/auth/auth.module'
-import { ServerHelperModule } from '@app/server-helper'
+import { SharedModule } from '@app/shared'
 import { EmailAdapterModule } from '@app/email-adapter'
 import { HashAdapterModule } from '@app/hash-adapter'
 import { BrowserServiceModule } from '@app/browser-service'
@@ -15,7 +15,7 @@ import { GeoModule } from './routes/geo/geo.module'
 @Module({
 	imports: [
 		MainConfigModule,
-		ServerHelperModule,
+		SharedModule,
 		EmailAdapterModule,
 		HashAdapterModule,
 		BrowserServiceModule,

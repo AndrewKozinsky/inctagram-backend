@@ -2,7 +2,7 @@ import { ErrorCode, SuccessCode } from '../../infrastructure/exceptionFilters/la
 import { AuthController } from '../auth/auth.controller'
 import { DevicesController } from '../devices/devices.controller'
 import { UserController } from '../user/user.controller'
-import { ErrorMessage } from '@app/server-helper'
+import { ErrorMessage } from '@app/shared'
 
 type MethodNames<T> = {
 	[K in keyof T]: T[K] extends (...args: any[]) => any ? K : never

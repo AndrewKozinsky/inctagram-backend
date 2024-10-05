@@ -9,7 +9,7 @@ import {
 	SetNewPasswordDtoModel,
 } from '../../models/user/user.input.model'
 import RouteNames from '../routesConfig/routeNames'
-import { ErrorMessage } from '@app/server-helper'
+import { ErrorMessage } from '@app/shared'
 import { BrowserServiceService } from '@app/browser-service'
 import { CheckDeviceRefreshTokenGuard } from '../../infrastructure/guards/checkDeviceRefreshToken.guard'
 import {

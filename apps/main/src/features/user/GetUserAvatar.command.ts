@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { MainConfigService } from '@app/config'
 import { UserRepository } from '../../repositories/user.repository'
-import { ErrorMessage } from '@app/server-helper'
+import { ErrorMessage } from '@app/shared'
 
 export class GetUserAvatarCommand {
 	constructor(public userId: number) {}

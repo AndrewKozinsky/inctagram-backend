@@ -2,7 +2,7 @@ import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from
 import { Observable } from 'rxjs'
 import { CustomException } from '../exceptionFilters/customException'
 import { HTTP_STATUSES } from '../../utils/httpStatuses'
-import { ErrorMessage } from '@app/server-helper'
+import { ErrorMessage } from '@app/shared'
 
 @Injectable()
 export class CheckAccessTokenGuard implements CanActivate {

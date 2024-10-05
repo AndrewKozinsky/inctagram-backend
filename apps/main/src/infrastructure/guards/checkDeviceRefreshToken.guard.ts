@@ -4,7 +4,7 @@ import { BrowserServiceService } from '@app/browser-service'
 import { CustomException } from '../exceptionFilters/customException'
 import { HTTP_STATUSES } from '../../utils/httpStatuses'
 import { DevicesRepository } from '../../repositories/devices.repository'
-import { ErrorMessage } from '@app/server-helper'
+import { ErrorMessage } from '@app/shared'
 
 @Injectable()
 export class CheckDeviceRefreshTokenGuard implements CanActivate {

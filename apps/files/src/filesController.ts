@@ -4,7 +4,7 @@ import { FilesService } from './filesService'
 import {
 	FileMS_EventNames,
 	FileMS_SaveUserAvatarInContract,
-} from '@app/server-helper/contracts/fileMS.contracts'
+} from '@app/shared/contracts/fileMS.contracts'
 
 @Controller()
 export class FilesController {

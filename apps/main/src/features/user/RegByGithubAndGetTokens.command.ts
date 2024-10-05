@@ -6,7 +6,7 @@ import { UserRepository } from '../../repositories/user.repository'
 import { CreateRefreshTokenCommand } from '../auth/CreateRefreshToken.command'
 import { GoogleService } from '../../routes/auth/googleService'
 import { UserQueryRepository } from '../../repositories/user.queryRepository'
-import { ErrorMessage } from '@app/server-helper'
+import { ErrorMessage } from '@app/shared'
 
 export class RegByProviderAndLoginCommand {
 	constructor(

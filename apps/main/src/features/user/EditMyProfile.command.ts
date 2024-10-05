@@ -3,7 +3,7 @@ import { UserRepository } from '../../repositories/user.repository'
 import { EditMyProfileDtoModel } from '../../models/user/user.input.model'
 import { UserQueryRepository } from '../../repositories/user.queryRepository'
 import { UserOutModel } from '../../models/user/user.out.model'
-import { ErrorMessage } from '@app/server-helper'
+import { ErrorMessage } from '@app/shared'
 
 export class EditMyProfileCommand {
 	constructor(

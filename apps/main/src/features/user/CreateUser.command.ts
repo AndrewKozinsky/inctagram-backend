@@ -4,7 +4,7 @@ import { UserRepository } from '../../repositories/user.repository'
 import { UserQueryRepository } from '../../repositories/user.queryRepository'
 import { CreateUserDtoModel } from '../../models/user/user.input.model'
 import { UserOutModel } from '../../models/user/user.out.model'
-import { ErrorMessage } from '@app/server-helper'
+import { ErrorMessage } from '@app/shared'
 
 export class CreateUserCommand {
 	constructor(public readonly createUserDto: CreateUserDtoModel) {}

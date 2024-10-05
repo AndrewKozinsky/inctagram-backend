@@ -1,10 +1,10 @@
 import { Global, Module } from '@nestjs/common'
 import { JwtAdapterService } from './jwt-adapter.service'
-import { ServerHelperModule } from '@app/server-helper'
+import { SharedModule } from '@app/shared'
 
 @Global()
 @Module({
-	imports: [ServerHelperModule],
+	imports: [SharedModule],
 	providers: [JwtAdapterService],
 	exports: [JwtAdapterService],
 })

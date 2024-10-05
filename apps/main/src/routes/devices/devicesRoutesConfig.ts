@@ -2,7 +2,7 @@ import { ErrorCode, SuccessCode } from '../../infrastructure/exceptionFilters/la
 import { SWGetUserDevicesRouteOut } from '../devices/swaggerTypes'
 import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
 import { RoutesConfig } from '../routesConfig/routesConfigTypes'
-import { ErrorMessage } from '@app/server-helper'
+import { ErrorMessage } from '@app/shared'
 
 export const devicesRoutesConfig = {
 	getUserDevices: {

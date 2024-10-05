@@ -3,7 +3,7 @@ import { UserRepository } from '../../repositories/user.repository'
 import { CreateRefreshTokenCommand } from './CreateRefreshToken.command'
 import { LoginDtoModel } from '../../models/auth/auth.input.model'
 import { UserQueryRepository } from '../../repositories/user.queryRepository'
-import { ErrorMessage } from '@app/server-helper'
+import { ErrorMessage } from '@app/shared'
 
 export class LoginCommand {
 	constructor(

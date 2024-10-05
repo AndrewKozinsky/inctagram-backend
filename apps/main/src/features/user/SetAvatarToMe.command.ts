@@ -6,7 +6,7 @@ import { UserRepository } from '../../repositories/user.repository'
 import {
 	FileMS_EventNames,
 	FileMS_SaveUserAvatarInContract,
-} from '@app/server-helper/contracts/fileMS.contracts'
+} from '@app/shared/contracts/fileMS.contracts'
 
 export class SetAvatarToMeCommand {
 	constructor(

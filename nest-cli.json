@@ -37,13 +37,13 @@
         "tsConfigPath": "libs/config/tsconfig.lib.json"
       }
     },
-    "server-helper": {
+    "shared": {
       "type": "library",
-      "root": "libs/server-helper",
+      "root": "libs/shared",
       "entryFile": "index",
-      "sourceRoot": "libs/server-helper/src",
+      "sourceRoot": "libs/shared/src",
       "compilerOptions": {
-        "tsConfigPath": "libs/server-helper/tsconfig.lib.json"
+        "tsConfigPath": "libs/shared/tsconfig.lib.json"
       }
     },
     "email-adapter": {

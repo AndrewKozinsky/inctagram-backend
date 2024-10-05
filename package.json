@@ -105,7 +105,7 @@
 		],
 		"moduleNameMapper": {
 			"^@app/config(|/.*)$": "<rootDir>/libs/config/src/$1",
-			"^@app/server-helper(|/.*)$": "<rootDir>/libs/server-helper/src/$1",
+			"^@app/shared(|/.*)$": "<rootDir>/libs/shared/src/$1",
 			"^@app/email-adapter(|/.*)$": "<rootDir>/libs/email-adapter/src/$1",
 			"^@app/hash-adapter(|/.*)$": "<rootDir>/libs/hash-adapter/src/$1",
 			"^@app/browser-service(|/.*)$": "<rootDir>/libs/browser-service/src/$1",
