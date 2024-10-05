@@ -5,7 +5,6 @@ import {
 	SWLoginRouteOut,
 	SWRegistrationRouteOut,
 } from '../auth/swaggerTypes'
-import { SWGetUserDevicesRouteOut } from '../devices/swaggerTypes'
 import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
 import { RoutesConfig } from '../routesConfig/routesConfigTypes'
 import { ErrorMessage } from '@app/shared'

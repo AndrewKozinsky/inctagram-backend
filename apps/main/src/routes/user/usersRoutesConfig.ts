@@ -30,7 +30,7 @@ export const usersRoutesConfig = {
 			response: [
 				{
 					code: SuccessCode.Ok,
-					description: "User's avatar url",
+					description: "Get user's avatar url",
 					dataClass: SWUserMeGetAvatarRouteOut,
 				},
 				{

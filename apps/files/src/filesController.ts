@@ -1,10 +1,7 @@
 import { Controller } from '@nestjs/common'
 import { MessagePattern } from '@nestjs/microservices'
 import { FilesService } from './filesService'
-import {
-	FileMS_EventNames,
-	FileMS_SaveUserAvatarInContract,
-} from '@app/shared/contracts/fileMS.contracts'
+import { FileMS_EventNames, FileMS_SaveUserAvatarInContract } from '@app/shared'
 
 @Controller()
 export class FilesController {

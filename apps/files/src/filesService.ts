@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import { MainConfigService } from '@app/config'
-import { ErrorMessage } from '@app/shared'
 import {
+	ErrorMessage,
 	FileMS_SaveFileInContract,
 	FileMS_SaveUserAvatarInContract,
-} from '@app/shared/contracts/fileMS.contracts'
+} from '@app/shared'
 
 @Injectable()
 export class FilesService {
@@ -40,9 +40,11 @@ export class FilesService {
 			fileBuffer: avatarFile.buffer,
 			fileSize: avatarFile.size,
 		}
+		// console.log(setUserAvatarContract)
 
 		try {
 			await this.save(setUserAvatarContract)
+			console.log(avatarUrl)
 			return avatarUrl
 		} catch (error: any) {
 			throw new Error(ErrorMessage.CannotSaveFile)

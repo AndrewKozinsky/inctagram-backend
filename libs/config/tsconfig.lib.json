@@ -12,8 +12,5 @@
 		"dist",
 		"test",
 		"**/*spec.ts"
-	],
-	"files": [
-		"src/types/index.d.ts"
 	]
 }

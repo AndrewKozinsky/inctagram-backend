@@ -3,10 +3,7 @@ import { lastValueFrom } from 'rxjs'
 import { Inject } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
 import { UserRepository } from '../../repositories/user.repository'
-import {
-	FileMS_EventNames,
-	FileMS_SaveUserAvatarInContract,
-} from '@app/shared/contracts/fileMS.contracts'
+import { FileMS_EventNames, FileMS_SaveUserAvatarInContract } from '@app/shared'
 
 export class SetAvatarToMeCommand {
 	constructor(
