@@ -12,6 +12,10 @@ export const devicesRoutesConfig = {
 				description: 'Returns all user devices.',
 				dataClass: SWGetUserDevicesRouteOut,
 			},
+			{
+				code: ErrorCode.Unauthorized_401,
+				errors: [ErrorMessage.RefreshTokenIsNotValid, ErrorMessage.AccessTokenIsNotValid],
+			},
 		],
 	},
 	terminateUserDevicesExceptOne: {
@@ -20,6 +24,10 @@ export const devicesRoutesConfig = {
 				code: SuccessCode.Ok,
 				description: "Terminate all user's devices except current",
 				dataClass: SWEmptyRouteOut,
+			},
+			{
+				code: ErrorCode.Unauthorized_401,
+				errors: [ErrorMessage.RefreshTokenIsNotValid, ErrorMessage.AccessTokenIsNotValid],
 			},
 		],
 	},
@@ -32,7 +40,11 @@ export const devicesRoutesConfig = {
 			},
 			{
 				code: ErrorCode.Unauthorized_401,
-				errors: [ErrorMessage.UserDeviceNotFound],
+				errors: [
+					ErrorMessage.UserDeviceNotFound,
+					ErrorMessage.RefreshTokenIsNotValid,
+					ErrorMessage.AccessTokenIsNotValid,
+				],
 			},
 			{
 				code: ErrorCode.Forbidden_403,

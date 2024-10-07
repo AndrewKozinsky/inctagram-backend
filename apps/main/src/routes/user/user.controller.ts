@@ -76,6 +76,7 @@ export class UserController implements OnModuleInit {
 	})
 	@ApiCookieAuth()
 	@ApiBearerAuth('access-token')
+	@ApiBearerAuth('refresh-token')
 	@UseGuards(CheckAccessTokenGuard)
 	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Post([RouteNames.USERS.ME.value, RouteNames.USERS.ME.AVATAR.value].join('/'))
@@ -98,6 +99,8 @@ export class UserController implements OnModuleInit {
 		}
 	}
 
+	@ApiBearerAuth('access-token')
+	@ApiBearerAuth('refresh-token')
 	@UseGuards(CheckAccessTokenGuard)
 	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Get([RouteNames.USERS.ME.value, RouteNames.USERS.ME.AVATAR.value].join('/'))
@@ -115,6 +118,8 @@ export class UserController implements OnModuleInit {
 		}
 	}
 
+	@ApiBearerAuth('access-token')
+	@ApiBearerAuth('refresh-token')
 	@UseGuards(CheckAccessTokenGuard)
 	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Delete([RouteNames.USERS.ME.value, RouteNames.USERS.ME.AVATAR.value].join('/'))
@@ -132,6 +137,8 @@ export class UserController implements OnModuleInit {
 		}
 	}
 
+	@ApiBearerAuth('access-token')
+	@ApiBearerAuth('refresh-token')
 	@UseGuards(CheckAccessTokenGuard)
 	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Patch(RouteNames.USERS.ME.value)
@@ -152,6 +159,8 @@ export class UserController implements OnModuleInit {
 		}
 	}
 
+	@ApiBearerAuth('access-token')
+	@ApiBearerAuth('refresh-token')
 	@UseGuards(CheckAccessTokenGuard)
 	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Get(RouteNames.USERS.ME.value)

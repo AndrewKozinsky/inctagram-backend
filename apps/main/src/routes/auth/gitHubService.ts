@@ -18,7 +18,7 @@ type UserEmailInfo = {
 
 export type UserInfoFromProvider = {
 	providerId: string
-	name: null | string
+	userName: null | string
 	email: string
 }
 
@@ -26,8 +26,9 @@ export type UserInfoFromProvider = {
 export class GitHubService {
 	constructor(private mainConfig: MainConfigService) {}
 
-	async getUserDataByOAuthCode(code: string) {
+	async getUserDataByOAuthCode(code: string): Promise<UserInfoFromProvider | null> {
 		const accessToken = await this.getAccessToken(code)
+		console.log({ accessToken })
 		if (!accessToken) return null
 
 		return await this.getUserByAccessCode(accessToken)
@@ -38,11 +39,13 @@ export class GitHubService {
 			this.mainConfig.get().mode === 'TEST'
 				? this.mainConfig.get().oauth.githubLocalToLocal.clientId
 				: this.mainConfig.get().oauth.githubProdToProd.clientId
+		console.log({ client_id })
 
 		const client_secret =
 			this.mainConfig.get().mode === 'TEST'
 				? this.mainConfig.get().oauth.githubLocalToLocal.clientSecret
 				: this.mainConfig.get().oauth.githubProdToProd.clientSecret
+		console.log({ client_secret })
 
 		const params = new URLSearchParams({
 			client_id,
@@ -61,6 +64,7 @@ export class GitHubService {
 			})
 				.then((res) => res.json())
 				.then((data) => {
+					console.log({ data })
 					resolve(data.access_token)
 				})
 		})
@@ -100,7 +104,7 @@ export class GitHubService {
 
 		return {
 			providerId: userMetaInfo.id.toString(),
-			name: userMetaInfo.name,
+			userName: userMetaInfo.name,
 			email: userEmailInfo.email,
 		}
 	}

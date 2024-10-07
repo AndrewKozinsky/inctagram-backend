@@ -1,7 +1,11 @@
 import { ErrorCode, SuccessCode } from '../../infrastructure/exceptionFilters/layerResult'
 import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
 import { RoutesConfig } from '../routesConfig/routesConfigTypes'
-import { SWUserProfileRouteOut, SWUserMeGetAvatarRouteOut } from './swaggerTypes'
+import {
+	SWUserProfileRouteOut,
+	SWUserMeGetAvatarRouteOut,
+	SWUserMeAddAvatarRouteOut,
+} from './swaggerTypes'
 import { ErrorMessage } from '@app/shared'
 
 export const usersRoutesConfig = {
@@ -11,11 +15,15 @@ export const usersRoutesConfig = {
 				{
 					code: SuccessCode.Ok,
 					description: "User's avatar was added",
-					dataClass: SWEmptyRouteOut,
+					dataClass: SWUserMeAddAvatarRouteOut,
 				},
 				{
 					code: ErrorCode.BadRequest_400,
-					errors: [ErrorMessage.FileHasWrongMimeType, ErrorMessage.FileIsTooLarge],
+					errors: [
+						ErrorMessage.FileHasWrongMimeType,
+						ErrorMessage.FileIsTooLarge,
+						ErrorMessage.FileNotFound,
+					],
 				},
 				{
 					code: ErrorCode.Unauthorized_401,
@@ -69,6 +77,13 @@ export const usersRoutesConfig = {
 					description: "Edit user's profile",
 					dataClass: SWUserProfileRouteOut,
 				},
+				{
+					code: ErrorCode.Unauthorized_401,
+					errors: [
+						ErrorMessage.AccessTokenIsNotValid,
+						ErrorMessage.RefreshTokenIsNotValid,
+					],
+				},
 			],
 		},
 		getProfile: {
@@ -77,6 +92,13 @@ export const usersRoutesConfig = {
 					code: SuccessCode.Ok,
 					description: "Get user's profile",
 					dataClass: SWUserProfileRouteOut,
+				},
+				{
+					code: ErrorCode.Unauthorized_401,
+					errors: [
+						ErrorMessage.AccessTokenIsNotValid,
+						ErrorMessage.RefreshTokenIsNotValid,
+					],
 				},
 			],
 		},

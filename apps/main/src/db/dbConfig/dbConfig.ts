@@ -82,7 +82,7 @@ export const bdConfig = {
 				match: /^[A-Za-zА-Яа-я]+$/,
 				matchErrorMessage: 'Last name must contain only letters',
 				description: "User's last name",
-				example: 'Andrew',
+				example: 'Kozinsky',
 				required: false,
 			},
 			avatar: {

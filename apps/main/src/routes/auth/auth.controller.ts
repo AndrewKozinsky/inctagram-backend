@@ -14,7 +14,7 @@ import { BrowserServiceService } from '@app/browser-service'
 import { CheckDeviceRefreshTokenGuard } from '../../infrastructure/guards/checkDeviceRefreshToken.guard'
 import {
 	ConfirmEmailQueries,
-	GetBlogsQueriesPipe,
+	ConfirmEmailQueriesPipe,
 	LoginDtoModel,
 	PasswordRecoveryDtoModel,
 	ResendConfirmationEmailDtoModel,
@@ -128,7 +128,7 @@ export class AuthController {
 	@Get(RouteNames.AUTH.EMAIL_CONFIRMATION.value)
 	@RouteDecorators(authRoutesConfig.emailConfirmation)
 	async emailConfirmation(
-		@Query(new GetBlogsQueriesPipe()) query: ConfirmEmailQueries,
+		@Query(new ConfirmEmailQueriesPipe()) query: ConfirmEmailQueries,
 	): Promise<SWEmptyRouteOut | undefined> {
 		try {
 			await this.commandBus.execute<
@@ -187,6 +187,7 @@ export class AuthController {
 
 	@ApiCookieAuth()
 	@ApiBearerAuth('access-token')
+	@ApiBearerAuth('refresh-token')
 	@UseGuards(CheckAccessTokenGuard)
 	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Post(RouteNames.AUTH.LOGOUT.value)
@@ -248,6 +249,7 @@ export class AuthController {
 	// (in cookie client must send correct refreshToken that will be revoked after refreshing)
 	@ApiCookieAuth()
 	@ApiBearerAuth('access-token')
+	@ApiBearerAuth('refresh-token')
 	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Post(RouteNames.AUTH.REFRESH_TOKEN.value)
 	@RouteDecorators(authRoutesConfig.getNewAccessAndRefreshToken)

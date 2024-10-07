@@ -16,7 +16,7 @@ export class FilesService {
 
 		this.s3Client = new S3Client([
 			{
-				region,
+				region: 'ru-central1', // 'ru-central1-a'
 				endpoint,
 				credentials: {
 					accessKeyId,
@@ -40,13 +40,12 @@ export class FilesService {
 			fileBuffer: avatarFile.buffer,
 			fileSize: avatarFile.size,
 		}
-		// console.log(setUserAvatarContract)
 
 		try {
 			await this.save(setUserAvatarContract)
-			console.log(avatarUrl)
 			return avatarUrl
 		} catch (error: any) {
+			console.log({ error })
 			throw new Error(ErrorMessage.CannotSaveFile)
 		}
 	}
@@ -72,7 +71,7 @@ export class FilesService {
 		const { bucket } = this.mainConfig.get().s3
 
 		return await this.s3Client.send(
-			// Класс PutObjectCommand создаёт экземпляр класса создающего файл.
+			// DeleteObjectCommand creates an instance deleting a file.
 			new DeleteObjectCommand({
 				Bucket: bucket,
 				// Путь до файла

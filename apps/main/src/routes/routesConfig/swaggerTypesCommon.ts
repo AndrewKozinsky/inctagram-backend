@@ -4,7 +4,7 @@ export class SWEmptyRouteOut {
 	@ApiProperty({ default: 'success' })
 	status: string
 
-	@ApiProperty()
+	@ApiProperty({ default: 200 })
 	code: number
 
 	@ApiProperty({

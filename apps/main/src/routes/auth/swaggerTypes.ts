@@ -4,7 +4,7 @@ export class SWRegistrationRouteOut {
 	@ApiProperty({ default: 'success' })
 	status: string
 
-	@ApiProperty()
+	@ApiProperty({ default: 201 })
 	code: number
 
 	@ApiProperty({
@@ -40,7 +40,7 @@ export class SWAuthorizeByProviderRouteOut {
 	@ApiProperty({ default: 'success' })
 	status: string
 
-	@ApiProperty()
+	@ApiProperty({ default: 200 })
 	code: number
 
 	@ApiProperty({
@@ -83,7 +83,7 @@ export class SWLoginRouteOut {
 	@ApiProperty({ default: 'success' })
 	status: string
 
-	@ApiProperty()
+	@ApiProperty({ default: 200 })
 	code: number
 
 	@ApiProperty({
@@ -102,6 +102,7 @@ export class SWLoginRouteOut {
 					countryCode: { type: 'string', nullable: true },
 					cityId: { type: 'number', nullable: true },
 					aboutMe: { type: 'string', nullable: true },
+					avatar: { type: 'string', nullable: true },
 				},
 			},
 		},
@@ -118,6 +119,7 @@ export class SWLoginRouteOut {
 			countryCode: null | string
 			cityId: null | number
 			aboutMe: null | string
+			avatar: null | string
 		}
 	}
 }
@@ -126,13 +128,13 @@ export class SWGetNewAccessAndRefreshTokenRouteOut {
 	@ApiProperty({ default: 'success' })
 	status: string
 
-	@ApiProperty()
+	@ApiProperty({ default: 200 })
 	code: number
 
 	@ApiProperty({
 		type: 'object',
 		properties: {
-			recoveryCode: { type: 'string' },
+			accessToken: { type: 'string' },
 		},
 	})
 	data: {

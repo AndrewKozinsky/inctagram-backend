@@ -9,7 +9,7 @@ export class ConfirmEmailQueries {
 }
 
 @Injectable()
-export class GetBlogsQueriesPipe implements PipeTransform {
+export class ConfirmEmailQueriesPipe implements PipeTransform {
 	async transform(dto: ConfirmEmailQueries, { metatype }: ArgumentMetadata) {
 		if (!metatype) {
 			return dto

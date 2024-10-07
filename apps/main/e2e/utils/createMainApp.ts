@@ -25,16 +25,16 @@ export async function createMainApp(
 		.overrideProvider(GitHubService)
 		.useValue({
 			getUserDataByOAuthCode: jest.fn().mockResolvedValue({
-				providerId: 1,
-				name: defUserName,
+				providerId: '1',
+				userName: defUserName,
 				email: defUserEmail,
 			}),
 		})
 		.overrideProvider(GoogleService)
 		.useValue({
 			getUserDataByOAuthCode: jest.fn().mockResolvedValue({
-				providerId: 1,
-				name: defUserName,
+				providerId: '1',
+				userName: defUserName,
 				email: defUserEmail,
 			}),
 		})

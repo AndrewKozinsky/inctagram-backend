@@ -2,7 +2,7 @@ import { agent as request } from 'supertest'
 import { INestApplication } from '@nestjs/common'
 
 export const adminAuthorizationValue = 'Basic YWRtaW46cXdlcnR5'
-export const defUserName = 'my-user-name'
+export const defUserName = 'myUserName'
 export const defUserEmail = 'mail@email.com'
 export const defUserPassword = 'password'
 

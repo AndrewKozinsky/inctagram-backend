@@ -107,7 +107,7 @@ export class GoogleService {
 
 		return {
 			providerId: userInfo.emailAddresses[0].metadata.source.id,
-			name: userInfo.names[0].displayName,
+			userName: userInfo.names[0].displayName,
 			email: userInfo.emailAddresses[0].value,
 		}
 	}

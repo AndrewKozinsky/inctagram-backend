@@ -352,6 +352,7 @@ describe('Auth (e2e)', () => {
 				mainConfig,
 			)
 		})
+
 		it('should return 200 if the JWT refreshToken inside cookie is valid', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
 				mainApp,

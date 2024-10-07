@@ -10,7 +10,11 @@ export class SWUserMeAddAvatarRouteOut {
 	@ApiProperty({
 		type: 'object',
 		properties: {
-			avatarUrl: { type: 'string', nullable: true },
+			avatarUrl: {
+				type: 'string',
+				default: 'https://storage.yandexcloud.net/sociable-people/users/100/avatar.png',
+				nullable: true,
+			},
 		},
 	})
 	data: {
@@ -28,7 +32,11 @@ export class SWUserMeGetAvatarRouteOut {
 	@ApiProperty({
 		type: 'object',
 		properties: {
-			avatarUrl: { type: 'string' },
+			avatarUrl: {
+				type: 'string',
+				default: 'https://storage.yandexcloud.net/sociable-people/users/100/avatar.png',
+				nullable: true,
+			},
 		},
 	})
 	data: {
@@ -55,7 +63,11 @@ export class SWUserProfileRouteOut {
 			countryCode: { type: 'string', nullable: true },
 			cityId: { type: 'number', nullable: true },
 			aboutMe: { type: 'string', nullable: true },
-			avatar: { type: 'string', nullable: true },
+			avatar: {
+				type: 'string',
+				default: 'https://storage.yandexcloud.net/sociable-people/users/100/avatar.png',
+				nullable: true,
+			},
 		},
 	})
 	data: {

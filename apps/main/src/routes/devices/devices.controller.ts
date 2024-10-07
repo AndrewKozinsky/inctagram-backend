@@ -16,10 +16,11 @@ import {
 	TerminateUserDeviceCommand,
 	TerminateUserDeviceHandler,
 } from '../../features/security/TerminateUserDevice.command'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
 import { SWGetUserDevicesRouteOut } from './swaggerTypes'
 import { devicesRoutesConfig } from './devicesRoutesConfig'
+import { CheckAccessTokenGuard } from '../../infrastructure/guards/checkAccessToken.guard'
 
 @ApiTags('Devices')
 @Controller(RouteNames.SECURITY.value)
@@ -31,6 +32,9 @@ export class DevicesController {
 	) {}
 
 	// Returns all devices with active sessions for current user
+	@ApiBearerAuth('access-token')
+	@ApiBearerAuth('refresh-token')
+	@UseGuards(CheckAccessTokenGuard)
 	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Get(RouteNames.SECURITY.DEVICES.value)
 	@RouteDecorators(devicesRoutesConfig.getUserDevices)
@@ -48,6 +52,9 @@ export class DevicesController {
 	}
 
 	// Terminate all other (exclude current) device's sessions
+	@ApiBearerAuth('access-token')
+	@ApiBearerAuth('refresh-token')
+	@UseGuards(CheckAccessTokenGuard)
 	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Delete(RouteNames.SECURITY.DEVICES.value)
 	@RouteDecorators(devicesRoutesConfig.terminateUserDevicesExceptOne)
@@ -67,6 +74,9 @@ export class DevicesController {
 	}
 
 	// Terminate specified device session
+	@ApiBearerAuth('access-token')
+	@ApiBearerAuth('refresh-token')
+	@UseGuards(CheckAccessTokenGuard)
 	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Delete(RouteNames.SECURITY.DEVICES.value + '/:deviceId')
 	@RouteDecorators(devicesRoutesConfig.terminateUserDevice)

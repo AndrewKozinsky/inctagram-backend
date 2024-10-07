@@ -38,6 +38,7 @@ export class RegByProviderAndLoginHandler implements ICommandHandler<RegByProvid
 		} else if (providerName === 'google') {
 			userInfo = await this.googleService.getUserDataByOAuthCode(providerCode)
 		}
+		console.log({ userInfo })
 
 		if (!userInfo) {
 			throw new Error(ErrorMessage.UserNotFound)
@@ -64,7 +65,7 @@ export class RegByProviderAndLoginHandler implements ICommandHandler<RegByProvid
 		else if (!userWithThisEmail) {
 			const args: any = {
 				email: userInfo.email,
-				userName: userInfo.name,
+				userName: userInfo.userName,
 			}
 
 			if (providerName === 'github') {

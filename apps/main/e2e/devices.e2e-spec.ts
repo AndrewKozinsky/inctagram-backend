@@ -101,6 +101,7 @@ describe('Auth (e2e)', () => {
 			const refreshToken2Str = userUtils.convertCookieRefreshTokenToTokenStr(refreshToken2)
 
 			const getUserDevicesRes2 = await getRequest(mainApp, RouteNames.SECURITY.DEVICES.full)
+				.set('authorization', 'Bearer ' + accessToken)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshToken2Str)
 				.expect(HTTP_STATUSES.OK_200)
 
@@ -153,6 +154,7 @@ describe('Auth (e2e)', () => {
 			const refreshTokenStr = userUtils.convertCookieRefreshTokenToTokenStr(refreshToken)
 
 			await deleteRequest(mainApp, RouteNames.SECURITY.DEVICES.DEVICE_ID('999').full)
+				.set('authorization', 'Bearer ' + accessToken)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
 				.expect(HTTP_STATUSES.NOT_FOUNT_404)
 		})
@@ -262,6 +264,7 @@ describe('Auth (e2e)', () => {
 				userUtils.convertCookieRefreshTokenToTokenStr(refreshToken)
 
 			return await deleteRequest(mainApp, RouteNames.SECURITY.DEVICES.full)
+				.set('authorization', 'Bearer ' + accessToken)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + deviceRefreshTokenStr)
 				.expect(HTTP_STATUSES.OK_200)
 		})
