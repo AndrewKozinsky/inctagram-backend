@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common'
 import { MainConfigModule } from '@app/config'
 import { AuthModule } from './routes/auth/auth.module'
-import { ServerHelperModule } from '@app/server-helper'
+import { SharedModule } from '@app/shared'
 import { EmailAdapterModule } from '@app/email-adapter'
 import { HashAdapterModule } from '@app/hash-adapter'
 import { BrowserServiceModule } from '@app/browser-service'
@@ -9,11 +9,13 @@ import { TestsModule } from './routes/test/tests.module'
 import { AuthService } from './routes/auth/auth.service'
 import { ReCaptchaAdapterModule } from '@app/re-captcha-adapter'
 import { DevicesModule } from './routes/devices/devices.module'
+import { UserModule } from './routes/user/user.module'
+import { GeoModule } from './routes/geo/geo.module'
 
 @Module({
 	imports: [
 		MainConfigModule,
-		ServerHelperModule,
+		SharedModule,
 		EmailAdapterModule,
 		HashAdapterModule,
 		BrowserServiceModule,
@@ -21,6 +23,8 @@ import { DevicesModule } from './routes/devices/devices.module'
 		TestsModule,
 		AuthModule,
 		DevicesModule,
+		UserModule,
+		GeoModule,
 	],
 	controllers: [],
 	providers: [AuthService],

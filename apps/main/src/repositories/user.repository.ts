@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { User } from '@prisma/client'
 import { add } from 'date-fns'
-import { ServerHelperService } from '@app/server-helper'
 import { HashAdapterService } from '@app/hash-adapter'
 import { PrismaService } from '../db/prisma.service'
 import { CreateUserDtoModel } from '../models/user/user.input.model'
@@ -16,6 +15,18 @@ export class UserRepository {
 		private hashAdapter: HashAdapterService,
 		private jwtAdapter: JwtAdapterService,
 	) {}
+
+	async getUserById(id: number) {
+		const user = await this.prisma.user.findUnique({
+			where: { id },
+		})
+
+		if (!user) {
+			return null
+		}
+
+		return this.mapDbUserToServiceUser(user)
+	}
 
 	async getUserByEmail(email: string) {
 		try {
@@ -35,7 +46,7 @@ export class UserRepository {
 		try {
 			const user = await this.prisma.user.findFirst({
 				where: {
-					OR: [{ email: args.email }, { name: args.name }],
+					OR: [{ email: args.email }, { user_name: args.name }],
 				},
 			})
 
@@ -47,18 +58,6 @@ export class UserRepository {
 		}
 	}
 
-	async getUserById(id: number) {
-		const user = await this.prisma.user.findUnique({
-			where: { id },
-		})
-
-		if (!user) {
-			return null
-		}
-
-		return this.mapDbUserToServiceUser(user)
-	}
-
 	async getUserByEmailAndPassword(email: string, password: string) {
 		const user = await this.prisma.user.findUnique({
 			where: { email },
@@ -67,6 +66,16 @@ export class UserRepository {
 
 		const isPasswordMath = await this.hashAdapter.compare(password, user.hashed_password)
 		if (!isPasswordMath) return null
+
+		return this.mapDbUserToServiceUser(user)
+	}
+
+	async getUserByUserName(userName: string) {
+		const user = await this.prisma.user.findFirst({
+			where: { user_name: userName },
+		})
+
+		if (!user) return null
 
 		return this.mapDbUserToServiceUser(user)
 	}
@@ -130,7 +139,7 @@ export class UserRepository {
 
 		const newUserParams: any = {
 			email: dto.email,
-			name: dto.name,
+			user_name: dto.userName,
 			hashed_password: await this.hashAdapter.hashString(dto.password),
 			email_confirmation_code: createUniqString(),
 			email_confirmation_code_expiration_date: add(new Date(), {
@@ -187,7 +196,8 @@ export class UserRepository {
 		return {
 			id: dbUser.id,
 			email: dbUser.email,
-			name: dbUser.name,
+			userName: dbUser.user_name,
+			avatar: dbUser.avatar,
 			hashedPassword: dbUser.hashed_password,
 			emailConfirmationCode: dbUser.email_confirmation_code,
 			confirmationCodeExpirationDate: dbUser.email_confirmation_code_expiration_date,

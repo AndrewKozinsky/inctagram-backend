@@ -9,7 +9,7 @@ import { ConfigModule } from '@nestjs/config'
 			isGlobal: true, // Make ConfigModule global in the microservices that import this library
 			ignoreEnvFile:
 				process.env.NODE_ENV !== 'DEVELOPMENT' && process.env.NODE_ENV !== 'TEST',
-			envFilePath: ['.env.test', '.env'],
+			envFilePath: ['.env', '.env.test'],
 		}),
 	],
 	providers: [MainConfigService],

@@ -76,7 +76,7 @@ model ${tableName} {
 
 		if (field.type === 'index') {
 			columnsArr.push(`\t${dbFieldName}	Int	@id	@default(autoincrement())`)
-		} else if (['string', 'email'].includes(field.type)) {
+		} else if (['string', 'email', 'dateString'].includes(field.type)) {
 			columnsArr.push(`\t${dbFieldName}	String` + createColumnAttrs(field))
 		} else if (field.type === 'boolean') {
 			columnsArr.push(`\t${dbFieldName}	Boolean` + createColumnAttrs(field))

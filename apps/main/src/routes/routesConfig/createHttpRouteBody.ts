@@ -1,6 +1,6 @@
 import { RoutesConfig } from './routesConfigTypes'
-import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { CustomException } from '../../infrastructure/exceptionFilters/customException'
+import { ErrorMessage } from '@app/shared'
 
 export type SuccessResponse<T> = {
 	status: 'success'

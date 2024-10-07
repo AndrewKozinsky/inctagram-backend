@@ -1,15 +1,4 @@
-import {
-	Body,
-	Controller,
-	Get,
-	HttpCode,
-	HttpStatus,
-	Post,
-	Query,
-	Req,
-	Res,
-	UseGuards,
-} from '@nestjs/common'
+import { Body, Controller, Get, HttpStatus, Post, Query, Req, Res, UseGuards } from '@nestjs/common'
 import { CommandBus } from '@nestjs/cqrs'
 import { Request, Response } from 'express'
 import { MainConfigService } from '@app/config'
@@ -20,60 +9,55 @@ import {
 	SetNewPasswordDtoModel,
 } from '../../models/user/user.input.model'
 import RouteNames from '../routesConfig/routeNames'
-import { ServerHelperService } from '@app/server-helper'
+import { ErrorMessage } from '@app/shared'
 import { BrowserServiceService } from '@app/browser-service'
 import { CheckDeviceRefreshTokenGuard } from '../../infrastructure/guards/checkDeviceRefreshToken.guard'
 import {
 	ConfirmEmailQueries,
-	GetBlogsQueriesPipe,
+	ConfirmEmailQueriesPipe,
 	LoginDtoModel,
 	PasswordRecoveryDtoModel,
 	ResendConfirmationEmailDtoModel,
 } from '../../models/auth/auth.input.model'
 import { RouteDecorators } from '../routesConfig/routesDecorators'
-import { routesConfig } from '../routesConfig/routesConfig'
 import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
 import { LoginOutModel } from '../../models/auth/auth.output.model'
 import { ApiBearerAuth, ApiCookieAuth, ApiTags } from '@nestjs/swagger'
 import {
 	RegByProviderAndLoginCommand,
 	RegByProviderAndLoginHandler,
-} from '../../features/user/RegByGithubAndGetTokens.commandHandler'
+} from '../../features/user/RegByGithubAndGetTokens.command'
 import { AuthService } from './auth.service'
 import {
 	GenerateAccessAndRefreshTokensCommand,
 	GenerateAccessAndRefreshTokensHandler,
-} from '../../features/auth/GenerateAccessAndRefreshTokens.commandHandler'
-import {
-	ConfirmEmailCommand,
-	ConfirmEmailHandler,
-} from '../../features/auth/ConfirmEmail.commandHandler'
-import { LoginCommand, LoginHandler } from '../../features/auth/Login.commandHandler'
-import { ResendConfirmationEmailCommand } from '../../features/auth/ResendConfirmationEmail.commandHandler'
-import { LogoutCommand, LogoutHandler } from '../../features/auth/Logout.commandHandler'
+} from '../../features/auth/GenerateAccessAndRefreshTokens.command'
+import { ConfirmEmailCommand, ConfirmEmailHandler } from '../../features/auth/ConfirmEmail.command'
+import { LoginCommand, LoginHandler } from '../../features/auth/Login.command'
+import { ResendConfirmationEmailCommand } from '../../features/auth/ResendConfirmationEmail.command'
+import { LogoutCommand, LogoutHandler } from '../../features/auth/Logout.command'
 import {
 	RecoveryPasswordCommand,
 	RecoveryPasswordHandler,
-} from '../../features/auth/RecoveryPassword.commandHandler'
-import { SetNewPasswordCommand } from '../../features/auth/SetNewPassword.commandHandler'
-import { CreateUserCommand, CreateUserHandler } from '../../features/user/CreateUser.commandHandler'
+} from '../../features/auth/RecoveryPassword.command'
+import { SetNewPasswordCommand } from '../../features/auth/SetNewPassword.command'
+import { CreateUserCommand, CreateUserHandler } from '../../features/user/CreateUser.command'
 import {
 	SWAuthorizeByProviderRouteOut,
 	SWGetNewAccessAndRefreshTokenRouteOut,
 	SWLoginRouteOut,
-	SWPasswordRecoveryRouteOut,
 	SWRegistrationRouteOut,
 } from './swaggerTypes'
-import { ErrorMessage } from '../../infrastructure/exceptionFilters/layerResult'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
+import { CheckAccessTokenGuard } from '../../infrastructure/guards/checkAccessToken.guard'
+import { authRoutesConfig } from './authRoutesConfig'
 
 @ApiTags('Auth')
 @Controller(RouteNames.AUTH.value)
 export class AuthController {
 	constructor(
 		private readonly commandBus: CommandBus,
-		private readonly serverHelper: ServerHelperService,
 		private readonly browserService: BrowserServiceService,
 		private mainConfig: MainConfigService,
 		private jwtAdapter: JwtAdapterService,
@@ -81,15 +65,8 @@ export class AuthController {
 		private reCaptchaAdapter: ReCaptchaAdapterService,
 	) {}
 
-	@Get('hello')
-	@HttpCode(HttpStatus.OK)
-	async hello() {
-		console.log('hello')
-		return 'hello'
-	}
-
 	@Post(RouteNames.AUTH.REGISTRATION.value)
-	@RouteDecorators(routesConfig.registration)
+	@RouteDecorators(authRoutesConfig.registration)
 	async registration(
 		@Body() body: CreateUserDtoModel,
 	): Promise<SWRegistrationRouteOut | undefined> {
@@ -99,25 +76,15 @@ export class AuthController {
 				ReturnType<typeof CreateUserHandler.prototype.execute>
 			>(new CreateUserCommand(body))
 
-			/*return createSuccessResp(routesConfig.registration, commandRes)*/
-			// ---
-			return {
-				status: 'success',
-				code: HttpStatus.CREATED,
-				data: {
-					id: 1,
-					name: 'name',
-					email: 'email',
-				},
-			}
+			return createSuccessResp(authRoutesConfig.registration, commandRes)
 		} catch (err: any) {
-			createFailResp(routesConfig.registration, err)
+			createFailResp(authRoutesConfig.registration, err)
 		}
 	}
 
 	// Register by GitHub or Google and get access and refresh tokens
 	@Get(RouteNames.AUTH.REGISTRATION.value + '/' + RouteNames.AUTH.REGISTRATION.BY_PROVIDER.value)
-	@RouteDecorators(routesConfig.authorizeByProvider)
+	@RouteDecorators(authRoutesConfig.authorizeByProvider)
 	async authorizeByProvider(
 		@Req() req: Request,
 		@Res() res: Response,
@@ -128,7 +95,7 @@ export class AuthController {
 			const clientIP = this.browserService.getClientIP(req)
 			const clientName = this.browserService.getClientName(req)
 
-			const { refreshTokenStr, user } = await this.commandBus.execute<
+			const authData = await this.commandBus.execute<
 				any,
 				ReturnType<typeof RegByProviderAndLoginHandler.prototype.execute>
 			>(
@@ -139,11 +106,12 @@ export class AuthController {
 					providerName: query.provider,
 				}),
 			)
+			const { refreshTokenStr, user } = authData
 
 			this.authService.setRefreshTokenInCookie(res, refreshTokenStr)
 
 			const commandRes: SWAuthorizeByProviderRouteOut = createSuccessResp<LoginOutModel>(
-				routesConfig.authorizeByProvider,
+				authRoutesConfig.authorizeByProvider,
 				{
 					accessToken: this.jwtAdapter.createAccessTokenStr(user.id),
 					user,
@@ -152,15 +120,15 @@ export class AuthController {
 
 			res.status(HttpStatus.OK).send(commandRes)
 		} catch (err: any) {
-			createFailResp(routesConfig.authorizeByProvider, err)
+			createFailResp(authRoutesConfig.authorizeByProvider, err)
 		}
 	}
 
 	// Confirm email
 	@Get(RouteNames.AUTH.EMAIL_CONFIRMATION.value)
-	@RouteDecorators(routesConfig.emailConfirmation)
+	@RouteDecorators(authRoutesConfig.emailConfirmation)
 	async emailConfirmation(
-		@Query(new GetBlogsQueriesPipe()) query: ConfirmEmailQueries,
+		@Query(new ConfirmEmailQueriesPipe()) query: ConfirmEmailQueries,
 	): Promise<SWEmptyRouteOut | undefined> {
 		try {
 			await this.commandBus.execute<
@@ -168,14 +136,14 @@ export class AuthController {
 				ReturnType<typeof ConfirmEmailHandler.prototype.execute>
 			>(new ConfirmEmailCommand(query.code))
 
-			return createSuccessResp(routesConfig.emailConfirmation, null)
+			return createSuccessResp(authRoutesConfig.emailConfirmation, null)
 		} catch (err: any) {
-			createFailResp(routesConfig.emailConfirmation, err)
+			createFailResp(authRoutesConfig.emailConfirmation, err)
 		}
 	}
 
 	@Post(RouteNames.AUTH.LOGIN.value)
-	@RouteDecorators(routesConfig.login)
+	@RouteDecorators(authRoutesConfig.login)
 	async login(@Req() req: Request, @Res() res: Response, @Body() body: LoginDtoModel) {
 		try {
 			const clientIP = this.browserService.getClientIP(req)
@@ -189,34 +157,41 @@ export class AuthController {
 
 			this.authService.setRefreshTokenInCookie(res, refreshTokenStr)
 
-			const respData: SWLoginRouteOut = createSuccessResp<LoginOutModel>(routesConfig.login, {
-				accessToken: this.jwtAdapter.createAccessTokenStr(user.id),
-				user,
-			})
+			const respData: SWLoginRouteOut = createSuccessResp<LoginOutModel>(
+				authRoutesConfig.login,
+				{
+					accessToken: this.jwtAdapter.createAccessTokenStr(user.id),
+					user,
+				},
+			)
 
 			res.status(HttpStatus.OK).send(respData)
 		} catch (err: unknown) {
-			createFailResp(routesConfig.login, err)
+			createFailResp(authRoutesConfig.login, err)
 		}
 	}
 
 	// Confirmation email resending
 	@Post(RouteNames.AUTH.CONFIRM_EMAIL_RESENDING.value)
-	@RouteDecorators(routesConfig.resendConfirmationEmail)
-	async resendConfirmationEmail(@Body() body: ResendConfirmationEmailDtoModel) {
+	@RouteDecorators(authRoutesConfig.resendConfirmationEmail)
+	async resendConfirmationEmail(
+		@Body() body: ResendConfirmationEmailDtoModel,
+	): Promise<SWEmptyRouteOut | undefined> {
 		try {
 			await this.commandBus.execute(new ResendConfirmationEmailCommand(body.email))
-			return createSuccessResp(routesConfig.resendConfirmationEmail, null)
+			return createSuccessResp(authRoutesConfig.resendConfirmationEmail, null)
 		} catch (err: any) {
-			createFailResp(routesConfig.resendConfirmationEmail, err)
+			createFailResp(authRoutesConfig.resendConfirmationEmail, err)
 		}
 	}
 
 	@ApiCookieAuth()
 	@ApiBearerAuth('access-token')
+	@ApiBearerAuth('refresh-token')
+	@UseGuards(CheckAccessTokenGuard)
 	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Post(RouteNames.AUTH.LOGOUT.value)
-	@RouteDecorators(routesConfig.logout)
+	@RouteDecorators(authRoutesConfig.logout)
 	async logout(@Req() req: Request, @Res() res: Response) {
 		try {
 			const refreshToken = this.browserService.getRefreshTokenStrFromReq(req)
@@ -227,18 +202,18 @@ export class AuthController {
 
 			res.clearCookie(this.mainConfig.get().refreshToken.name)
 			res.status(HttpStatus.OK)
-			res.send(createSuccessResp(routesConfig.logout, null))
+			res.send(createSuccessResp(authRoutesConfig.logout, null))
 		} catch (err: unknown) {
-			this.serverHelper.convertLayerErrToHttpErr(err)
+			createFailResp(authRoutesConfig.logout, err)
 		}
 	}
 
 	// Password recovery via Email confirmation. Email should be sent with RecoveryCode inside
 	@Post(RouteNames.AUTH.PASSWORD_RECOVERY.value)
-	@RouteDecorators(routesConfig.passwordRecovery)
+	@RouteDecorators(authRoutesConfig.passwordRecovery)
 	async passwordRecovery(
 		@Body() body: PasswordRecoveryDtoModel,
-	): Promise<SWPasswordRecoveryRouteOut | undefined> {
+	): Promise<SWEmptyRouteOut | undefined> {
 		try {
 			const isCaptchaValid = await this.reCaptchaAdapter.isValid(body.recaptchaValue)
 
@@ -251,22 +226,22 @@ export class AuthController {
 				ReturnType<typeof RecoveryPasswordHandler.prototype.execute>
 			>(new RecoveryPasswordCommand(body.email))
 
-			return createSuccessResp(routesConfig.passwordRecovery, commandRes)
+			return createSuccessResp(authRoutesConfig.passwordRecovery, commandRes)
 		} catch (err: any) {
-			createFailResp(routesConfig.passwordRecovery, err)
+			createFailResp(authRoutesConfig.passwordRecovery, err)
 		}
 	}
 
 	@Post(RouteNames.AUTH.NEW_PASSWORD.value)
-	@RouteDecorators(routesConfig.newPassword)
-	async newPassword(@Body() body: SetNewPasswordDtoModel) {
+	@RouteDecorators(authRoutesConfig.newPassword)
+	async newPassword(@Body() body: SetNewPasswordDtoModel): Promise<SWEmptyRouteOut | undefined> {
 		try {
 			await this.commandBus.execute(
 				new SetNewPasswordCommand(body.recoveryCode, body.newPassword),
 			)
-			return createSuccessResp(routesConfig.newPassword, null)
+			return createSuccessResp(authRoutesConfig.newPassword, null)
 		} catch (err: any) {
-			createFailResp(routesConfig.newPassword, err)
+			createFailResp(authRoutesConfig.newPassword, err)
 		}
 	}
 
@@ -274,9 +249,10 @@ export class AuthController {
 	// (in cookie client must send correct refreshToken that will be revoked after refreshing)
 	@ApiCookieAuth()
 	@ApiBearerAuth('access-token')
+	@ApiBearerAuth('refresh-token')
 	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Post(RouteNames.AUTH.REFRESH_TOKEN.value)
-	@RouteDecorators(routesConfig.getNewAccessAndRefreshToken)
+	@RouteDecorators(authRoutesConfig.getNewAccessAndRefreshToken)
 	async getNewAccessAndRefreshToken(@Req() req: Request, @Res() res: Response) {
 		try {
 			const { newAccessToken, newRefreshTokenStr } = await this.commandBus.execute<
@@ -285,7 +261,7 @@ export class AuthController {
 			>(new GenerateAccessAndRefreshTokensCommand(req.deviceRefreshToken!))
 
 			const respData: SWGetNewAccessAndRefreshTokenRouteOut = createSuccessResp(
-				routesConfig.getNewAccessAndRefreshToken,
+				authRoutesConfig.getNewAccessAndRefreshToken,
 				{
 					accessToken: newAccessToken,
 				},
@@ -295,7 +271,7 @@ export class AuthController {
 
 			res.status(HttpStatus.OK).send(respData)
 		} catch (err: unknown) {
-			createFailResp(routesConfig.getNewAccessAndRefreshToken, err)
+			createFailResp(authRoutesConfig.getNewAccessAndRefreshToken, err)
 		}
 	}
 }

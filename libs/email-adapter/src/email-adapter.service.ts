@@ -8,7 +8,7 @@ export class EmailAdapterService {
 
 	async sendEmailConfirmationMessage(userEmail: string, confirmationCode: string) {
 		const siteName = this.mainConfig.get().site.name
-		const domainApi = this.mainConfig.get().site.domainApi
+		const domainApi = this.mainConfig.get().site.domainApiWithPostfix
 
 		const subject = 'Registration at ' + siteName
 		const textMessage = 'Registration at ' + siteName
@@ -26,7 +26,7 @@ export class EmailAdapterService {
 	}
 
 	async sendPasswordRecoveryMessage(userEmail: string, recoveryCode: string) {
-		const domainApi = this.mainConfig.get().site.domainApi
+		const domainApi = this.mainConfig.get().site.domainApiWithPostfix
 
 		const subject = 'Password recovery at our web-site'
 		const textMessage = 'Password recovery at our web-site'

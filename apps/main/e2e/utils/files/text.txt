@@ -1,0 +1,26 @@
+/*new ParseFilePipeBuilder()
+	.addFileTypeValidator({ fileType: /(jpg|jpeg|png|webp|gif)$/ })
+	.addMaxSizeValidator({ maxSize: 5000 })
+	.build({
+		fileIsRequired: true,
+		errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+	}),*/
+
+
+// DELETE
+/*@Injectable()
+export class HashAdapterService {
+	generateSalt() {
+		return bcrypt.genSalt()
+	}
+	generateHash(str: string, salt: string) {
+		return bcrypt.hash(str, salt)
+	}
+	async hashString(str: string) {
+		const passwordSalt = await this.generateSalt()
+		return await this.generateHash(str, passwordSalt)
+	}
+	compare(str: string, hashedStr: string) {
+		return bcrypt.compare(str, hashedStr)
+	}
+}*/

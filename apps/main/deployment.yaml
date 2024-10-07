@@ -27,16 +27,31 @@ spec:
                  secretKeyRef:
                    name: inctagram-backend-main-production-config-secret
                    key: MAIN_MICROSERVICE_PORT
-             - name: OAUT_GITHUB_CLIENT_ID
+             - name: FILES_MICROSERVICE_PORT
                valueFrom:
                  secretKeyRef:
                    name: inctagram-backend-main-production-config-secret
-                   key: OAUT_GITHUB_CLIENT_ID
-             - name: OAUT_GITHUB_CLIENT_SECRET
+                   key: FILES_MICROSERVICE_PORT
+             - name: OAUT_GITHUB_CLIENT_ID_LOCAL_TO_LOCAL
                valueFrom:
                  secretKeyRef:
                    name: inctagram-backend-main-production-config-secret
-                   key: OAUT_GITHUB_CLIENT_SECRET
+                   key: OAUT_GITHUB_CLIENT_ID_LOCAL_TO_LOCAL
+             - name: OAUT_GITHUB_CLIENT_SECRET_LOCAL_TO_LOCAL
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-backend-main-production-config-secret
+                   key: OAUT_GITHUB_CLIENT_SECRET_LOCAL_TO_LOCAL
+             - name: OAUT_GITHUB_CLIENT_ID_PROD_TO_PROD
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-backend-main-production-config-secret
+                   key: OAUT_GITHUB_CLIENT_ID_PROD_TO_PROD
+             - name: OAUT_GITHUB_CLIENT_SECRET_PROD_TO_PROD
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-backend-main-production-config-secret
+                   key: OAUT_GITHUB_CLIENT_SECRET_PROD_TO_PROD
              - name: OAUT_GOOGLE_CLIENT_ID
                valueFrom:
                  secretKeyRef:
@@ -47,11 +62,26 @@ spec:
                  secretKeyRef:
                    name: inctagram-backend-main-production-config-secret
                    key: OAUT_GOOGLE_CLIENT_SECRET
+             - name: RECAPTCHA_SITE_KEY
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-backend-main-production-config-secret
+                   key: RECAPTCHA_SITE_KEY
              - name: RECAPTCHA_SERVER_KEY
                valueFrom:
                  secretKeyRef:
                    name: inctagram-backend-main-production-config-secret
                    key: RECAPTCHA_SERVER_KEY
+             - name: S3_ACCESS_KEY_ID
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-backend-main-production-config-secret
+                   key: S3_ACCESS_KEY_ID
+             - name: S3_SECRET_ACCESS_KEY_ID
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-backend-main-production-config-secret
+                   key: S3_SECRET_ACCESS_KEY_ID
              - name: DATABASE_URL
                valueFrom:
                  secretKeyRef:

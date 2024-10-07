@@ -1,11 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { User } from '@prisma/client'
-import { add } from 'date-fns'
-import { ServerHelperService } from '@app/server-helper'
-import { HashAdapterService } from '@app/hash-adapter'
 import { PrismaService } from '../db/prisma.service'
-import { CreateUserDtoModel } from '../models/user/user.input.model'
-import { UserServiceModel } from '../models/user/user.service.model'
 import { UserOutModel } from '../models/user/user.out.model'
 
 @Injectable()
@@ -28,7 +23,14 @@ export class UserQueryRepository {
 		return {
 			id: dbUser.id,
 			email: dbUser.email,
-			name: dbUser.name,
+			userName: dbUser.user_name,
+			firstName: dbUser.first_name,
+			lastName: dbUser.last_name,
+			dateOfBirth: dbUser.date_of_birth,
+			countryCode: dbUser.country_code,
+			cityId: dbUser.city_id,
+			aboutMe: dbUser.about_me,
+			avatar: dbUser.avatar,
 		}
 	}
 }

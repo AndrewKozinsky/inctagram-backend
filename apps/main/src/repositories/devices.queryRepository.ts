@@ -1,12 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { DeviceToken, User } from '@prisma/client'
-import { add } from 'date-fns'
-import { ServerHelperService } from '@app/server-helper'
-import { HashAdapterService } from '@app/hash-adapter'
+import { DeviceToken } from '@prisma/client'
 import { PrismaService } from '../db/prisma.service'
-import { CreateUserDtoModel } from '../models/user/user.input.model'
-import { UserServiceModel } from '../models/user/user.service.model'
-import { UserOutModel } from '../models/user/user.out.model'
 import {
 	GetUserDevicesOutModel,
 	UserDeviceOutModel,

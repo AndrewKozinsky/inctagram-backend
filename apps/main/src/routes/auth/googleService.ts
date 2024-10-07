@@ -30,16 +30,23 @@ export class GoogleService {
 
 	async getUserDataByOAuthCode(code: string) {
 		const accessToken = await this.getAccessToken(code)
+		if (!accessToken) return null
+
 		return await this.getUserByAccessCode(accessToken)
 	}
 
 	async getAccessToken(code: string): Promise<string> {
+		const redirect_uri =
+			this.mainConfig.get().mode === 'TEST'
+				? 'http://localhost:3000/google'
+				: 'https://sociable-people.com/google'
+
 		const params = new URLSearchParams({
 			client_id: this.mainConfig.get().oauth.google.clientId,
-			client_secret: this.mainConfig.get().oauth.google.clientId,
+			client_secret: this.mainConfig.get().oauth.google.clientSecret,
 			code,
 			grant_type: 'authorization_code',
-			redirect_uri: 'http://localhost:3000/api/v1/auth/registration/google',
+			redirect_uri,
 		}).toString()
 
 		const myHeaders = new Headers()
@@ -77,7 +84,6 @@ export class GoogleService {
 			})
 				.then((res) => res.json())
 				.then((data) => {
-					console.log(data.emailAddresses[0].metadata)
 					resolve(data)
 					/*
 					{
@@ -100,8 +106,8 @@ export class GoogleService {
 		})
 
 		return {
-			providerId: parseInt(userInfo.emailAddresses[0].metadata.source.id),
-			name: userInfo.names[0].displayName,
+			providerId: userInfo.emailAddresses[0].metadata.source.id,
+			userName: userInfo.names[0].displayName,
 			email: userInfo.emailAddresses[0].value,
 		}
 	}

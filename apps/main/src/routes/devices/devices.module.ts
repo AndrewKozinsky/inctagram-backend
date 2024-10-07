@@ -8,8 +8,8 @@ import { UserQueryRepository } from '../../repositories/user.queryRepository'
 import { DevicesController } from './devices.controller'
 import { DevicesRepository } from '../../repositories/devices.repository'
 import { DevicesQueryRepository } from '../../repositories/devices.queryRepository'
-import { TerminateUserDeviceHandler } from '../../features/security/TerminateUserDevice.commandHandler'
-import { TerminateAllDeviceRefreshTokensApartThisHandler } from '../../features/security/TerminateAllDeviceRefreshTokensApartThis.commandHandler'
+import { TerminateUserDeviceHandler } from '../../features/security/TerminateUserDevice.command'
+import { TerminateAllDeviceRefreshTokensApartThisHandler } from '../../features/security/TerminateAllDeviceRefreshTokensApartThis.command'
 
 const services = [PrismaService, MainConfigService, JwtAdapterService, DevicesQueryRepository]
 

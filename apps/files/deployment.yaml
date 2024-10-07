@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: DEPLOYMENT_NAME
+  namespace: NAMESPACE
+  labels:
+    app: PROJECT
+spec:
+  selector:
+    matchLabels:
+      project: PROJECT
+  template:
+    metadata:
+      namespace: NAMESPACE
+      labels:
+        project: PROJECT
+    spec:
+      containers:
+         - name: PROJECT
+           image: REGISTRY_HOSTNAME/PROJECT:TAG_VERSION
+           ports:
+             - containerPort: PORT_CONTAINER
+
+           env:
+             - name: FILES_MICROSERVICE_PORT
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-backend-files-production-config-secret
+                   key: FILES_MICROSERVICE_PORT
+             - name: OAUT_GITHUB_CLIENT_ID_LOCAL_TO_LOCAL
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-backend-files-production-config-secret
+                   key: OAUT_GITHUB_CLIENT_ID_LOCAL_TO_LOCAL
+             - name: OAUT_GITHUB_CLIENT_SECRET_LOCAL_TO_LOCAL
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-backend-files-production-config-secret
+                   key: OAUT_GITHUB_CLIENT_SECRET_LOCAL_TO_LOCAL
+             - name: OAUT_GITHUB_CLIENT_ID_PROD_TO_PROD
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-backend-files-production-config-secret
+                   key: OAUT_GITHUB_CLIENT_ID_PROD_TO_PROD
+             - name: OAUT_GITHUB_CLIENT_SECRET_PROD_TO_PROD
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-backend-files-production-config-secret
+                   key: OAUT_GITHUB_CLIENT_SECRET_PROD_TO_PROD
+             - name: OAUT_GOOGLE_CLIENT_ID
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-backend-files-production-config-secret
+                   key: OAUT_GOOGLE_CLIENT_ID
+             - name: OAUT_GOOGLE_CLIENT_SECRET
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-backend-files-production-config-secret
+                   key: OAUT_GOOGLE_CLIENT_SECRET
+             - name: RECAPTCHA_SITE_KEY
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-backend-files-production-config-secret
+                   key: RECAPTCHA_SITE_KEY
+             - name: RECAPTCHA_SERVER_KEY
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-backend-files-production-config-secret
+                   key: RECAPTCHA_SERVER_KEY
+             - name: S3_ACCESS_KEY_ID
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-backend-files-production-config-secret
+                   key: S3_ACCESS_KEY_ID
+             - name: S3_SECRET_ACCESS_KEY_ID
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-backend-files-production-config-secret
+                   key: S3_SECRET_ACCESS_KEY_ID
+             - name: MAIN_MICROSERVICE_PORT
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-backend-files-production-config-secret
+                   key: MAIN_MICROSERVICE_PORT

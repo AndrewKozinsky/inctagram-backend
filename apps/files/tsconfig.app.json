@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "declaration": false,
+    "outDir": "../../dist/apps/files"
+  },
+  "include": ["src/**/*", "__tests__/**/*"],
+  "exclude": ["node_modules", "dist", "test", "**/*spec.ts"],
+	"files": [
+		"src/types/index.d.ts"
+	]
+}

@@ -28,7 +28,7 @@ export const bdConfig = {
 			recaptchaValue: {
 				type: 'string',
 				minLength: 1,
-				maxLength: 100,
+				maxLength: 4000,
 				required: true,
 			},
 		},
@@ -43,28 +43,78 @@ export const bdConfig = {
 				required: true,
 			},
 			github_id: {
-				type: 'number',
+				type: 'string',
 				unique: true,
 				description: 'Github ID if user used this way or null',
 				required: false,
 			},
 			google_id: {
-				type: 'number',
+				type: 'string',
 				unique: true,
 				description: 'Google ID if user used this way or null',
 				required: false,
 			},
-			name: {
+			user_name: {
 				type: 'string',
 				unique: true,
 				minLength: 6,
 				maxLength: 30,
 				match: /^[A-Za-z0-9_-]+$/,
-				matchErrorMessage:
-					'Password must contain only letters, numbers and !"#$%&\'()*+,\\-./:;<=>?@[\\\\\\]^_{|}~ symbols',
-				description: "User's name",
-				example: 'Andrew',
+				matchErrorMessage: 'Name must contain only letters, numbers and _ - symbols',
+				description: 'Username',
+				example: 'AndrewKozinsky',
 				required: true,
+			},
+			first_name: {
+				type: 'string',
+				minLength: 1,
+				maxLength: 50,
+				match: /^[A-Za-zА-Яа-я]+$/,
+				matchErrorMessage: 'First name must contain only letters',
+				description: "User's first name",
+				example: 'Andrew',
+				required: false,
+			},
+			last_name: {
+				type: 'string',
+				minLength: 1,
+				maxLength: 50,
+				match: /^[A-Za-zА-Яа-я]+$/,
+				matchErrorMessage: 'Last name must contain only letters',
+				description: "User's last name",
+				example: 'Kozinsky',
+				required: false,
+			},
+			avatar: {
+				type: 'string',
+				description: "User's avatar image",
+				example: 'https://sociable-people.storage.yandexcloud.net/users/1/avatar.png',
+				required: false,
+			},
+			date_of_birth: {
+				type: 'dateString',
+				description: "User's date of birth",
+				example: '2024-09-29T09:18:40.523Z',
+				required: false,
+			},
+			country_code: {
+				type: 'string',
+				description: 'Code of the country. RU for Russia',
+				required: false,
+			},
+			city_id: {
+				type: 'number',
+				description: 'Id of the city',
+				required: false,
+			},
+			about_me: {
+				type: 'string',
+				minLength: 1,
+				maxLength: 200,
+				description: 'A text about me',
+				example:
+					'I am a hard-working and driven individual who isn’t afraid to face a challenge.',
+				required: false,
 			},
 			hashed_password: {
 				type: 'string',
@@ -140,43 +190,6 @@ export const bdConfig = {
 				type: 'manyToOne',
 				thisField: 'user_id',
 				foreignTable: 'User',
-				foreignField: 'id',
-			},
-		},
-	},
-	Country: {
-		dtoProps: {},
-		dbFields: {
-			id: {
-				type: 'index',
-			},
-			name: {
-				type: 'string',
-				description: 'Country name',
-				required: true,
-				unique: true,
-			},
-			City: {
-				type: 'oneToMany',
-			},
-		},
-	},
-	City: {
-		dtoProps: {},
-		dbFields: {
-			id: {
-				type: 'index',
-			},
-			name: {
-				type: 'string',
-				description: 'City name',
-				required: true,
-				unique: true,
-			},
-			country_id: {
-				type: 'manyToOne',
-				thisField: 'country_id',
-				foreignTable: 'Country',
 				foreignField: 'id',
 			},
 		},

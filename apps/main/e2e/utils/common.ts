@@ -1,66 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing'
-import { AppModule } from '../../src/app.module'
-import { applyAppSettings } from '../../src/infrastructure/applyAppSettings'
 import { agent as request } from 'supertest'
 import { INestApplication } from '@nestjs/common'
-import { EmailAdapterService } from '@app/email-adapter'
-import { GitHubService } from '../../src/routes/auth/gitHubService'
-import { GoogleService } from '../../src/routes/auth/googleService'
-import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 
 export const adminAuthorizationValue = 'Basic YWRtaW46cXdlcnR5'
-export const userName = 'my-user-name'
-export const userEmail = 'mail@email.com'
-export const userPassword = 'password'
-
-export async function createTestApp(
-	emailAdapter: EmailAdapterService,
-	gitHubService: GitHubService,
-	googleService: GoogleService,
-	reCaptchaAdapter: ReCaptchaAdapterService,
-) {
-	const moduleFixture: TestingModule = await Test.createTestingModule({
-		imports: [AppModule],
-	})
-		.overrideProvider(EmailAdapterService)
-		.useValue({
-			sendEmailConfirmationMessage: jest.fn().mockResolvedValue('Mocked Email Response'),
-			sendEmail: jest.fn().mockResolvedValue('Mocked Email Response'),
-			sendPasswordRecoveryMessage: jest.fn().mockResolvedValue('Mocked Email Response'),
-		})
-		.overrideProvider(GitHubService)
-		.useValue({
-			getUserDataByOAuthCode: jest.fn().mockResolvedValue({
-				providerId: 1,
-				name: userName,
-				email: userEmail,
-			}),
-		})
-		.overrideProvider(GoogleService)
-		.useValue({
-			getUserDataByOAuthCode: jest.fn().mockResolvedValue({
-				providerId: 1,
-				name: userName,
-				email: userEmail,
-			}),
-		})
-		.overrideProvider(ReCaptchaAdapterService)
-		.useValue({
-			isValid: jest.fn().mockResolvedValue(true),
-		})
-		.compile()
-
-	const app = moduleFixture.createNestApplication()
-	applyAppSettings(app)
-	await app.init()
-
-	emailAdapter = moduleFixture.get<EmailAdapterService>(EmailAdapterService)
-	gitHubService = moduleFixture.get<GitHubService>(GitHubService)
-	googleService = moduleFixture.get<GoogleService>(GoogleService)
-	reCaptchaAdapter = moduleFixture.get<ReCaptchaAdapterService>(ReCaptchaAdapterService)
-
-	return { app, emailAdapter, gitHubService, googleService, reCaptchaAdapter }
-}
+export const defUserName = 'myUserName'
+export const defUserEmail = 'mail@email.com'
+export const defUserPassword = 'password'
 
 export function postRequest(app: INestApplication, url: string) {
 	return request(app.getHttpServer()).post('/' + url)
@@ -68,6 +12,14 @@ export function postRequest(app: INestApplication, url: string) {
 
 export function getRequest(app: INestApplication, url: string) {
 	return request(app.getHttpServer()).get('/' + url)
+}
+
+export function putRequest(app: INestApplication, url: string) {
+	return request(app.getHttpServer()).put('/' + url)
+}
+
+export function patchRequest(app: INestApplication, url: string) {
+	return request(app.getHttpServer()).patch('/' + url)
 }
 
 export function deleteRequest(app: INestApplication, url: string) {
@@ -115,6 +67,6 @@ export function checkSuccessResponse(resObj: any, code: number, data?: any) {
 	expect(resObj.code).toBe(code)
 
 	if (data) {
-		expect(resObj.data).toBe(data)
+		expect(resObj.data).toEqual(data)
 	}
 }

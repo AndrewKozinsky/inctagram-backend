@@ -1,19 +1,24 @@
 import { Injectable } from '@nestjs/common'
 import { MainConfigService } from '@app/config'
 
-type UserMetaInfo = {
-	login: string // 'AndrewKozinsky'
-	id: number // 14260404
-	name: null | string // 'Andrew Kozinsky'
-}
+type UserMetaInfo =
+	| {
+			login: string // 'AndrewKozinsky'
+			id: string // 14260404
+			name: null | string // 'Andrew Kozinsky'
+	  }
+	| {
+			message: string // 'Bad credentials'
+			status: string // '401'
+	  }
 
 type UserEmailInfo = {
 	email: string // 'andkozinskiy@yandex.ru'
 }
 
 export type UserInfoFromProvider = {
-	providerId: number
-	name: null | string
+	providerId: string
+	userName: null | string
 	email: string
 }
 
@@ -21,15 +26,30 @@ export type UserInfoFromProvider = {
 export class GitHubService {
 	constructor(private mainConfig: MainConfigService) {}
 
-	async getUserDataByOAuthCode(code: string) {
+	async getUserDataByOAuthCode(code: string): Promise<UserInfoFromProvider | null> {
 		const accessToken = await this.getAccessToken(code)
+		console.log({ accessToken })
+		if (!accessToken) return null
+
 		return await this.getUserByAccessCode(accessToken)
 	}
 
 	async getAccessToken(code: string): Promise<string> {
+		const client_id =
+			this.mainConfig.get().mode === 'TEST'
+				? this.mainConfig.get().oauth.githubLocalToLocal.clientId
+				: this.mainConfig.get().oauth.githubProdToProd.clientId
+		console.log({ client_id })
+
+		const client_secret =
+			this.mainConfig.get().mode === 'TEST'
+				? this.mainConfig.get().oauth.githubLocalToLocal.clientSecret
+				: this.mainConfig.get().oauth.githubProdToProd.clientSecret
+		console.log({ client_secret })
+
 		const params = new URLSearchParams({
-			client_id: this.mainConfig.get().oauth.github.clientId,
-			client_secret: this.mainConfig.get().oauth.github.clientSecret,
+			client_id,
+			client_secret,
 			code,
 		}).toString()
 
@@ -44,12 +64,13 @@ export class GitHubService {
 			})
 				.then((res) => res.json())
 				.then((data) => {
+					console.log({ data })
 					resolve(data.access_token)
 				})
 		})
 	}
 
-	async getUserByAccessCode(accessToken: string): Promise<UserInfoFromProvider> {
+	async getUserByAccessCode(accessToken: string): Promise<null | UserInfoFromProvider> {
 		const myHeaders = new Headers()
 		myHeaders.append('Authorization', 'Bearer ' + accessToken)
 
@@ -63,6 +84,14 @@ export class GitHubService {
 				})
 		})
 
+		if ('status' in userMetaInfo && userMetaInfo.status === '401') {
+			return null
+		}
+
+		if ('status' in userMetaInfo && 'message' in userMetaInfo) {
+			return null
+		}
+
 		const userEmailInfo: UserEmailInfo = await new Promise((resolve, reject) => {
 			fetch('https://api.github.com/user/emails', {
 				headers: myHeaders,
@@ -74,8 +103,8 @@ export class GitHubService {
 		})
 
 		return {
-			providerId: userMetaInfo.id,
-			name: userMetaInfo.name,
+			providerId: userMetaInfo.id.toString(),
+			userName: userMetaInfo.name,
 			email: userEmailInfo.email,
 		}
 	}

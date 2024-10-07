@@ -25,11 +25,11 @@
       "@app/config/*": [
         "libs/config/src/*"
       ],
-      "@app/server-helper": [
-        "libs/server-helper/src"
+      "@app/shared": [
+        "libs/shared/src"
       ],
-      "@app/server-helper/*": [
-        "libs/server-helper/src/*"
+      "@app/shared/*": [
+        "libs/shared/src/*"
       ],
       "@app/email-adapter": [
         "libs/email-adapter/src"
@@ -61,6 +61,6 @@
       "@app/re-captcha-adapter/*": [
         "libs/re-captcha-adapter/src/*"
       ]
-    }
-  }
+    },
+  },
 }

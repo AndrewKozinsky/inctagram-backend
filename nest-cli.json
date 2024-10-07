@@ -19,13 +19,13 @@
         "tsConfigPath": "apps/main/tsconfig.app.json"
       }
     },
-    "second": {
+    "files": {
       "type": "application",
-      "root": "apps/second",
+      "root": "apps/files",
       "entryFile": "main",
-      "sourceRoot": "apps/second/src",
+      "sourceRoot": "apps/files/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/second/tsconfig.app.json"
+        "tsConfigPath": "apps/files/tsconfig.app.json"
       }
     },
     "config": {
@@ -37,13 +37,13 @@
         "tsConfigPath": "libs/config/tsconfig.lib.json"
       }
     },
-    "server-helper": {
+    "shared": {
       "type": "library",
-      "root": "libs/server-helper",
+      "root": "libs/shared",
       "entryFile": "index",
-      "sourceRoot": "libs/server-helper/src",
+      "sourceRoot": "libs/shared/src",
       "compilerOptions": {
-        "tsConfigPath": "libs/server-helper/tsconfig.lib.json"
+        "tsConfigPath": "libs/shared/tsconfig.lib.json"
       }
     },
     "email-adapter": {

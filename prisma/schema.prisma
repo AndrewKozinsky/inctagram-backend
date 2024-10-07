@@ -11,9 +11,16 @@ datasource db {
 model User {
 	id	Int	@id	@default(autoincrement())
 	email	String	@unique
-	github_id	Int?	@unique
-	google_id	Int?	@unique
-	name	String	@unique
+	github_id	String?	@unique
+	google_id	String?	@unique
+	user_name	String	@unique
+	first_name	String?
+	last_name	String?
+	avatar	String?
+	date_of_birth	String?
+	country_code	String?
+	city_id	Int?
+	about_me	String?
 	hashed_password	String
 	email_confirmation_code	String?
 	email_confirmation_code_expiration_date	String?
@@ -31,17 +38,4 @@ model DeviceToken {
 	device_name	String
 	user User @relation(fields: [user_id], references: [id])
 	user_id Int
-}
-
-model Country {
-	id	Int	@id	@default(autoincrement())
-	name	String	@unique
-	City	City[]
-}
-
-model City {
-	id	Int	@id	@default(autoincrement())
-	name	String	@unique
-	country Country @relation(fields: [country_id], references: [id])
-	country_id Int
 }
