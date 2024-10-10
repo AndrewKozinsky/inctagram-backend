@@ -18,7 +18,7 @@ export class FilesService {
 
 		this.s3Client = new S3Client([
 			{
-				region, // 'ru-central1-a'
+				region,
 				endpoint,
 				credentials: {
 					accessKeyId,
