@@ -12,6 +12,7 @@ export class MainConfigService {
 				name: 'Inctagram',
 				domainApi: 'main.sociable-people.com',
 				domainApiWithPostfix: 'main.sociable-people.com/api/v1',
+				domainRoot: 'sociable-people.com',
 			},
 			db: {
 				host: this.configService.get<string>('DATABASE_URL') || '',
