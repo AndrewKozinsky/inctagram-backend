@@ -170,10 +170,7 @@ export const userUtils = {
 
 			// Get created expired token
 			const refreshToken = await securityRepository.getDeviceRefreshTokenByDeviceId(deviceId)
-			const refreshTokenStr = jwtService.createRefreshTokenStr(
-				refreshToken!.deviceId,
-				refreshToken!.expirationDate,
-			)
+			const refreshTokenStr = jwtService.createRefreshTokenStr(refreshToken!.deviceId)
 
 			if (methodType === 'get') {
 				await getRequest(app, routeUrl)

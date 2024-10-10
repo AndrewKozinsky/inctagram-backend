@@ -31,6 +31,7 @@ export class CreateRefreshTokenHandler implements ICommandHandler<CreateRefreshT
 		const refreshTokenStr = this.jwtAdapter.createRefreshTokenStr(
 			newDeviceRefreshToken.deviceId,
 		)
+		// console.log(refreshTokenStr)
 
 		return refreshTokenStr
 	}

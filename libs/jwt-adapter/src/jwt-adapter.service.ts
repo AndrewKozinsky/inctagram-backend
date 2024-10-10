@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import jwt, { decode } from 'jsonwebtoken'
-import { add, addMilliseconds } from 'date-fns'
+import { addMilliseconds } from 'date-fns'
 import { MainConfigService } from '@app/config'
 import { DeviceTokenServiceModel } from '../../../apps/main/src/models/auth/auth.service.model'
 import { createUniqString } from '@app/shared'
@@ -15,15 +15,12 @@ export class JwtAdapterService {
 		})
 	}
 
-	createRefreshTokenStr(deviceId: string, expirationDate?: string): string {
-		const defaultExpDate = add(new Date(), {
-			seconds: this.mainConfig.get().refreshToken.lifeDurationInMs / 1000,
-		})
-
-		const expDate = expirationDate || defaultExpDate
+	createRefreshTokenStr(deviceId: string): string {
+		const expiresInMs = this.mainConfig.get().refreshToken.lifeDurationInMs
+		const expiresInSeconds = expiresInMs / 1000
 
 		return jwt.sign({ deviceId }, this.mainConfig.get().jwt.secret, {
-			expiresIn: (+new Date(expDate) - +new Date()) / 1000 + 's',
+			expiresIn: expiresInSeconds + 's',
 		})
 	}
 

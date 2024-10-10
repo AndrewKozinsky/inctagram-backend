@@ -41,17 +41,20 @@ export class CheckDeviceRefreshTokenGuard implements CanActivate {
 				)
 			}
 
+			console.log(deviceRefreshToken!.expirationDate)
+			console.log(refreshTokenStrExpirationDate!.toISOString())
+
 			if (
-				refreshTokenStrExpirationDate!.toISOString() === deviceRefreshToken!.expirationDate
+				deviceRefreshToken!.expirationDate !== refreshTokenStrExpirationDate!.toISOString()
 			) {
-				request.deviceRefreshToken = deviceRefreshToken
-				return true
+				throw CustomException(
+					HTTP_STATUSES.UNAUTHORIZED_401.toString(),
+					ErrorMessage.RefreshTokenIsNotValid,
+				)
 			}
 
-			throw CustomException(
-				HTTP_STATUSES.UNAUTHORIZED_401.toString(),
-				ErrorMessage.RefreshTokenIsNotValid,
-			)
+			request.deviceRefreshToken = deviceRefreshToken
+			return true
 		} catch (err: unknown) {
 			throw CustomException(
 				HTTP_STATUSES.UNAUTHORIZED_401.toString(),
