@@ -18,7 +18,7 @@ export class FilesService {
 
 		this.s3Client = new S3Client([
 			{
-				region: 'ru-central1', // 'ru-central1-a'
+				region, // 'ru-central1-a'
 				endpoint,
 				credentials: {
 					accessKeyId,
@@ -86,6 +86,8 @@ export class FilesService {
 
 	async save(fileData: FileMS_SaveFileInContract) {
 		const { bucket } = this.mainConfig.get().s3
+
+		// console.log(this.s3Client)
 
 		return await this.s3Client.send(
 			// Класс PutObjectCommand создаёт экземпляр класса создающего файл.

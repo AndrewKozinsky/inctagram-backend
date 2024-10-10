@@ -10,8 +10,8 @@ export class AuthService {
 		res.cookie(this.mainConfig.get().refreshToken.name, refreshTokenStr, {
 			maxAge: this.mainConfig.get().refreshToken.lifeDurationInMs,
 			httpOnly: false,
-			secure: false,
-			// sameSite: 'none',
+			secure: true,
+			sameSite: 'none',
 		})
 	}
 }

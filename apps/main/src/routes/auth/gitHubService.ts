@@ -35,17 +35,16 @@ export class GitHubService {
 	}
 
 	async getAccessToken(code: string): Promise<string> {
+		console.log({ code })
 		const client_id =
 			this.mainConfig.get().mode === 'TEST'
 				? this.mainConfig.get().oauth.githubLocalToLocal.clientId
 				: this.mainConfig.get().oauth.githubProdToProd.clientId
-		console.log({ client_id })
 
 		const client_secret =
 			this.mainConfig.get().mode === 'TEST'
 				? this.mainConfig.get().oauth.githubLocalToLocal.clientSecret
 				: this.mainConfig.get().oauth.githubProdToProd.clientSecret
-		console.log({ client_secret })
 
 		const params = new URLSearchParams({
 			client_id,

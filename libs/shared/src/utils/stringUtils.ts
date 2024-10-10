@@ -12,7 +12,7 @@ type CookieObj = {
 	Expires: string
 	HttpOnly: boolean
 	Secure: boolean
-	// sameSite: string
+	sameSite: string
 }
 /**
  * Get string like
@@ -39,8 +39,8 @@ export function parseCookieStringToObj(cookieString: string) {
 		Path: '',
 		Expires: '',
 		HttpOnly: false,
-		Secure: false,
-		// sameSite: 'none',
+		Secure: true,
+		sameSite: 'none',
 	}
 
 	for (let i = 0; i < cookieParts.length; i++) {

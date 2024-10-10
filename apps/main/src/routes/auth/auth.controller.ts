@@ -93,9 +93,7 @@ export class AuthController {
 	) {
 		try {
 			const clientIP = this.browserService.getClientIP(req)
-			console.log({ clientIP })
 			const clientName = this.browserService.getClientName(req)
-			console.log({ clientName })
 
 			const authData = await this.commandBus.execute<
 				any,
