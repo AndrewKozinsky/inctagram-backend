@@ -14,8 +14,12 @@ export enum ErrorMessage {
 	UserDoesNotOwnThisDeviceToken = 'User does not own this device token',
 	UserDeviceNotFound = 'User device not found',
 	// FILES
+	FilesNotFound = 'Files not found',
 	FileNotFound = 'File not found',
 	FileHasWrongMimeType = 'File has wrong mime type',
+	OneOfFilesHasWrongMimeType = 'OneOfFileshas wrong mime type',
 	FileIsTooLarge = 'File is too large',
+	OneOfFilesIsTooLarge = 'One of files is too large',
 	CannotSaveFile = 'Cannot save file',
+	CannotSaveFiles = 'Cannot save files',
 }

@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UserRepository } from '../../repositories/user.repository'
 import { EmailAdapterService } from '@app/email-adapter'
-import { createUniqString } from '../../utils/stringUtils'
+import { createUniqString } from '@app/shared'
 import { ErrorMessage } from '@app/shared'
 
 export class RecoveryPasswordCommand {

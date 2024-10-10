@@ -92,6 +92,9 @@ export const RouteNames = {
 			},
 		},
 	},
+	POSTS: {
+		value: 'posts',
+	},
 }
 
 export default RouteNames

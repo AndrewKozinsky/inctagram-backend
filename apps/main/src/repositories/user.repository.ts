@@ -5,7 +5,7 @@ import { HashAdapterService } from '@app/hash-adapter'
 import { PrismaService } from '../db/prisma.service'
 import { CreateUserDtoModel } from '../models/user/user.input.model'
 import { UserServiceModel } from '../models/user/user.service.model'
-import { createUniqString } from '../utils/stringUtils'
+import { createUniqString } from '@app/shared'
 import { JwtAdapterService } from '@app/jwt-adapter'
 
 @Injectable()

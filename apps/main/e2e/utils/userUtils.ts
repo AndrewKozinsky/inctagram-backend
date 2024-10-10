@@ -13,7 +13,7 @@ import {
 import RouteNames from '../../src/routes/routesConfig/routeNames'
 import { HTTP_STATUSES } from '../../src/utils/httpStatuses'
 import { UserRepository } from '../../src/repositories/user.repository'
-import { createUniqString, parseCookieStringToObj } from '../../src/utils/stringUtils'
+import { createUniqString, parseCookieStringToObj } from '@app/shared/utils/stringUtils'
 import { DeviceTokenOutModel } from '../../src/models/auth/auth.output.model'
 import { DevicesRepository } from '../../src/repositories/devices.repository'
 import { JwtAdapterService } from '@app/jwt-adapter'
@@ -87,7 +87,7 @@ export const userUtils = {
 		const { accessToken } = loginRes.body.data
 		const refreshTokenStr = loginRes.headers['set-cookie'][0]
 
-		return [accessToken, refreshTokenStr]
+		return [accessToken, refreshTokenStr, loginRes.body.data.user]
 	},
 	convertCookieRefreshTokenToTokenStr(cookieRefreshToken: string) {
 		const tokenParts = cookieRefreshToken.split(';')

@@ -3,7 +3,7 @@ import jwt, { decode } from 'jsonwebtoken'
 import { add, addMilliseconds } from 'date-fns'
 import { MainConfigService } from '@app/config'
 import { DeviceTokenServiceModel } from '../../../apps/main/src/models/auth/auth.service.model'
-import { createUniqString } from '../../../apps/main/src/utils/stringUtils'
+import { createUniqString } from '@app/shared'
 
 @Injectable()
 export class JwtAdapterService {

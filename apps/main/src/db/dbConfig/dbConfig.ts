@@ -153,6 +153,9 @@ export const bdConfig = {
 			DeviceToken: {
 				type: 'oneToMany',
 			},
+			Post: {
+				type: 'oneToMany',
+			},
 		},
 	},
 	DeviceToken: {
@@ -190,6 +193,52 @@ export const bdConfig = {
 				type: 'manyToOne',
 				thisField: 'user_id',
 				foreignTable: 'User',
+				foreignField: 'id',
+			},
+		},
+	},
+	Post: {
+		dtoProps: {},
+		dbFields: {
+			id: {
+				type: 'index',
+			},
+			text: {
+				type: 'string',
+				description: 'Post description',
+				required: false,
+			},
+			location: {
+				type: 'string',
+				description: 'Photos location',
+				required: false,
+			},
+			user_id: {
+				type: 'manyToOne',
+				thisField: 'user_id',
+				foreignTable: 'User',
+				foreignField: 'id',
+			},
+			PostPhoto: {
+				type: 'oneToMany',
+			},
+		},
+	},
+	PostPhoto: {
+		dtoProps: {},
+		dbFields: {
+			id: {
+				type: 'index',
+			},
+			url: {
+				type: 'string',
+				description: 'Photo url',
+				required: true,
+			},
+			post_id: {
+				type: 'manyToOne',
+				thisField: 'post_id',
+				foreignTable: 'Post',
 				foreignField: 'id',
 			},
 		},
