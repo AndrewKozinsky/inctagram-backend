@@ -11,6 +11,7 @@ export class AuthService {
 			maxAge: this.mainConfig.get().refreshToken.lifeDurationInMs,
 			httpOnly: false,
 			secure: false,
+			sameSite: false,
 		})
 	}
 }
