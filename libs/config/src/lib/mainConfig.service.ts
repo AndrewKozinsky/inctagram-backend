@@ -7,20 +7,24 @@ export class MainConfigService {
 
 	get() {
 		return {
-			mode: this.configService.get<string>('MODE'),
+			mode: this.configService.get<string>('MODE') || '',
 			site: {
 				name: 'Inctagram',
 				domainApi: 'main.sociable-people.com',
 				domainApiWithPostfix: 'main.sociable-people.com/api/v1',
+				domainRoot: 'sociable-people.com',
 			},
 			db: {
-				host: this.configService.get<string>('DATABASE_URL'),
+				host: this.configService.get<string>('DATABASE_URL') || '',
 			},
 			mainMicroService: {
-				port: parseInt(this.configService.get<string>('MAIN_MICROSERVICE_PORT') || '', 10),
+				port: parseInt(this.configService.get<string>('MAIN_MICROSERVICE_PORT') || '0', 10),
 			},
 			filesMicroService: {
-				port: parseInt(this.configService.get<string>('FILES_MICROSERVICE_PORT') || '', 10),
+				port: parseInt(
+					this.configService.get<string>('FILES_MICROSERVICE_PORT') || '0',
+					10,
+				),
 			},
 			// Yandex Cloud
 			s3: {
@@ -28,9 +32,9 @@ export class MainConfigService {
 				// Адрес сервиса Яндекса
 				endpoint: 'https://storage.yandexcloud.net',
 				// Ключ доступа к учётной записи
-				accessKeyId: this.configService.get<string>('S3_ACCESS_KEY_ID'),
+				accessKeyId: this.configService.get<string>('S3_ACCESS_KEY_ID') || '',
 				// Секретный ключ доступа к учётной записи
-				secretAccessKey: this.configService.get<string>('S3_SECRET_ACCESS_KEY_ID'),
+				secretAccessKey: this.configService.get<string>('S3_SECRET_ACCESS_KEY_ID') || '',
 				// Название своей корзины
 				bucket: 'sociable-people',
 				filesRootUrl: 'https://sociable-people.storage.yandexcloud.net',
@@ -51,31 +55,29 @@ export class MainConfigService {
 			},
 			oauth: {
 				githubLocalToLocal: {
-					clientId: this.configService.get<string>(
-						'OAUT_GITHUB_CLIENT_ID_LOCAL_TO_LOCAL',
-					) as string,
-					clientSecret: this.configService.get<string>(
-						'OAUT_GITHUB_CLIENT_SECRET_LOCAL_TO_LOCAL',
-					) as string,
+					clientId:
+						this.configService.get<string>('OAUT_GITHUB_CLIENT_ID_LOCAL_TO_LOCAL') ||
+						'',
+					clientSecret:
+						this.configService.get<string>(
+							'OAUT_GITHUB_CLIENT_SECRET_LOCAL_TO_LOCAL',
+						) || '',
 				},
 				githubProdToProd: {
-					clientId: this.configService.get<string>(
-						'OAUT_GITHUB_CLIENT_ID_PROD_TO_PROD',
-					) as string,
-					clientSecret: this.configService.get<string>(
-						'OAUT_GITHUB_CLIENT_SECRET_PROD_TO_PROD',
-					) as string,
+					clientId:
+						this.configService.get<string>('OAUT_GITHUB_CLIENT_ID_PROD_TO_PROD') || '',
+					clientSecret:
+						this.configService.get<string>('OAUT_GITHUB_CLIENT_SECRET_PROD_TO_PROD') ||
+						'',
 				},
 				google: {
 					clientId: this.configService.get<string>('OAUT_GOOGLE_CLIENT_ID') as string,
-					clientSecret: this.configService.get<string>(
-						'OAUT_GOOGLE_CLIENT_SECRET',
-					) as string,
+					clientSecret: this.configService.get<string>('OAUT_GOOGLE_CLIENT_SECRET') || '',
 				},
 			},
 			reCaptcha: {
-				siteKey: this.configService.get<string>('RECAPTCHA_SITE_KEY') as string,
-				serverKey: this.configService.get<string>('RECAPTCHA_SERVER_KEY') as string,
+				siteKey: this.configService.get<string>('RECAPTCHA_SITE_KEY') || '',
+				serverKey: this.configService.get<string>('RECAPTCHA_SERVER_KEY') || '',
 			},
 		}
 	}

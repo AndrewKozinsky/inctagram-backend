@@ -6,3 +6,4 @@ export {
 	FileMS_SaveUserAvatarInContract,
 	FileMS_SaveFileInContract,
 } from './contracts/fileMS.contracts'
+export { createUniqString, parseCookieStringToObj } from './utils/stringUtils'

@@ -11,6 +11,7 @@ import { ErrorExceptionFilter } from './exceptionFilters/exception.filter'
 export function applyAppSettings(app: INestApplication) {
 	app.enableCors({
 		origin: ['http://localhost:3000', 'http://localhost:5173', 'https://sociable-people.com'],
+		credentials: true,
 	})
 
 	app.use(cookieParser())

@@ -11,6 +11,7 @@ import { ReCaptchaAdapterModule } from '@app/re-captcha-adapter'
 import { DevicesModule } from './routes/devices/devices.module'
 import { UserModule } from './routes/user/user.module'
 import { GeoModule } from './routes/geo/geo.module'
+import { PostModule } from './routes/post/post.module'
 
 @Module({
 	imports: [
@@ -25,6 +26,7 @@ import { GeoModule } from './routes/geo/geo.module'
 		DevicesModule,
 		UserModule,
 		GeoModule,
+		PostModule,
 	],
 	controllers: [],
 	providers: [AuthService],

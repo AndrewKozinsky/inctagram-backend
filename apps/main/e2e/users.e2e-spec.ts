@@ -19,7 +19,7 @@ import { clearAllDB } from './utils/db'
 import { EmailAdapterService } from '@app/email-adapter'
 import { UserRepository } from '../src/repositories/user.repository'
 import { userUtils } from './utils/userUtils'
-import { parseCookieStringToObj } from '../src/utils/stringUtils'
+import { parseCookieStringToObj } from '@app/shared'
 import { GitHubService } from '../src/routes/auth/gitHubService'
 import { GoogleService } from '../src/routes/auth/googleService'
 import { DevicesRepository } from '../src/repositories/devices.repository'
@@ -30,7 +30,7 @@ it.only('123', async () => {
 	expect(2).toBe(2)
 })
 
-describe('Auth (e2e)', () => {
+describe('Users (e2e)', () => {
 	let mainApp: INestApplication = 1 as any
 
 	let emailAdapter: EmailAdapterService
@@ -169,7 +169,6 @@ describe('Auth (e2e)', () => {
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.set('Content-Type', 'multipart/form-data')
 				.attach('avatarFile', avatarFilePath)
-				.set('authorization', 'Bearer ' + accessToken)
 				.expect(HTTP_STATUSES.OK_200)
 		})
 	})

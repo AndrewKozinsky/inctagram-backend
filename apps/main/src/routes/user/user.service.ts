@@ -9,8 +9,9 @@ export class UserService {
 	setRefreshTokenInCookie(res: Response, refreshTokenStr: string) {
 		res.cookie(this.mainConfig.get().refreshToken.name, refreshTokenStr, {
 			maxAge: this.mainConfig.get().refreshToken.lifeDurationInMs,
-			httpOnly: true,
+			httpOnly: false,
 			secure: true,
+			sameSite: 'none',
 		})
 	}
 }

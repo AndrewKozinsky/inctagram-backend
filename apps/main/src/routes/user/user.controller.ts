@@ -5,6 +5,7 @@ import {
 	Get,
 	Inject,
 	OnModuleInit,
+	Param,
 	Patch,
 	Post,
 	Req,
@@ -41,12 +42,17 @@ import {
 	SWUserProfileRouteOut,
 	SWUserMeAddAvatarRouteOut,
 	SWUserMeGetAvatarRouteOut,
+	SWGetUserPostsRouteOut,
 } from './swaggerTypes'
 import {
 	EditMyProfileCommand,
 	EditMyProfileHandler,
 } from '../../features/user/EditMyProfile.command'
 import { GetMyProfileCommand, GetMyProfileHandler } from '../../features/user/GetMyProfile.command'
+import { postsRoutesConfig } from '../post/postsRoutesConfig'
+import { SWGetPostRouteOut } from '../post/swaggerTypes'
+import { GetPostCommand, GetPostHandler } from '../../features/posts/GetPost.command'
+import { GetUserPostsHandler } from '../../features/posts/GetUserPosts.command'
 
 @ApiTags('User')
 @Controller(RouteNames.USERS.value)
@@ -175,6 +181,21 @@ export class UserController implements OnModuleInit {
 			return createSuccessResp(usersRoutesConfig.me.getProfile, res)
 		} catch (err: any) {
 			createFailResp(usersRoutesConfig.me.getProfile, err)
+		}
+	}
+
+	@Get(RouteNames.USERS.POSTS.value)
+	@RouteDecorators(usersRoutesConfig.posts.getUserPosts)
+	async getUserPosts(@Req() req: Request): Promise<SWGetUserPostsRouteOut | null | undefined> {
+		try {
+			const commandRes = await this.commandBus.execute<
+				any,
+				ReturnType<typeof GetUserPostsHandler.prototype.execute>
+			>(new GetUserPostsHandler(req.user.id))
+
+			return createSuccessResp(postsRoutesConfig.getPost, commandRes)
+		} catch (err: any) {
+			createFailResp(postsRoutesConfig.getPost, err)
 		}
 	}
 }

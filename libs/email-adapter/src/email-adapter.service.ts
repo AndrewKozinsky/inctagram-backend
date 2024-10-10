@@ -8,17 +8,17 @@ export class EmailAdapterService {
 
 	async sendEmailConfirmationMessage(userEmail: string, confirmationCode: string) {
 		const siteName = this.mainConfig.get().site.name
-		const domainApi = this.mainConfig.get().site.domainApiWithPostfix
+		const domainRoot = this.mainConfig.get().site.domainRoot
 
 		const subject = 'Registration at ' + siteName
 		const textMessage = 'Registration at ' + siteName
 		const htmlMessage = `
 <h1>Thanks for your registration</h1>
 <p>To finish registration please confirm your email by follow the link below:
-	<a href='https://${domainApi}/auth/email-confirmation?code=${confirmationCode}'>confirm email</a>
+	<a href='https://${domainRoot}/emailConfirmation?code=${confirmationCode}'>confirm email</a>
 </p>
 <p>
-	<a href="https://${domainApi}/unsubscribe">unsubscribe</a>
+	<a href="https://${domainRoot}/unsubscribe">unsubscribe</a>
 </p>`
 
 		// Send an email

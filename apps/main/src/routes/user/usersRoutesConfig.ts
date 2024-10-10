@@ -5,8 +5,10 @@ import {
 	SWUserProfileRouteOut,
 	SWUserMeGetAvatarRouteOut,
 	SWUserMeAddAvatarRouteOut,
+	SWGetUserPostsRouteOut,
 } from './swaggerTypes'
 import { ErrorMessage } from '@app/shared'
+import { SWGetPostRouteOut } from '../post/swaggerTypes'
 
 export const usersRoutesConfig = {
 	me: {
@@ -99,6 +101,17 @@ export const usersRoutesConfig = {
 						ErrorMessage.AccessTokenIsNotValid,
 						ErrorMessage.RefreshTokenIsNotValid,
 					],
+				},
+			],
+		},
+	},
+	posts: {
+		getUserPosts: {
+			response: [
+				{
+					code: SuccessCode.Ok,
+					description: "Get user's posts",
+					dataClass: SWGetUserPostsRouteOut,
 				},
 			],
 		},
