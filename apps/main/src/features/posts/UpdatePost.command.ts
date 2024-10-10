@@ -14,6 +14,7 @@ export class UpdatePostCommand {
 		public postId: number,
 		public userId: number,
 		public dto: UpdatePostDtoModel,
+		public photoFiles: Express.Multer.File[],
 	) {}
 }
 
@@ -25,7 +26,7 @@ export class UpdatePostHandler implements ICommandHandler<UpdatePostCommand> {
 	) {}
 
 	async execute(command: UpdatePostCommand) {
-		const { postId, userId, dto } = command
+		const { postId, userId, dto, photoFiles } = command
 
 		const postWithId = await this.postRepository.getPostById(postId)
 

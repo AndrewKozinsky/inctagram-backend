@@ -102,6 +102,22 @@ export class PostController implements OnModuleInit {
 		}
 	}
 
+	@ApiConsumes('multipart/form-data')
+	@ApiBody({
+		description: 'Images must be loaded to the photoFiles property',
+		type: 'multipart/form-data',
+		schema: {
+			type: 'object',
+			properties: {
+				photoFiles: {
+					type: 'array',
+					items: {
+						format: 'binary',
+					},
+				},
+			},
+		},
+	})
 	@ApiCookieAuth()
 	@ApiBearerAuth('access-token')
 	@ApiBearerAuth('refresh-token')
@@ -109,16 +125,19 @@ export class PostController implements OnModuleInit {
 	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Patch(':postId')
 	@RouteDecorators(postsRoutesConfig.getPost)
+	@UseInterceptors(FilesInterceptor('photoFiles'))
 	async updatePost(
 		@Param('postId') postId: number,
 		@Body() body: UpdatePostDtoModel,
 		@Req() req: Request,
+		@UploadedFiles(new UploadPostImagesPipe())
+		photoFiles: Express.Multer.File[],
 	): Promise<SWUpdatePostRouteOut | undefined> {
 		try {
 			const commandRes = await this.commandBus.execute<
 				any,
 				ReturnType<typeof UpdatePostHandler.prototype.execute>
-			>(new UpdatePostCommand(postId, req.user.id, body))
+			>(new UpdatePostCommand(postId, req.user.id, body, photoFiles))
 
 			return createSuccessResp(postsRoutesConfig.updatePost, commandRes)
 		} catch (err: any) {

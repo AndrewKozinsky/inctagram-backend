@@ -40,12 +40,18 @@ export class PostQueryRepository {
 	}
 
 	async updatePostById(postId: number, userId: number, dto: UpdatePostDtoModel) {
-		const posts = await this.prisma.post.update({
-			where: { id: postId },
-			data: {},
-		})
+		const newPostData: Record<string, string> = {}
+		if (dto.text || dto.text == '') {
+			newPostData.text = dto.text
+		}
+		if (dto.location || dto.location == '') {
+			newPostData.location = dto.location
+		}
 
-		// return posts.map(this.mapDbPostToServicePost)
+		await this.prisma.post.update({
+			where: { id: postId },
+			data: newPostData,
+		})
 	}
 
 	mapDbPostToServicePost(dbPost: DBPostWithPhotos): PostOutModel {
