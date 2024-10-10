@@ -11,7 +11,7 @@ export class UserService {
 			maxAge: this.mainConfig.get().refreshToken.lifeDurationInMs,
 			httpOnly: false,
 			secure: false,
-			sameSite: 'none',
+			// sameSite: 'none',
 		})
 	}
 }
