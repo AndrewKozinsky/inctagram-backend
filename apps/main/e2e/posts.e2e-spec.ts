@@ -27,7 +27,7 @@ import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 import { createMainApp } from './utils/createMainApp'
 import { agent as request } from 'supertest'
 
-it('123', async () => {
+it.only('123', async () => {
 	expect(2).toBe(2)
 })
 
@@ -139,7 +139,7 @@ describe('Posts (e2e)', () => {
 			checkErrorResponse(addPostRes.body, 400, 'One of files is too large')
 		})
 
-		it.only('should return 200 if send correct data', async () => {
+		it('should return 200 if send correct data', async () => {
 			const [accessToken, refreshTokenStr, user] = await userUtils.createUserAndLogin(
 				mainApp,
 				userRepository,
