@@ -22,4 +22,7 @@ export enum ErrorMessage {
 	OneOfFilesIsTooLarge = 'One of files is too large',
 	CannotSaveFile = 'Cannot save file',
 	CannotSaveFiles = 'Cannot save files',
+	// POSTS
+	PostNotFound = 'Post not found',
+	PostNotBelongToUser = 'Post does not belong to the user',
 }

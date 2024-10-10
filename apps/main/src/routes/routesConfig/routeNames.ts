@@ -91,6 +91,10 @@ export const RouteNames = {
 				full: 'users/me/avatar',
 			},
 		},
+		POSTS: {
+			value: 'posts',
+			full: 'users/posts',
+		},
 	},
 	POSTS: {
 		value: 'posts',

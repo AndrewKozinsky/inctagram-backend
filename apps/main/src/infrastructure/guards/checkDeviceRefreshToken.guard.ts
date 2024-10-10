@@ -41,9 +41,6 @@ export class CheckDeviceRefreshTokenGuard implements CanActivate {
 				)
 			}
 
-			console.log(deviceRefreshToken!.expirationDate)
-			console.log(refreshTokenStrExpirationDate!.toISOString())
-
 			if (
 				deviceRefreshToken!.expirationDate !== refreshTokenStrExpirationDate!.toISOString()
 			) {

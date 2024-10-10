@@ -3,6 +3,7 @@ import { Post, PostPhoto, User } from '@prisma/client'
 import { PrismaService } from '../db/prisma.service'
 import { UserOutModel } from '../models/user/user.out.model'
 import { PostOutModel } from '../models/post/post.out.model'
+import { UpdatePostDtoModel } from '../models/post/post.input.model'
 
 type DBPostWithPhotos = Post & {
 	PostPhoto: PostPhoto[]
@@ -25,6 +26,26 @@ export class PostQueryRepository {
 		}
 
 		return this.mapDbPostToServicePost(post)
+	}
+
+	async getUserPosts(userId: number) {
+		const posts = await this.prisma.post.findMany({
+			where: { user_id: userId },
+			include: {
+				PostPhoto: true,
+			},
+		})
+
+		return posts.map(this.mapDbPostToServicePost)
+	}
+
+	async updatePostById(postId: number, userId: number, dto: UpdatePostDtoModel) {
+		const posts = await this.prisma.post.update({
+			where: { id: postId },
+			data: {},
+		})
+
+		// return posts.map(this.mapDbPostToServicePost)
 	}
 
 	mapDbPostToServicePost(dbPost: DBPostWithPhotos): PostOutModel {
