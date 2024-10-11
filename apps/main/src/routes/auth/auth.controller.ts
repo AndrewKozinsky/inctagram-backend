@@ -91,6 +91,8 @@ export class AuthController {
 		@Query() query: ProviderNameQueryModel,
 		@Query('code') providerCode: string,
 	) {
+		console.log({ req })
+		console.log(req.headers)
 		try {
 			const clientIP = this.browserService.getClientIP(req)
 			const clientName = this.browserService.getClientName(req)
