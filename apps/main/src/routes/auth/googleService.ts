@@ -59,7 +59,6 @@ export class GoogleService {
 			})
 				.then((res) => res.json())
 				.then((data) => {
-					console.log({ data })
 					resolve(data.access_token)
 					/*
 					* {

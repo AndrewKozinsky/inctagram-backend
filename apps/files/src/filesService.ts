@@ -90,8 +90,6 @@ export class FilesService {
 	async save(fileData: FileMS_SaveFileInContract) {
 		const { bucket } = this.mainConfig.get().s3
 
-		// console.log(this.s3Client)
-
 		return await this.s3Client.send(
 			// Класс PutObjectCommand создаёт экземпляр класса создающего файл.
 			new PutObjectCommand({

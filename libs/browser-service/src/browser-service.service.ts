@@ -23,15 +23,13 @@ export class BrowserServiceService {
 	// Returns client's device name
 	isReqFromLocalhost(req: Request): boolean {
 		try {
-			console.log('=============================')
-			console.log(req.rawHeaders)
-			console.log('=============================')
 			const header = req.rawHeaders.find((header) => header.includes('localhost'))
-			console.log(header)
+			console.log({ header })
 			return Boolean(header)!!
 		} catch (err: any) {
 			console.log(err)
 		}
+		console.log('HERE')
 		return true
 	}
 
