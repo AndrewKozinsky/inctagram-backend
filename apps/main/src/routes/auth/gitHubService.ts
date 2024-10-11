@@ -44,7 +44,6 @@ export class GitHubService {
 		const client_secret = isReqFromLocalhost
 			? this.mainConfig.get().oauth.githubLocalToLocal.clientSecret
 			: this.mainConfig.get().oauth.githubProdToProd.clientSecret
-		console.log({ client_secret })
 
 		const params = new URLSearchParams({
 			client_id,
