@@ -28,15 +28,15 @@ type UserInfo = {
 export class GoogleService {
 	constructor(private mainConfig: MainConfigService) {}
 
-	async getUserDataByOAuthCode(clientHostName: string, code: string) {
-		const accessToken = await this.getAccessToken(clientHostName, code)
+	async getUserDataByOAuthCode(isReqFromLocalhost: boolean, code: string) {
+		const accessToken = await this.getAccessToken(isReqFromLocalhost, code)
 		if (!accessToken) return null
 
 		return await this.getUserByAccessCode(accessToken)
 	}
 
-	async getAccessToken(clientHostName: string, code: string): Promise<string> {
-		const redirect_uri = clientHostName.startsWith('localhost')
+	async getAccessToken(isReqFromLocalhost: boolean, code: string): Promise<string> {
+		const redirect_uri = isReqFromLocalhost
 			? 'http://localhost:3000/google'
 			: 'https://sociable-people.com/google'
 

@@ -21,8 +21,9 @@ export class BrowserServiceService {
 	}
 
 	// Returns client's device name
-	getClientHostName(req: Request): string {
-		return req.host
+	isReqFromLocalhost(req: Request): boolean {
+		const header = req.rawHeaders.find((header) => header.includes('localhost'))
+		return Boolean(header)!!
 	}
 
 	getRefreshTokenStrFromReq(req: Request): string {

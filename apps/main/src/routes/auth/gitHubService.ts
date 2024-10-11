@@ -27,23 +27,21 @@ export class GitHubService {
 	constructor(private mainConfig: MainConfigService) {}
 
 	async getUserDataByOAuthCode(
-		clientHostName: string,
+		isReqFromLocalhost: boolean,
 		code: string,
 	): Promise<UserInfoFromProvider | null> {
-		const accessToken = await this.getAccessToken(clientHostName, code)
+		const accessToken = await this.getAccessToken(isReqFromLocalhost, code)
 		if (!accessToken) return null
 
 		return await this.getUserByAccessCode(accessToken)
 	}
 
-	async getAccessToken(clientHostName: string, code: string): Promise<string> {
-		console.log({ clientHostName })
-		const client_id = clientHostName.startsWith('localhost')
+	async getAccessToken(isReqFromLocalhost: boolean, code: string): Promise<string> {
+		const client_id = isReqFromLocalhost
 			? this.mainConfig.get().oauth.githubLocalToLocal.clientId
 			: this.mainConfig.get().oauth.githubProdToProd.clientId
-		console.log({ client_id })
 
-		const client_secret = clientHostName.startsWith('localhost')
+		const client_secret = isReqFromLocalhost
 			? this.mainConfig.get().oauth.githubLocalToLocal.clientSecret
 			: this.mainConfig.get().oauth.githubProdToProd.clientSecret
 		console.log({ client_secret })
