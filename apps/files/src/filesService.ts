@@ -16,16 +16,19 @@ export class FilesService {
 	constructor(private mainConfig: MainConfigService) {
 		const { region, endpoint, accessKeyId, secretAccessKey } = this.mainConfig.get().s3
 
-		this.s3Client = new S3Client([
-			{
-				region,
-				endpoint,
-				credentials: {
-					accessKeyId,
-					secretAccessKey,
-				},
+		this.s3Client = new S3Client({
+			// Указать регион где должны находиться серверы.
+			// Не нашёл что скрывается за этим названием.
+			region,
+			// Указать адрес сервиса Яндекса
+			endpoint,
+			credentials: {
+				// Указать ключ доступа к учётной записи
+				accessKeyId,
+				// Указать секретный ключ доступа к учётной записи
+				secretAccessKey,
 			},
-		])
+		})
 	}
 
 	async saveUserAvatar(saveUserAvatarInContract: FileMS_SaveUserAvatarInContract) {

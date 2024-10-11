@@ -30,6 +30,7 @@ export class GoogleService {
 
 	async getUserDataByOAuthCode(code: string) {
 		const accessToken = await this.getAccessToken(code)
+		console.log({ accessToken })
 		if (!accessToken) return null
 
 		return await this.getUserByAccessCode(accessToken)
@@ -40,6 +41,7 @@ export class GoogleService {
 			this.mainConfig.get().mode === 'TEST'
 				? 'http://localhost:3000/google'
 				: 'https://sociable-people.com/google'
+		console.log({ redirect_uri })
 
 		const params = new URLSearchParams({
 			client_id: this.mainConfig.get().oauth.google.clientId,
@@ -48,18 +50,20 @@ export class GoogleService {
 			grant_type: 'authorization_code',
 			redirect_uri,
 		}).toString()
+		console.log({ params })
 
-		const myHeaders = new Headers()
-		myHeaders.append('Accept', 'application/json')
-		myHeaders.append('Accept-Encoding', 'application/json')
+		const headers = new Headers()
+		headers.append('Accept', 'application/json')
+		headers.append('Accept-Encoding', 'application/json')
 
 		return await new Promise((resolve, reject) => {
 			fetch(`https://oauth2.googleapis.com/token?${params}`, {
 				method: 'POST',
-				headers: myHeaders,
+				headers,
 			})
 				.then((res) => res.json())
 				.then((data) => {
+					console.log({ data })
 					resolve(data.access_token)
 					/*
 					* {

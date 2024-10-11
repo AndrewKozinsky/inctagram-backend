@@ -40,26 +40,30 @@ export class GitHubService {
 			this.mainConfig.get().mode === 'TEST'
 				? this.mainConfig.get().oauth.githubLocalToLocal.clientId
 				: this.mainConfig.get().oauth.githubProdToProd.clientId
+		console.log({ client_id })
 
 		const client_secret =
 			this.mainConfig.get().mode === 'TEST'
 				? this.mainConfig.get().oauth.githubLocalToLocal.clientSecret
 				: this.mainConfig.get().oauth.githubProdToProd.clientSecret
+		console.log({ client_secret })
 
 		const params = new URLSearchParams({
 			client_id,
 			client_secret,
 			code,
 		}).toString()
+		console.log({ params })
 
-		const myHeaders = new Headers()
-		myHeaders.append('Accept', 'application/json')
-		myHeaders.append('Accept-Encoding', 'application/json')
+		const headers = new Headers()
+		headers.append('Accept', 'application/json')
+		headers.append('Accept-Encoding', 'application/json')
+		console.log({ myHeaders: headers })
 
 		return await new Promise((resolve, reject) => {
 			fetch(`https://github.com/login/oauth/access_token?${params}`, {
 				method: 'GET',
-				headers: myHeaders,
+				headers,
 			})
 				.then((res) => res.json())
 				.then((data) => {
