@@ -95,7 +95,6 @@ export class AuthController {
 			const clientIP = this.browserService.getClientIP(req)
 			const clientName = this.browserService.getClientName(req)
 			const isReqFromLocalhost = this.browserService.isReqFromLocalhost(req)
-			console.log({ isReqFromLocalhost })
 
 			const authData = await this.commandBus.execute<
 				any,

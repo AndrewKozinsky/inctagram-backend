@@ -94,6 +94,7 @@ export class UserController implements OnModuleInit {
 		@Req() req: Request,
 	): Promise<SWUserMeAddAvatarRouteOut | undefined> {
 		try {
+			console.log('setMyAvatar')
 			const commandRes = await this.commandBus.execute<
 				any,
 				ReturnType<typeof SetAvatarToMeHandler.prototype.execute>
