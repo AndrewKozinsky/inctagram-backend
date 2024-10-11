@@ -91,8 +91,12 @@ export class AuthController {
 		@Query() query: ProviderNameQueryModel,
 		@Query('code') providerCode: string,
 	) {
-		console.log({ req })
-		console.log(req.headers)
+		// console.log({ req })
+		// console.log(req.headers)
+		console.log(req.rawHeaders) // origin -> http://localhost:3000
+		console.log(typeof req.rawHeaders) // origin -> http://localhost:3000
+
+		// req.rawHeaders.find(header => header)
 		try {
 			const clientIP = this.browserService.getClientIP(req)
 			const clientName = this.browserService.getClientName(req)
