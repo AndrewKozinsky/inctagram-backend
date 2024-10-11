@@ -20,6 +20,11 @@ export class BrowserServiceService {
 		return browserInfo.browser + ' ' + browserInfo.version
 	}
 
+	// Returns client's device name
+	getClientHostName(req: Request): string {
+		return req.host
+	}
+
 	getRefreshTokenStrFromReq(req: Request): string {
 		if (!req.cookies) return ''
 

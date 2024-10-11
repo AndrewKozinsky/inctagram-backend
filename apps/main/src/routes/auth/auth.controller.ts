@@ -94,6 +94,7 @@ export class AuthController {
 		try {
 			const clientIP = this.browserService.getClientIP(req)
 			const clientName = this.browserService.getClientName(req)
+			const clientHostName = this.browserService.getClientHostName(req)
 
 			const authData = await this.commandBus.execute<
 				any,
@@ -102,6 +103,7 @@ export class AuthController {
 				new RegByProviderAndLoginCommand({
 					clientIP,
 					clientName,
+					clientHostName,
 					providerCode,
 					providerName: query.provider,
 				}),

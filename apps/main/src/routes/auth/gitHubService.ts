@@ -26,27 +26,24 @@ export type UserInfoFromProvider = {
 export class GitHubService {
 	constructor(private mainConfig: MainConfigService) {}
 
-	async getUserDataByOAuthCode(code: string): Promise<UserInfoFromProvider | null> {
-		const accessToken = await this.getAccessToken(code)
-		console.log({ accessToken })
+	async getUserDataByOAuthCode(
+		clientHostName: string,
+		code: string,
+	): Promise<UserInfoFromProvider | null> {
+		const accessToken = await this.getAccessToken(clientHostName, code)
 		if (!accessToken) return null
 
 		return await this.getUserByAccessCode(accessToken)
 	}
 
-	async getAccessToken(code: string): Promise<string> {
-		console.log({ code })
-		/*const client_id =
-			this.mainConfig.get().mode === 'TEST'
-				? this.mainConfig.get().oauth.githubLocalToLocal.clientId
-				: this.mainConfig.get().oauth.githubProdToProd.clientId*/
-		const client_id = this.mainConfig.get().oauth.githubLocalToLocal.clientId
+	async getAccessToken(clientHostName: string, code: string): Promise<string> {
+		const client_id = clientHostName.startsWith('localhost')
+			? this.mainConfig.get().oauth.githubLocalToLocal.clientId
+			: this.mainConfig.get().oauth.githubProdToProd.clientId
 
-		/*const client_secret =
-			this.mainConfig.get().mode === 'TEST'
-				? this.mainConfig.get().oauth.githubLocalToLocal.clientSecret
-				: this.mainConfig.get().oauth.githubProdToProd.clientSecret*/
-		const client_secret = this.mainConfig.get().oauth.githubLocalToLocal.clientSecret
+		const client_secret = clientHostName.startsWith('localhost')
+			? this.mainConfig.get().oauth.githubLocalToLocal.clientSecret
+			: this.mainConfig.get().oauth.githubProdToProd.clientSecret
 
 		const params = new URLSearchParams({
 			client_id,
@@ -65,7 +62,6 @@ export class GitHubService {
 			})
 				.then((res) => res.json())
 				.then((data) => {
-					console.log({ data })
 					resolve(data.access_token)
 				})
 		})

@@ -28,20 +28,17 @@ type UserInfo = {
 export class GoogleService {
 	constructor(private mainConfig: MainConfigService) {}
 
-	async getUserDataByOAuthCode(code: string) {
-		const accessToken = await this.getAccessToken(code)
-		console.log({ accessToken })
+	async getUserDataByOAuthCode(clientHostName: string, code: string) {
+		const accessToken = await this.getAccessToken(clientHostName, code)
 		if (!accessToken) return null
 
 		return await this.getUserByAccessCode(accessToken)
 	}
 
-	async getAccessToken(code: string): Promise<string> {
-		const redirect_uri =
-			this.mainConfig.get().mode === 'TEST'
-				? 'http://localhost:3000/google'
-				: 'https://sociable-people.com/google'
-		console.log({ redirect_uri })
+	async getAccessToken(clientHostName: string, code: string): Promise<string> {
+		const redirect_uri = clientHostName.startsWith('localhost')
+			? 'http://localhost:3000/google'
+			: 'https://sociable-people.com/google'
 
 		const params = new URLSearchParams({
 			client_id: this.mainConfig.get().oauth.google.clientId,
@@ -50,7 +47,6 @@ export class GoogleService {
 			grant_type: 'authorization_code',
 			redirect_uri,
 		}).toString()
-		console.log({ params })
 
 		const headers = new Headers()
 		headers.append('Accept', 'application/json')
