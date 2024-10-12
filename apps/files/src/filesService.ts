@@ -46,7 +46,7 @@ export class FilesService {
 		}
 
 		try {
-			await this.save(setUserAvatarContract)
+			await this.saveFile(setUserAvatarContract)
 			return avatarUrl
 		} catch (error: any) {
 			throw new Error(ErrorMessage.CannotSaveFile)
@@ -58,7 +58,7 @@ export class FilesService {
 
 		const imagesUrls: string[] = []
 
-		// Create avatar image dataset
+		// Create images
 		for (const imageFile of photoFiles) {
 			const fileExtension = this.getFileExtension(imageFile)
 			const imageUrl = `users/${userId}/posts/${createUniqString()}.${fileExtension}`
@@ -71,7 +71,7 @@ export class FilesService {
 			}
 
 			try {
-				await this.save(setUserAvatarContract)
+				await this.saveFile(setUserAvatarContract)
 				imagesUrls.push(imageUrl)
 			} catch (error: any) {
 				throw new Error(ErrorMessage.CannotSaveFile)
@@ -85,7 +85,7 @@ export class FilesService {
 		return file.originalname.split('.')[file.originalname.split('.').length - 1]
 	}
 
-	async save(fileData: FileMS_SaveFileInContract) {
+	async saveFile(fileData: FileMS_SaveFileInContract) {
 		const { bucket } = this.mainConfig.get().s3
 
 		return await this.s3Client.send(
@@ -102,7 +102,7 @@ export class FilesService {
 		)
 	}
 
-	async delete(filePath: string) {
+	async deleteFile(filePath: string) {
 		const { bucket } = this.mainConfig.get().s3
 
 		return await this.s3Client.send(

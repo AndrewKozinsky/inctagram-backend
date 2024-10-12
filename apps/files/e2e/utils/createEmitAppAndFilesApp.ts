@@ -1,4 +1,4 @@
-import { ClientProxy, ClientProxyFactory, Transport } from '@nestjs/microservices'
+import { ClientProxyFactory, Transport } from '@nestjs/microservices'
 import { Test, TestingModule } from '@nestjs/testing'
 import { FilesModule } from '../../src/filesModule'
 import { S3Client } from '@aws-sdk/client-s3'
@@ -24,7 +24,7 @@ export async function createFilesApp(s3Client: S3Client) {
 	})
 		.overrideProvider(S3Client)
 		.useValue({
-			send: jest.fn().mockResolvedValue('Mocked'),
+			send: jest.fn().mockResolvedValue('Mocked S3Client send() method'),
 		})
 		.compile()
 

@@ -6,7 +6,7 @@ import { PrismaService } from '../db/prisma.service'
 import { CreateUserDtoModel } from '../models/user/user.input.model'
 import { UserServiceModel } from '../models/user/user.service.model'
 import { JwtAdapterService } from '@app/jwt-adapter'
-import { CreatePostDtoModel } from '../models/post/post.input.model'
+import { CreatePostDtoModel, UpdatePostDtoModel } from '../models/post/post.input.model'
 import { PostServiceModel } from '../models/post/post.service.model'
 
 type DBPostWithPhotos = Post & {
@@ -47,18 +47,26 @@ export class PostRepository {
 		return this.mapDbPostToServicePost(post)
 	}
 
-	/*async updateUser(userId: number, data: Partial<User>) {
-		await this.prisma.user.update({
-			where: { id: userId },
-			data,
-		})
-	}*/
+	async updatePost(postId: number, dto: UpdatePostDtoModel) {
+		const newPostData: Record<string, string> = {}
+		if (dto.text || dto.text == '') {
+			newPostData.text = dto.text
+		}
+		if (dto.location || dto.location == '') {
+			newPostData.location = dto.location
+		}
 
-	/*async deleteUser(userId: number) {
-		await this.prisma.user.delete({
-			where: { id: userId },
+		await this.prisma.post.update({
+			where: { id: postId },
+			data: newPostData,
 		})
-	}*/
+	}
+
+	async deletePost(postId: number) {
+		await this.prisma.post.delete({
+			where: { id: postId },
+		})
+	}
 
 	mapDbPostToServicePost(dbPost: DBPostWithPhotos): PostServiceModel {
 		return {

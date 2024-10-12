@@ -163,12 +163,12 @@ describe('Posts (e2e)', () => {
 				.set('Content-Type', 'multipart/form-data')
 				.attach('avatarFile', avatarFilePath)
 				.attach('avatarFile', avatarFilePath)
-				.send({
+				/*.send({
 					text: 'Post description',
 					location: 'Photo location',
-				})
-			// .field('text', 'Post description')
-			// .field('location', 'Photo location')
+				})*/
+				.field('text', 'Post description')
+				.field('location', 'Photo location')
 			// .expect(HTTP_STATUSES.OK_200)
 			console.log(addPostRes.body)
 

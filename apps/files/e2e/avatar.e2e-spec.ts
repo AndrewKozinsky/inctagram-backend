@@ -50,13 +50,7 @@ describe('Auth (e2e)', () => {
 		}
 
 		const response = await emitApp.send(eventName, payload).toPromise()
-
 		expect(s3Client.send).toBeCalledTimes(1)
-
-		// console.log(response)
-
-		// Assert the response
-		// expect(response).toEqual({ id: 123, data: 'Sample Data' })
 	})
 })
 

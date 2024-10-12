@@ -13,6 +13,22 @@ type DBPostWithPhotos = Post & {
 export class PostQueryRepository {
 	constructor(private prisma: PrismaService) {}
 
+	async getRecentPosts() {
+		/*const post = await this.prisma.post.findUnique({
+			where: { id },
+			include: {
+				PostPhoto: true,
+			},
+		})
+
+		if (!post) {
+			return null
+		}
+
+		return this.mapDbPostToServicePost(post)*/
+		return []
+	}
+
 	async getPostById(id: number) {
 		const post = await this.prisma.post.findUnique({
 			where: { id },
@@ -37,21 +53,6 @@ export class PostQueryRepository {
 		})
 
 		return posts.map(this.mapDbPostToServicePost)
-	}
-
-	async updatePostById(postId: number, userId: number, dto: UpdatePostDtoModel) {
-		const newPostData: Record<string, string> = {}
-		if (dto.text || dto.text == '') {
-			newPostData.text = dto.text
-		}
-		if (dto.location || dto.location == '') {
-			newPostData.location = dto.location
-		}
-
-		await this.prisma.post.update({
-			where: { id: postId },
-			data: newPostData,
-		})
 	}
 
 	mapDbPostToServicePost(dbPost: DBPostWithPhotos): PostOutModel {

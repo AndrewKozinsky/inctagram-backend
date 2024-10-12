@@ -42,6 +42,7 @@ import {
 	SWUserMeAddAvatarRouteOut,
 	SWUserMeGetAvatarRouteOut,
 	SWGetUserPostsRouteOut,
+	SWGetAllUsersRouteOut,
 } from './swaggerTypes'
 import {
 	EditMyProfileCommand,
@@ -50,6 +51,7 @@ import {
 import { GetMyProfileCommand, GetMyProfileHandler } from '../../features/user/GetMyProfile.command'
 import { postsRoutesConfig } from '../post/postsRoutesConfig'
 import { GetUserPostsHandler } from '../../features/posts/GetUserPosts.command'
+import { GetUsersCommand, GetUsersHandler } from '../../features/user/GetUsers.command'
 
 @ApiTags('User')
 @Controller(RouteNames.USERS.value)
@@ -61,6 +63,77 @@ export class UserController implements OnModuleInit {
 
 	async onModuleInit() {
 		await this.filesMicroClient.connect()
+	}
+
+	@Get()
+	@RouteDecorators(usersRoutesConfig.getUsers)
+	async getUsers(): Promise<undefined | SWGetAllUsersRouteOut> {
+		try {
+			const res = await this.commandBus.execute<
+				any,
+				ReturnType<typeof GetUsersHandler.prototype.execute>
+			>(new GetUsersCommand())
+
+			return createSuccessResp(usersRoutesConfig.getUsers, res)
+		} catch (err: any) {
+			createFailResp(usersRoutesConfig.getUsers, err)
+		}
+	}
+
+	@ApiBearerAuth('access-token')
+	@ApiBearerAuth('refresh-token')
+	@UseGuards(CheckAccessTokenGuard)
+	@UseGuards(CheckDeviceRefreshTokenGuard)
+	@Patch(RouteNames.USERS.ME.value)
+	@RouteDecorators(usersRoutesConfig.me.editProfile)
+	async editMyProfile(
+		@Req() req: Request,
+		@Body() body: EditMyProfileDtoModel,
+	): Promise<SWUserProfileRouteOut | undefined> {
+		try {
+			const res = await this.commandBus.execute<
+				any,
+				ReturnType<typeof EditMyProfileHandler.prototype.execute>
+			>(new EditMyProfileCommand(req.user.id, body))
+
+			return createSuccessResp(usersRoutesConfig.me.editProfile, res)
+		} catch (err: any) {
+			createFailResp(usersRoutesConfig.me.deleteAvatar, err)
+		}
+	}
+
+	@ApiBearerAuth('access-token')
+	@ApiBearerAuth('refresh-token')
+	@UseGuards(CheckAccessTokenGuard)
+	@UseGuards(CheckDeviceRefreshTokenGuard)
+	@Get(RouteNames.USERS.ME.value)
+	@RouteDecorators(usersRoutesConfig.me.getProfile)
+	async getMyProfile(@Req() req: Request): Promise<SWUserProfileRouteOut | undefined> {
+		try {
+			const res = await this.commandBus.execute<
+				any,
+				ReturnType<typeof GetMyProfileHandler.prototype.execute>
+			>(new GetMyProfileCommand(req.user.id))
+
+			return createSuccessResp(usersRoutesConfig.me.getProfile, res)
+		} catch (err: any) {
+			createFailResp(usersRoutesConfig.me.getProfile, err)
+		}
+	}
+
+	@Get(':userId/' + RouteNames.USERS.USER_ID(1).POSTS.value)
+	@RouteDecorators(usersRoutesConfig.posts.getUserPosts)
+	async getUserPosts(@Req() req: Request): Promise<SWGetUserPostsRouteOut | null | undefined> {
+		try {
+			const commandRes = await this.commandBus.execute<
+				any,
+				ReturnType<typeof GetUserPostsHandler.prototype.execute>
+			>(new GetUserPostsHandler(req.user.id))
+
+			return createSuccessResp(postsRoutesConfig.getPost, commandRes)
+		} catch (err: any) {
+			createFailResp(postsRoutesConfig.getPost, err)
+		}
 	}
 
 	@ApiConsumes('multipart/form-data')
@@ -137,62 +210,6 @@ export class UserController implements OnModuleInit {
 			return createSuccessResp(usersRoutesConfig.me.deleteAvatar, null)
 		} catch (err: any) {
 			createFailResp(usersRoutesConfig.me.deleteAvatar, err)
-		}
-	}
-
-	@ApiBearerAuth('access-token')
-	@ApiBearerAuth('refresh-token')
-	@UseGuards(CheckAccessTokenGuard)
-	@UseGuards(CheckDeviceRefreshTokenGuard)
-	@Patch(RouteNames.USERS.ME.value)
-	@RouteDecorators(usersRoutesConfig.me.editProfile)
-	async editMyProfile(
-		@Req() req: Request,
-		@Body() body: EditMyProfileDtoModel,
-	): Promise<SWUserProfileRouteOut | undefined> {
-		try {
-			const res = await this.commandBus.execute<
-				any,
-				ReturnType<typeof EditMyProfileHandler.prototype.execute>
-			>(new EditMyProfileCommand(req.user.id, body))
-
-			return createSuccessResp(usersRoutesConfig.me.editProfile, res)
-		} catch (err: any) {
-			createFailResp(usersRoutesConfig.me.deleteAvatar, err)
-		}
-	}
-
-	@ApiBearerAuth('access-token')
-	@ApiBearerAuth('refresh-token')
-	@UseGuards(CheckAccessTokenGuard)
-	@UseGuards(CheckDeviceRefreshTokenGuard)
-	@Get(RouteNames.USERS.ME.value)
-	@RouteDecorators(usersRoutesConfig.me.getProfile)
-	async getMyProfile(@Req() req: Request): Promise<SWUserProfileRouteOut | undefined> {
-		try {
-			const res = await this.commandBus.execute<
-				any,
-				ReturnType<typeof GetMyProfileHandler.prototype.execute>
-			>(new GetMyProfileCommand(req.user.id))
-
-			return createSuccessResp(usersRoutesConfig.me.getProfile, res)
-		} catch (err: any) {
-			createFailResp(usersRoutesConfig.me.getProfile, err)
-		}
-	}
-
-	@Get(RouteNames.USERS.POSTS.value)
-	@RouteDecorators(usersRoutesConfig.posts.getUserPosts)
-	async getUserPosts(@Req() req: Request): Promise<SWGetUserPostsRouteOut | null | undefined> {
-		try {
-			const commandRes = await this.commandBus.execute<
-				any,
-				ReturnType<typeof GetUserPostsHandler.prototype.execute>
-			>(new GetUserPostsHandler(req.user.id))
-
-			return createSuccessResp(postsRoutesConfig.getPost, commandRes)
-		} catch (err: any) {
-			createFailResp(postsRoutesConfig.getPost, err)
 		}
 	}
 }

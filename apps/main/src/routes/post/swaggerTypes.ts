@@ -37,7 +37,7 @@ export class SWAddPostRouteOut {
 						url: {
 							type: 'number',
 							default:
-								'https://storage.yandexcloud.net/sociable-people/users/100/avatar.png',
+								'https://storage.yandexcloud.net/sociable-people/users/100/posts/photo.png',
 						},
 					},
 				},
@@ -94,7 +94,7 @@ export class SWGetPostRouteOut {
 						url: {
 							type: 'number',
 							default:
-								'https://storage.yandexcloud.net/sociable-people/users/100/avatar.png',
+								'https://storage.yandexcloud.net/sociable-people/users/100/posts/photo.png',
 						},
 					},
 				},
@@ -150,7 +150,7 @@ export class SWUpdatePostRouteOut {
 						url: {
 							type: 'number',
 							default:
-								'https://storage.yandexcloud.net/sociable-people/users/100/avatar.png',
+								'https://storage.yandexcloud.net/sociable-people/users/100/posts/photo.png',
 						},
 					},
 				},
@@ -167,4 +167,60 @@ export class SWUpdatePostRouteOut {
 			url: string
 		}[]
 	}
+}
+
+export class SWGetRecentPostRouteOut {
+	@ApiProperty({ default: 'success' })
+	status: string
+
+	@ApiProperty()
+	code: number
+
+	/*@ApiProperty({
+		type: 'object',
+		properties: {
+			id: {
+				type: 'number',
+				default: 1,
+			},
+			text: {
+				type: 'string',
+				default: 'Images of clouded roses and angry green eyes flow through my dreams.',
+				nullable: true,
+			},
+			location: {
+				type: 'string',
+				default: 'Rostov-on-Don, 47.265223, 39.595245',
+				nullable: true,
+			},
+			userId: {
+				type: 'number',
+				default: 1,
+			},
+			photos: {
+				type: 'array',
+				items: {
+					type: 'object',
+					properties: {
+						id: { type: 'number' },
+						url: {
+							type: 'number',
+							default:
+								'https://storage.yandexcloud.net/sociable-people/users/100/posts/photo.png',
+						},
+					},
+				},
+			},
+		},
+	})
+	data: {
+		id: number
+		text: null | string
+		location: null | string
+		userId: number
+		photos: {
+			id: number
+			url: string
+		}[]
+	}*/
 }

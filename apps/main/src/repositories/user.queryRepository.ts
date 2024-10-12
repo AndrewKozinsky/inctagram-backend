@@ -7,6 +7,14 @@ import { UserOutModel } from '../models/user/user.out.model'
 export class UserQueryRepository {
 	constructor(private prisma: PrismaService) {}
 
+	async getUsers() {
+		const totalUsersCount = await this.prisma.user.count()
+
+		return {
+			totalCount: totalUsersCount,
+		}
+	}
+
 	async getUserById(id: number) {
 		const user = await this.prisma.user.findUnique({
 			where: { id },

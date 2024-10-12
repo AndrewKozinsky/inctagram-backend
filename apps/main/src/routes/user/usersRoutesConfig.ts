@@ -6,11 +6,20 @@ import {
 	SWUserMeGetAvatarRouteOut,
 	SWUserMeAddAvatarRouteOut,
 	SWGetUserPostsRouteOut,
+	SWGetAllUsersRouteOut,
 } from './swaggerTypes'
 import { ErrorMessage } from '@app/shared'
-import { SWGetPostRouteOut } from '../post/swaggerTypes'
 
 export const usersRoutesConfig = {
+	getUsers: {
+		response: [
+			{
+				code: SuccessCode.Ok,
+				description: 'Get all user',
+				dataClass: SWGetAllUsersRouteOut,
+			},
+		],
+	},
 	me: {
 		setAvatar: {
 			response: [
