@@ -20,6 +20,12 @@ export class BrowserServiceService {
 		return browserInfo.browser + ' ' + browserInfo.version
 	}
 
+	// Returns client's device name
+	isReqFromLocalhost(req: Request): boolean {
+		const header = req.rawHeaders.find((header) => header.includes('localhost'))
+		return Boolean(header)!!
+	}
+
 	getRefreshTokenStrFromReq(req: Request): string {
 		if (!req.cookies) return ''
 

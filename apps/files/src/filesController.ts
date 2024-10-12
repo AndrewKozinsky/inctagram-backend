@@ -2,6 +2,7 @@ import { Controller } from '@nestjs/common'
 import { MessagePattern } from '@nestjs/microservices'
 import { FilesService } from './filesService'
 import { FileMS_EventNames, FileMS_SaveUserAvatarInContract } from '@app/shared'
+import { FileMS_SavePostImagesInContract } from '@app/shared/contracts/fileMS.contracts'
 
 @Controller()
 export class FilesController {
@@ -10,5 +11,12 @@ export class FilesController {
 	@MessagePattern(FileMS_EventNames.SaveUserAvatar)
 	async saveUserAvatar(saveUserAvatarInContract: FileMS_SaveUserAvatarInContract) {
 		return await this.filesService.saveUserAvatar(saveUserAvatarInContract)
+	}
+
+	@MessagePattern(FileMS_EventNames.SavePostImages)
+	async savePostImages(savePostImagesInContract: FileMS_SavePostImagesInContract) {
+		console.log({ savePostImagesInContract })
+		console.log('======================')
+		return await this.filesService.savePostImages(savePostImagesInContract)
 	}
 }

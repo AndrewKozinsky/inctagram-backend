@@ -22,7 +22,7 @@ import { GoogleService } from '../src/routes/auth/googleService'
 import { DevicesRepository } from '../src/repositories/devices.repository'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 import { createMainApp } from './utils/createMainApp'
-import { parseCookieStringToObj } from '../src/utils/stringUtils'
+import { parseCookieStringToObj } from '@app/shared'
 
 it.only('123', async () => {
 	expect(2).toBe(2)

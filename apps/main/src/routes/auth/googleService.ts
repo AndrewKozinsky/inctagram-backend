@@ -28,18 +28,17 @@ type UserInfo = {
 export class GoogleService {
 	constructor(private mainConfig: MainConfigService) {}
 
-	async getUserDataByOAuthCode(code: string) {
-		const accessToken = await this.getAccessToken(code)
+	async getUserDataByOAuthCode(isReqFromLocalhost: boolean, code: string) {
+		const accessToken = await this.getAccessToken(isReqFromLocalhost, code)
 		if (!accessToken) return null
 
 		return await this.getUserByAccessCode(accessToken)
 	}
 
-	async getAccessToken(code: string): Promise<string> {
-		const redirect_uri =
-			this.mainConfig.get().mode === 'TEST'
-				? 'http://localhost:3000/google'
-				: 'https://sociable-people.com/google'
+	async getAccessToken(isReqFromLocalhost: boolean, code: string): Promise<string> {
+		const redirect_uri = isReqFromLocalhost
+			? 'http://localhost:3000/google'
+			: 'https://sociable-people.com/google'
 
 		const params = new URLSearchParams({
 			client_id: this.mainConfig.get().oauth.google.clientId,
@@ -49,14 +48,14 @@ export class GoogleService {
 			redirect_uri,
 		}).toString()
 
-		const myHeaders = new Headers()
-		myHeaders.append('Accept', 'application/json')
-		myHeaders.append('Accept-Encoding', 'application/json')
+		const headers = new Headers()
+		headers.append('Accept', 'application/json')
+		headers.append('Accept-Encoding', 'application/json')
 
 		return await new Promise((resolve, reject) => {
 			fetch(`https://oauth2.googleapis.com/token?${params}`, {
 				method: 'POST',
-				headers: myHeaders,
+				headers,
 			})
 				.then((res) => res.json())
 				.then((data) => {

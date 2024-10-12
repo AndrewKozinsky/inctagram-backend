@@ -6,6 +6,8 @@ import {
 	FileMS_SaveFileInContract,
 	FileMS_SaveUserAvatarInContract,
 } from '@app/shared'
+import { FileMS_SavePostImagesInContract } from '@app/shared/contracts/fileMS.contracts'
+import { createUniqString } from '@app/shared'
 
 @Injectable()
 export class FilesService {
@@ -14,25 +16,29 @@ export class FilesService {
 	constructor(private mainConfig: MainConfigService) {
 		const { region, endpoint, accessKeyId, secretAccessKey } = this.mainConfig.get().s3
 
-		this.s3Client = new S3Client([
-			{
-				region: 'ru-central1', // 'ru-central1-a'
-				endpoint,
-				credentials: {
-					accessKeyId,
-					secretAccessKey,
-				},
+		this.s3Client = new S3Client({
+			// Указать регион где должны находиться серверы.
+			// Не нашёл что скрывается за этим названием.
+			region,
+			// Указать адрес сервиса Яндекса
+			endpoint,
+			credentials: {
+				// Указать ключ доступа к учётной записи
+				accessKeyId,
+				// Указать секретный ключ доступа к учётной записи
+				secretAccessKey,
 			},
-		])
+		})
 	}
 
 	async saveUserAvatar(saveUserAvatarInContract: FileMS_SaveUserAvatarInContract) {
 		const { userId, avatarFile } = saveUserAvatarInContract
+		console.log({ avatarFile })
 
 		// Create avatar image dataset
-		const fileExtension =
-			avatarFile.originalname.split('.')[avatarFile.originalname.split('.').length - 1]
+		const fileExtension = this.getFileExtension(avatarFile)
 		const avatarUrl = 'users/' + userId + '/avatar.' + fileExtension
+		console.log({ fileExtension })
 
 		const setUserAvatarContract: FileMS_SaveFileInContract = {
 			mimetype: avatarFile.mimetype,
@@ -40,6 +46,7 @@ export class FilesService {
 			fileBuffer: avatarFile.buffer,
 			fileSize: avatarFile.size,
 		}
+		console.log({ setUserAvatarContract })
 
 		try {
 			await this.save(setUserAvatarContract)
@@ -48,6 +55,39 @@ export class FilesService {
 			console.log({ error })
 			throw new Error(ErrorMessage.CannotSaveFile)
 		}
+	}
+
+	async savePostImages(savePostImagesInContract: FileMS_SavePostImagesInContract) {
+		const { userId, photoFiles } = savePostImagesInContract
+
+		const imagesUrls: string[] = []
+
+		// Create avatar image dataset
+		for (const imageFile of photoFiles) {
+			const fileExtension = this.getFileExtension(imageFile)
+			const imageUrl = `users/${userId}/posts/${createUniqString()}.${fileExtension}`
+
+			const setUserAvatarContract: FileMS_SaveFileInContract = {
+				mimetype: imageFile.mimetype,
+				filePath: imageUrl,
+				fileBuffer: imageFile.buffer,
+				fileSize: imageFile.size,
+			}
+
+			try {
+				await this.save(setUserAvatarContract)
+				imagesUrls.push(imageUrl)
+			} catch (error: any) {
+				console.log({ error })
+				throw new Error(ErrorMessage.CannotSaveFile)
+			}
+		}
+
+		return imagesUrls
+	}
+
+	getFileExtension(file: Express.Multer.File) {
+		return file.originalname.split('.')[file.originalname.split('.').length - 1]
 	}
 
 	async save(fileData: FileMS_SaveFileInContract) {

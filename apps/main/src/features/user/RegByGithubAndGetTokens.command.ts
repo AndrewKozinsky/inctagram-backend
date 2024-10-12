@@ -13,6 +13,7 @@ export class RegByProviderAndLoginCommand {
 		public args: {
 			clientIP: string
 			clientName: string
+			isReqFromLocalhost: boolean
 			providerCode: string
 			providerName: OAuthProviderName
 		},
@@ -30,15 +31,21 @@ export class RegByProviderAndLoginHandler implements ICommandHandler<RegByProvid
 	) {}
 
 	async execute(command: RegByProviderAndLoginCommand) {
-		const { providerCode, providerName, clientIP, clientName } = command.args
+		const { providerCode, providerName, isReqFromLocalhost, clientIP, clientName } =
+			command.args
 
 		let userInfo
 		if (providerName === 'github') {
-			userInfo = await this.gitHubService.getUserDataByOAuthCode(providerCode)
+			userInfo = await this.gitHubService.getUserDataByOAuthCode(
+				isReqFromLocalhost,
+				providerCode,
+			)
 		} else if (providerName === 'google') {
-			userInfo = await this.googleService.getUserDataByOAuthCode(providerCode)
+			userInfo = await this.googleService.getUserDataByOAuthCode(
+				isReqFromLocalhost,
+				providerCode,
+			)
 		}
-		console.log({ userInfo })
 
 		if (!userInfo) {
 			throw new Error(ErrorMessage.UserNotFound)

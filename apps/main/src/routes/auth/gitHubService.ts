@@ -26,26 +26,24 @@ export type UserInfoFromProvider = {
 export class GitHubService {
 	constructor(private mainConfig: MainConfigService) {}
 
-	async getUserDataByOAuthCode(code: string): Promise<UserInfoFromProvider | null> {
-		const accessToken = await this.getAccessToken(code)
-		console.log({ accessToken })
+	async getUserDataByOAuthCode(
+		isReqFromLocalhost: boolean,
+		code: string,
+	): Promise<UserInfoFromProvider | null> {
+		const accessToken = await this.getAccessToken(isReqFromLocalhost, code)
 		if (!accessToken) return null
 
 		return await this.getUserByAccessCode(accessToken)
 	}
 
-	async getAccessToken(code: string): Promise<string> {
-		const client_id =
-			this.mainConfig.get().mode === 'TEST'
-				? this.mainConfig.get().oauth.githubLocalToLocal.clientId
-				: this.mainConfig.get().oauth.githubProdToProd.clientId
-		console.log({ client_id })
+	async getAccessToken(isReqFromLocalhost: boolean, code: string): Promise<string> {
+		const client_id = isReqFromLocalhost
+			? this.mainConfig.get().oauth.githubLocalToLocal.clientId
+			: this.mainConfig.get().oauth.githubProdToProd.clientId
 
-		const client_secret =
-			this.mainConfig.get().mode === 'TEST'
-				? this.mainConfig.get().oauth.githubLocalToLocal.clientSecret
-				: this.mainConfig.get().oauth.githubProdToProd.clientSecret
-		console.log({ client_secret })
+		const client_secret = isReqFromLocalhost
+			? this.mainConfig.get().oauth.githubLocalToLocal.clientSecret
+			: this.mainConfig.get().oauth.githubProdToProd.clientSecret
 
 		const params = new URLSearchParams({
 			client_id,
@@ -53,18 +51,17 @@ export class GitHubService {
 			code,
 		}).toString()
 
-		const myHeaders = new Headers()
-		myHeaders.append('Accept', 'application/json')
-		myHeaders.append('Accept-Encoding', 'application/json')
+		const headers = new Headers()
+		headers.append('Accept', 'application/json')
+		headers.append('Accept-Encoding', 'application/json')
 
 		return await new Promise((resolve, reject) => {
 			fetch(`https://github.com/login/oauth/access_token?${params}`, {
 				method: 'GET',
-				headers: myHeaders,
+				headers,
 			})
 				.then((res) => res.json())
 				.then((data) => {
-					console.log({ data })
 					resolve(data.access_token)
 				})
 		})
