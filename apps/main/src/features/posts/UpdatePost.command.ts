@@ -14,7 +14,6 @@ export class UpdatePostCommand {
 		public postId: number,
 		public userId: number,
 		public dto: UpdatePostDtoModel,
-		public photoFiles: Express.Multer.File[],
 	) {}
 }
 
@@ -26,7 +25,7 @@ export class UpdatePostHandler implements ICommandHandler<UpdatePostCommand> {
 	) {}
 
 	async execute(command: UpdatePostCommand) {
-		const { postId, userId, dto, photoFiles } = command
+		const { postId, userId, dto } = command
 
 		const postWithId = await this.postRepository.getPostById(postId)
 
@@ -37,7 +36,7 @@ export class UpdatePostHandler implements ICommandHandler<UpdatePostCommand> {
 			throw new Error(ErrorMessage.PostNotBelongToUser)
 		}
 
-		await this.postQueryRepository.updatePostById(postId, userId, dto)
+		await this.postRepository.updatePost(postId, dto)
 
 		const updatedPost = await this.postQueryRepository.getPostById(postId)
 		return updatedPost!

@@ -11,10 +11,6 @@ import { CreatePostDtoModel } from '../models/post/post.input.model'
 import { PostServiceModel } from '../models/post/post.service.model'
 import { PostPhotoServiceModel } from '../models/postPhoto/post.service.model'
 
-type DBPostWithPhotos = Post & {
-	PostPhoto: PostPhoto[]
-}
-
 @Injectable()
 export class PostPhotoRepository {
 	constructor(private prisma: PrismaService) {}
@@ -28,6 +24,14 @@ export class PostPhotoRepository {
 		})
 
 		return this.mapDbPostToServicePost(postPhoto)
+	}
+
+	async deletePostPhotos(postId: number) {
+		await this.prisma.postPhoto.deleteMany({
+			where: {
+				post_id: postId,
+			},
+		})
 	}
 
 	mapDbPostToServicePost(dbPostPhoto: PostPhoto): PostPhotoServiceModel {

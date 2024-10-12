@@ -28,6 +28,10 @@ export class EditMyProfileHandler implements ICommandHandler<EditMyProfileComman
 			throw new Error(ErrorMessage.UserNameIsExists)
 		}
 
+		if (bodyDto.dateOfBirth && new Date(bodyDto.dateOfBirth) > new Date()) {
+			throw new Error(ErrorMessage.DateIsWrong)
+		}
+
 		// Create an object to change user data in DB table
 		type UpdateUserSecondArgType = Parameters<typeof this.userRepository.updateUser>[1]
 		const updateUserObj: UpdateUserSecondArgType = {

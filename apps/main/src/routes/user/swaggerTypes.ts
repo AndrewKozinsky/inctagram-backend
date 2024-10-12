@@ -1,5 +1,26 @@
 import { ApiProperty } from '@nestjs/swagger'
 
+export class SWGetAllUsersRouteOut {
+	@ApiProperty({ default: 'success' })
+	status: string
+
+	@ApiProperty({ default: 200 })
+	code: number
+
+	@ApiProperty({
+		type: 'object',
+		properties: {
+			totalCount: {
+				type: 'number',
+				default: 41,
+			},
+		},
+	})
+	data: {
+		totalCount: number
+	}
+}
+
 export class SWUserMeAddAvatarRouteOut {
 	@ApiProperty({ default: 'success' })
 	status: string
@@ -88,7 +109,7 @@ export class SWGetUserPostsRouteOut {
 	@ApiProperty({ default: 'success' })
 	status: string
 
-	@ApiProperty()
+	@ApiProperty({ default: 200 })
 	code: number
 
 	@ApiProperty({
@@ -120,11 +141,11 @@ export class SWGetUserPostsRouteOut {
 					items: {
 						type: 'object',
 						properties: {
-							id: { type: 'number' },
+							id: { type: 'number', default: 1 },
 							url: {
 								type: 'number',
 								default:
-									'https://storage.yandexcloud.net/sociable-people/users/100/avatar.png',
+									'https://storage.yandexcloud.net/sociable-people/users/100/posts/photo.png',
 							},
 						},
 					},

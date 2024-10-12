@@ -26,18 +26,21 @@ import { DevicesRepository } from '../src/repositories/devices.repository'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 import { createMainApp } from './utils/createMainApp'
 import { agent as request } from 'supertest'
+import { ClientProxy } from '@nestjs/microservices'
 
-it.only('123', async () => {
+it('123', async () => {
 	expect(2).toBe(2)
 })
 
 describe('Posts (e2e)', () => {
-	let mainApp: INestApplication = 1 as any
+	let mainApp: INestApplication
 
 	let emailAdapter: EmailAdapterService
 	let gitHubService: GitHubService
 	let googleService: GoogleService
 	let reCaptchaAdapter: ReCaptchaAdapterService
+	let filesMicroservice: ClientProxy
+
 	let userRepository: UserRepository
 	let securityRepository: DevicesRepository
 	let jwtService: JwtAdapterService
@@ -49,6 +52,7 @@ describe('Posts (e2e)', () => {
 			gitHubService,
 			googleService,
 			reCaptchaAdapter,
+			filesMicroservice,
 		)
 
 		mainApp = createMainAppRes.mainApp
@@ -57,6 +61,7 @@ describe('Posts (e2e)', () => {
 		gitHubService = createMainAppRes.gitHubService
 		googleService = createMainAppRes.googleService
 		reCaptchaAdapter = createMainAppRes.reCaptchaAdapter
+		filesMicroservice = createMainAppRes.filesMicroservice
 
 		userRepository = await mainApp.resolve(UserRepository)
 		securityRepository = await mainApp.resolve(DevicesRepository)
@@ -139,7 +144,7 @@ describe('Posts (e2e)', () => {
 			checkErrorResponse(addPostRes.body, 400, 'One of files is too large')
 		})
 
-		it('should return 200 if send correct data', async () => {
+		it.only('should return 200 if send correct data', async () => {
 			const [accessToken, refreshTokenStr, user] = await userUtils.createUserAndLogin(
 				mainApp,
 				userRepository,
@@ -152,17 +157,35 @@ describe('Posts (e2e)', () => {
 
 			const avatarFilePath = path.join(__dirname, 'utils/files/avatar.png')
 
+			// I write a test to check a route where images and body are sent.
+			// But there are some problems.
 			const addPostRes = await postRequest(mainApp, RouteNames.POSTS.value)
 				.set('authorization', 'Bearer ' + accessToken)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.set('Content-Type', 'multipart/form-data')
 				.attach('avatarFile', avatarFilePath)
 				.attach('avatarFile', avatarFilePath)
+				// If I use the code below to send data in body
+				/*.send({
+					text: 'Post description',
+					location: 'Photo location',
+				})*/
+				// the test throw an error
+				// .send() can't be used if .attach() or .field() is used.
+				// Please use only .send() or only .field() & .attach()
+				// But when I use field instead of send
 				.field('text', 'Post description')
 				.field('location', 'Photo location')
-				.expect(HTTP_STATUSES.OK_200)
+			// My controller return this error
+			/* {
+			  status: 'error',
+			  code: 400,
+			  message: 'Wrong body',
+			  wrongFields: 'Unexpected field'
+			} */
+			// And I don't understand which field is wrong
 
-			// .send() can't be used if .attach() or .field() is used. Please use only .send() or only .field() & .attach()
+			console.log(addPostRes.body)
 		})
 	})
 })

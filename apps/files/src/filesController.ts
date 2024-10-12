@@ -15,8 +15,6 @@ export class FilesController {
 
 	@MessagePattern(FileMS_EventNames.SavePostImages)
 	async savePostImages(savePostImagesInContract: FileMS_SavePostImagesInContract) {
-		console.log({ savePostImagesInContract })
-		console.log('======================')
 		return await this.filesService.savePostImages(savePostImagesInContract)
 	}
 }

@@ -23,8 +23,9 @@ import { DevicesRepository } from '../src/repositories/devices.repository'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 import { createMainApp } from './utils/createMainApp'
 import { parseCookieStringToObj } from '@app/shared'
+import { ClientProxy } from '@nestjs/microservices'
 
-it.only('123', async () => {
+it('123', async () => {
 	expect(2).toBe(2)
 })
 
@@ -34,6 +35,7 @@ describe('Auth (e2e)', () => {
 	let gitHubService: GitHubService
 	let googleService: GoogleService
 	let reCaptchaAdapter: ReCaptchaAdapterService
+	let filesMicroservice: ClientProxy
 
 	let userRepository: UserRepository
 	let securityRepository: DevicesRepository
@@ -46,6 +48,7 @@ describe('Auth (e2e)', () => {
 			gitHubService,
 			googleService,
 			reCaptchaAdapter,
+			filesMicroservice,
 		)
 		mainApp = createMainAppRes.mainApp
 
@@ -53,6 +56,7 @@ describe('Auth (e2e)', () => {
 		gitHubService = createMainAppRes.gitHubService
 		googleService = createMainAppRes.googleService
 		reCaptchaAdapter = createMainAppRes.reCaptchaAdapter
+		filesMicroservice = createMainAppRes.filesMicroservice
 
 		userRepository = await mainApp.resolve(UserRepository)
 		securityRepository = await mainApp.resolve(DevicesRepository)

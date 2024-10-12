@@ -91,6 +91,16 @@ export const RouteNames = {
 				full: 'users/me/avatar',
 			},
 		},
+		USER_ID(userId: number) {
+			return {
+				value: userId,
+				full: 'users/' + userId,
+				POSTS: {
+					value: 'posts',
+					full: 'users/' + userId + '/posts',
+				},
+			}
+		},
 		POSTS: {
 			value: 'posts',
 			full: 'users/posts',
@@ -98,6 +108,10 @@ export const RouteNames = {
 	},
 	POSTS: {
 		value: 'posts',
+		RECENT: {
+			value: 'recent',
+			full: 'posts/recent',
+		},
 	},
 }
 
