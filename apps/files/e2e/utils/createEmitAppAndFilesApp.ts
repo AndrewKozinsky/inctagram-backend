@@ -1,7 +1,7 @@
 import { ClientProxy, ClientProxyFactory, Transport } from '@nestjs/microservices'
 import { Test, TestingModule } from '@nestjs/testing'
 import { FilesModule } from '../../src/filesModule'
-import { INestMicroservice, Module } from '@nestjs/common'
+import { S3Client } from '@aws-sdk/client-s3'
 
 export async function createEmitApp() {
 	// Create a client proxy to communicate with the microservice
@@ -18,10 +18,15 @@ export async function createEmitApp() {
 	return emitApp
 }
 
-export async function createFilesApp() {
+export async function createFilesApp(s3Client: S3Client) {
 	const moduleFixture: TestingModule = await Test.createTestingModule({
 		imports: [FilesModule],
-	}).compile()
+	})
+		.overrideProvider(S3Client)
+		.useValue({
+			send: jest.fn().mockResolvedValue('Mocked'),
+		})
+		.compile()
 
 	const filesApp = moduleFixture.createNestMicroservice({
 		transport: Transport.TCP,
@@ -33,5 +38,10 @@ export async function createFilesApp() {
 
 	await filesApp.listen()
 
-	return filesApp
+	s3Client = moduleFixture.get<S3Client>(S3Client)
+
+	return {
+		s3Client,
+		filesApp,
+	}
 }

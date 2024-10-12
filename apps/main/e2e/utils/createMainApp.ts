@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { EmailAdapterService } from '@app/email-adapter'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
+import { ClientProxy } from '@nestjs/microservices'
 import { AppModule } from '../../src/app.module'
 import { applyAppSettings } from '../../src/infrastructure/applyAppSettings'
 import { GitHubService } from '../../src/routes/auth/gitHubService'
@@ -12,6 +13,7 @@ export async function createMainApp(
 	gitHubService: GitHubService,
 	googleService: GoogleService,
 	reCaptchaAdapter: ReCaptchaAdapterService,
+	filesMicroservice: ClientProxy,
 ) {
 	const moduleFixture: TestingModule = await Test.createTestingModule({
 		imports: [AppModule],
@@ -45,6 +47,7 @@ export async function createMainApp(
 		.overrideProvider('FILES_MICROSERVICE')
 		.useValue({
 			connect: jest.fn().mockResolvedValue(true),
+			send: jest.fn().mockResolvedValue(true),
 		})
 		.compile()
 
@@ -56,6 +59,14 @@ export async function createMainApp(
 	gitHubService = moduleFixture.get<GitHubService>(GitHubService)
 	googleService = moduleFixture.get<GoogleService>(GoogleService)
 	reCaptchaAdapter = moduleFixture.get<ReCaptchaAdapterService>(ReCaptchaAdapterService)
+	filesMicroservice = moduleFixture.get('FILES_MICROSERVICE')
 
-	return { mainApp, emailAdapter, gitHubService, googleService, reCaptchaAdapter }
+	return {
+		mainApp,
+		emailAdapter,
+		gitHubService,
+		googleService,
+		reCaptchaAdapter,
+		filesMicroservice,
+	}
 }

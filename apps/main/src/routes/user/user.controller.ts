@@ -5,7 +5,6 @@ import {
 	Get,
 	Inject,
 	OnModuleInit,
-	Param,
 	Patch,
 	Post,
 	Req,
@@ -50,8 +49,6 @@ import {
 } from '../../features/user/EditMyProfile.command'
 import { GetMyProfileCommand, GetMyProfileHandler } from '../../features/user/GetMyProfile.command'
 import { postsRoutesConfig } from '../post/postsRoutesConfig'
-import { SWGetPostRouteOut } from '../post/swaggerTypes'
-import { GetPostCommand, GetPostHandler } from '../../features/posts/GetPost.command'
 import { GetUserPostsHandler } from '../../features/posts/GetUserPosts.command'
 
 @ApiTags('User')
@@ -94,7 +91,6 @@ export class UserController implements OnModuleInit {
 		@Req() req: Request,
 	): Promise<SWUserMeAddAvatarRouteOut | undefined> {
 		try {
-			console.log('setMyAvatar')
 			const commandRes = await this.commandBus.execute<
 				any,
 				ReturnType<typeof SetAvatarToMeHandler.prototype.execute>

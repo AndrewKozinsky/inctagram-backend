@@ -30,7 +30,6 @@ export class SetAvatarToMeHandler implements ICommandHandler<SetAvatarToMeComman
 			avatarUrl = await lastValueFrom(
 				this.filesMicroClient.send(FileMS_EventNames.SaveUserAvatar, sendingDataContract),
 			)
-			console.log({ avatarUrl })
 
 			// Set avatar image src to user table in DB
 			await this.userRepository.updateUser(userId, {

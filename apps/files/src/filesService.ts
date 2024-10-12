@@ -33,12 +33,10 @@ export class FilesService {
 
 	async saveUserAvatar(saveUserAvatarInContract: FileMS_SaveUserAvatarInContract) {
 		const { userId, avatarFile } = saveUserAvatarInContract
-		console.log({ avatarFile })
 
 		// Create avatar image dataset
 		const fileExtension = this.getFileExtension(avatarFile)
 		const avatarUrl = 'users/' + userId + '/avatar.' + fileExtension
-		console.log({ fileExtension })
 
 		const setUserAvatarContract: FileMS_SaveFileInContract = {
 			mimetype: avatarFile.mimetype,
@@ -46,13 +44,11 @@ export class FilesService {
 			fileBuffer: avatarFile.buffer,
 			fileSize: avatarFile.size,
 		}
-		console.log({ setUserAvatarContract })
 
 		try {
 			await this.save(setUserAvatarContract)
 			return avatarUrl
 		} catch (error: any) {
-			console.log({ error })
 			throw new Error(ErrorMessage.CannotSaveFile)
 		}
 	}
@@ -78,7 +74,6 @@ export class FilesService {
 				await this.save(setUserAvatarContract)
 				imagesUrls.push(imageUrl)
 			} catch (error: any) {
-				console.log({ error })
 				throw new Error(ErrorMessage.CannotSaveFile)
 			}
 		}

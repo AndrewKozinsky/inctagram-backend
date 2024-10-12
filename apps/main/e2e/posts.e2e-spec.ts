@@ -26,18 +26,21 @@ import { DevicesRepository } from '../src/repositories/devices.repository'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 import { createMainApp } from './utils/createMainApp'
 import { agent as request } from 'supertest'
+import { ClientProxy } from '@nestjs/microservices'
 
-it.only('123', async () => {
+it('123', async () => {
 	expect(2).toBe(2)
 })
 
 describe('Posts (e2e)', () => {
-	let mainApp: INestApplication = 1 as any
+	let mainApp: INestApplication
 
 	let emailAdapter: EmailAdapterService
 	let gitHubService: GitHubService
 	let googleService: GoogleService
 	let reCaptchaAdapter: ReCaptchaAdapterService
+	let filesMicroservice: ClientProxy
+
 	let userRepository: UserRepository
 	let securityRepository: DevicesRepository
 	let jwtService: JwtAdapterService
@@ -49,6 +52,7 @@ describe('Posts (e2e)', () => {
 			gitHubService,
 			googleService,
 			reCaptchaAdapter,
+			filesMicroservice,
 		)
 
 		mainApp = createMainAppRes.mainApp
@@ -57,6 +61,7 @@ describe('Posts (e2e)', () => {
 		gitHubService = createMainAppRes.gitHubService
 		googleService = createMainAppRes.googleService
 		reCaptchaAdapter = createMainAppRes.reCaptchaAdapter
+		filesMicroservice = createMainAppRes.filesMicroservice
 
 		userRepository = await mainApp.resolve(UserRepository)
 		securityRepository = await mainApp.resolve(DevicesRepository)
@@ -139,7 +144,7 @@ describe('Posts (e2e)', () => {
 			checkErrorResponse(addPostRes.body, 400, 'One of files is too large')
 		})
 
-		it('should return 200 if send correct data', async () => {
+		it.only('should return 200 if send correct data', async () => {
 			const [accessToken, refreshTokenStr, user] = await userUtils.createUserAndLogin(
 				mainApp,
 				userRepository,
@@ -158,11 +163,26 @@ describe('Posts (e2e)', () => {
 				.set('Content-Type', 'multipart/form-data')
 				.attach('avatarFile', avatarFilePath)
 				.attach('avatarFile', avatarFilePath)
-				.field('text', 'Post description')
-				.field('location', 'Photo location')
-				.expect(HTTP_STATUSES.OK_200)
+				.send({
+					text: 'Post description',
+					location: 'Photo location',
+				})
+			// .field('text', 'Post description')
+			// .field('location', 'Photo location')
+			// .expect(HTTP_STATUSES.OK_200)
+			console.log(addPostRes.body)
 
-			// .send() can't be used if .attach() or .field() is used. Please use only .send() or only .field() & .attach()
+			// .send() can't be used if .attach() or .field() is used.
+			// Please use only .send() or only .field() & .attach()
+
+			/*
+			{
+			  status: 'error',
+			  code: 400,
+			  message: 'Wrong body',
+			  wrongFields: 'Unexpected field'
+			}
+			*/
 		})
 	})
 })

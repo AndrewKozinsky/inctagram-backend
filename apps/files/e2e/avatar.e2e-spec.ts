@@ -5,17 +5,23 @@ import path from 'path'
 import fs from 'node:fs/promises'
 import { FileMS_EventNames, FileMS_SaveUserAvatarInContract } from '@app/shared'
 import { Readable } from 'stream'
+import { EmailAdapterService } from '@app/email-adapter'
+import { S3Client } from '@aws-sdk/client-s3'
 
-it.only('123', async () => {
+it('123', async () => {
 	expect(2).toBe(2)
 })
 
 describe('Auth (e2e)', () => {
 	let emitApp: ClientProxy
 	let filesApp: INestMicroservice
+	let s3Client: S3Client
 
 	beforeAll(async () => {
-		filesApp = await createFilesApp()
+		const createFilesAppRes = await createFilesApp(s3Client)
+		filesApp = createFilesAppRes.filesApp
+		s3Client = createFilesAppRes.s3Client
+
 		emitApp = await createEmitApp()
 	})
 
@@ -30,7 +36,7 @@ describe('Auth (e2e)', () => {
 		await filesApp.close()
 	})
 
-	it('should respond to the request', async () => {
+	it.only('should respond to the request', async () => {
 		const avatarFilePath = path.join(__dirname, 'utils/files/avatar.png')
 		const avatarFileBuffer = await fs.readFile(avatarFilePath)
 
@@ -43,11 +49,9 @@ describe('Auth (e2e)', () => {
 			avatarFile,
 		}
 
-		try {
-			const response = await emitApp.send(eventName, payload).toPromise()
-		} catch (err) {
-			console.log(err)
-		}
+		const response = await emitApp.send(eventName, payload).toPromise()
+
+		expect(s3Client.send).toBeCalledTimes(1)
 
 		// console.log(response)
 

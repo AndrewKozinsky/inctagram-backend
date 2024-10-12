@@ -84,6 +84,7 @@ export const usersRoutesConfig = {
 					errors: [
 						ErrorMessage.AccessTokenIsNotValid,
 						ErrorMessage.RefreshTokenIsNotValid,
+						ErrorMessage.DateIsWrong,
 					],
 				},
 			],
