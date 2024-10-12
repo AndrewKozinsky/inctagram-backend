@@ -157,32 +157,35 @@ describe('Posts (e2e)', () => {
 
 			const avatarFilePath = path.join(__dirname, 'utils/files/avatar.png')
 
+			// I write a test to check a route where images and body are sent.
+			// But there are some problems.
 			const addPostRes = await postRequest(mainApp, RouteNames.POSTS.value)
 				.set('authorization', 'Bearer ' + accessToken)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.set('Content-Type', 'multipart/form-data')
 				.attach('avatarFile', avatarFilePath)
 				.attach('avatarFile', avatarFilePath)
+				// If I use the code below to send data in body
 				/*.send({
 					text: 'Post description',
 					location: 'Photo location',
 				})*/
+				// the test throw an error
+				// .send() can't be used if .attach() or .field() is used.
+				// Please use only .send() or only .field() & .attach()
+				// But when I use field instead of send
 				.field('text', 'Post description')
 				.field('location', 'Photo location')
-			// .expect(HTTP_STATUSES.OK_200)
-			console.log(addPostRes.body)
-
-			// .send() can't be used if .attach() or .field() is used.
-			// Please use only .send() or only .field() & .attach()
-
-			/*
-			{
+			// My controller return this error
+			/* {
 			  status: 'error',
 			  code: 400,
 			  message: 'Wrong body',
 			  wrongFields: 'Unexpected field'
-			}
-			*/
+			} */
+			// And I don't understand which field is wrong
+
+			console.log(addPostRes.body)
 		})
 	})
 })
