@@ -25,7 +25,6 @@ import { GoogleService } from '../src/routes/auth/googleService'
 import { DevicesRepository } from '../src/repositories/devices.repository'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 import { createMainApp } from './utils/createMainApp'
-import { agent as request } from 'supertest'
 import { ClientProxy } from '@nestjs/microservices'
 
 it('123', async () => {
@@ -45,6 +44,10 @@ describe('Posts (e2e)', () => {
 	let securityRepository: DevicesRepository
 	let jwtService: JwtAdapterService
 	let mainConfig: MainConfigService
+
+	jest.mock('rxjs', () => ({
+		lastValueFrom: jest.fn(),
+	}))
 
 	beforeAll(async () => {
 		const createMainAppRes = await createMainApp(
@@ -163,27 +166,11 @@ describe('Posts (e2e)', () => {
 				.set('authorization', 'Bearer ' + accessToken)
 				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.set('Content-Type', 'multipart/form-data')
-				.attach('avatarFile', avatarFilePath)
-				.attach('avatarFile', avatarFilePath)
-				// If I use the code below to send data in body
-				/*.send({
-					text: 'Post description',
-					location: 'Photo location',
-				})*/
-				// the test throw an error
-				// .send() can't be used if .attach() or .field() is used.
-				// Please use only .send() or only .field() & .attach()
-				// But when I use field instead of send
+				.attach('photoFiles', avatarFilePath)
+				.attach('photoFiles', avatarFilePath)
 				.field('text', 'Post description')
 				.field('location', 'Photo location')
-			// My controller return this error
-			/* {
-			  status: 'error',
-			  code: 400,
-			  message: 'Wrong body',
-			  wrongFields: 'Unexpected field'
-			} */
-			// And I don't understand which field is wrong
+			// expect(lastValueFrom).toBeCalledTimes(1)
 
 			console.log(addPostRes.body)
 		})

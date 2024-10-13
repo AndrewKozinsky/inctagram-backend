@@ -13,19 +13,16 @@
 		"test:main:module": "NODE_ENV=TEST jest --config apps/main/src/jest.json --runInBand",
 		"build:main": "nest build main",
 		"start:main:prod": "node dist/apps/main/main",
-
 		"start:files": "nest start files",
 		"start:files:dev": "nest start files --watch",
 		"test:files:e2e": "NODE_ENV=TEST jest --config apps/files/e2e/jest-e2e.json --runInBand",
 		"test:files:module:watch": "NODE_ENV=TEST jest --config apps/files/src/jest.json --watch --runInBand",
 		"build:files": "nest build files",
 		"start:files:prod": "node dist/apps/files/main",
-
 		"migrate:dev": "prisma migrate dev",
 		"migrate:deploy": "prisma migrate deploy",
 		"migrate:generate-types": "prisma generate",
 		"generatePrismaFile": "ts-node apps/main/src/db/prismaGenerator/generatePrismaSchemaFile.ts",
-
 		"test:e2e": "NODE_ENV=TEST jest --config apps/main/e2e/jest-e2e.json --runInBand",
 		"test": "NODE_ENV=TEST jest --config apps/main/src/jest.json --runInBand"
 	},
@@ -38,7 +35,7 @@
 		"@nestjs/microservices": "^10.4.4",
 		"@nestjs/platform-express": "^10.0.0",
 		"@nestjs/swagger": "^7.4.0",
-		"@prisma/client": "^5.19.1",
+		"@prisma/client": "^5.20.0",
 		"@types/bcrypt": "^5.0.2",
 		"@types/express-useragent": "^1.0.5",
 		"@types/jsonwebtoken": "^9.0.6",
@@ -52,7 +49,7 @@
 		"express-useragent": "^1.0.15",
 		"jsonwebtoken": "^9.0.2",
 		"multer": "^1.4.5-lts.1",
-		"prisma": "^5.19.0",
+		"prisma": "^5.20.0",
 		"reflect-metadata": "^0.2.0",
 		"rxjs": "^7.8.1",
 		"sendpulse-api": "^1.1.7",

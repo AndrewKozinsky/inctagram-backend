@@ -47,7 +47,7 @@ export async function createMainApp(
 		.overrideProvider('FILES_MICROSERVICE')
 		.useValue({
 			connect: jest.fn().mockResolvedValue(true),
-			send: jest.fn().mockResolvedValue(true),
+			send: jest.fn().mockResolvedValue(new Promise((resolve) => resolve(true))),
 		})
 		.compile()
 

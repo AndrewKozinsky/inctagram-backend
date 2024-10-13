@@ -219,7 +219,9 @@ export const bdConfig = {
 				foreignTable: 'User',
 				foreignField: 'id',
 			},
-			// created_at: {},
+			created_at: {
+				type: 'createdAt',
+			},
 			PostPhoto: {
 				type: 'oneToMany',
 			},
@@ -235,6 +237,9 @@ export const bdConfig = {
 				type: 'string',
 				description: 'Photo url',
 				required: true,
+			},
+			created_at: {
+				type: 'createdAt',
 			},
 			post_id: {
 				type: 'manyToOne',

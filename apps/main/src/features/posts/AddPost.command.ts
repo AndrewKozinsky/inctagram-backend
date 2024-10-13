@@ -34,10 +34,12 @@ export class AddPostHandler implements ICommandHandler<AddPostCommand> {
 		// Save photos
 		try {
 			const sendingDataContract: FileMS_SavePostImagesInContract = { userId, photoFiles }
+
 			photoUrls = await lastValueFrom(
 				this.filesMicroClient.send(FileMS_EventNames.SavePostImages, sendingDataContract),
 			)
 		} catch (err: any) {
+			console.log(err)
 			throw new Error(ErrorMessage.CannotSaveFiles)
 		}
 

@@ -14,19 +14,13 @@ export class PostQueryRepository {
 	constructor(private prisma: PrismaService) {}
 
 	async getRecentPosts() {
-		/*const post = await this.prisma.post.findUnique({
-			where: { id },
+		const posts = await this.prisma.post.findMany({
 			include: {
 				PostPhoto: true,
 			},
 		})
 
-		if (!post) {
-			return null
-		}
-
-		return this.mapDbPostToServicePost(post)*/
-		return []
+		return posts.map(this.mapDbPostToServicePost)
 	}
 
 	async getPostById(id: number) {
