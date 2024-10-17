@@ -1,5 +1,4 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
-import { UserRepository } from '../../repositories/user.repository'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { DevicesRepository } from '../../repositories/devices.repository'
 

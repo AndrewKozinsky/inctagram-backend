@@ -12,11 +12,6 @@ export class CreatePostDtoModel {
 
 	@DtoFieldDecorators('location', bdConfig.Post.dbFields.location)
 	location: string
-
-	// Is it necessary???
-	@IsString()
-	@IsOptional()
-	photoFiles: any
 }
 
 export class UpdatePostDtoModel {
@@ -25,11 +20,6 @@ export class UpdatePostDtoModel {
 
 	@DtoFieldDecorators('location', bdConfig.Post.dbFields.location)
 	location: string
-
-	// Is it necessary???
-	@IsString()
-	@IsOptional()
-	photoFiles: any
 }
 
 @Injectable()

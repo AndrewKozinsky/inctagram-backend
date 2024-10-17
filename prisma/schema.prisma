@@ -1,58 +1,60 @@
 generator client {
-	provider      = "prisma-client-js"
-	binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+    provider      = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
-	provider = "postgresql"
-	url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 model User {
-	id	Int	@id	@default(autoincrement())
-	email	String	@unique
-	github_id	String?	@unique
-	google_id	String?	@unique
-	user_name	String	@unique
-	first_name	String?
-	last_name	String?
-	avatar	String?
-	date_of_birth	String?
-	country_code	String?
-	city_id	Int?
-	about_me	String?
-	hashed_password	String
-	email_confirmation_code	String?
-	email_confirmation_code_expiration_date	String?
-	is_email_confirmed	Boolean	@default(false)
-	password_recovery_code	String?
-	DeviceToken	DeviceToken[]
-	Post	Post[]
+    id                                      Int           @id @default(autoincrement())
+    email                                   String        @unique
+    github_id                               String?       @unique
+    google_id                               String?       @unique
+    user_name                               String        @unique
+    first_name                              String?
+    last_name                               String?
+    avatar                                  String?
+    date_of_birth                           String?
+    country_code                            String?
+    city_id                                 Int?
+    about_me                                String?
+    hashed_password                         String
+    email_confirmation_code                 String?
+    email_confirmation_code_expiration_date String?
+    is_email_confirmed                      Boolean       @default(false)
+    password_recovery_code                  String?
+    DeviceToken                             DeviceToken[]
+    Post                                    Post[]
 }
 
 model DeviceToken {
-	id	Int	@id	@default(autoincrement())
-	issued_at	String
-	expiration_date	String
-	device_ip	String
-	device_id	String
-	device_name	String
-	user User @relation(fields: [user_id], references: [id])
-	user_id Int
+    id              Int    @id @default(autoincrement())
+    issued_at       String
+    expiration_date String
+    device_ip       String
+    device_id       String
+    device_name     String
+    user            User   @relation(fields: [user_id], references: [id])
+    user_id         Int
 }
 
 model Post {
-	id	Int	@id	@default(autoincrement())
-	text	String?
-	location	String?
-	user User @relation(fields: [user_id], references: [id])
-	user_id Int
-	PostPhoto	PostPhoto[]
+    id         Int         @id @default(autoincrement())
+    text       String?
+    location   String?
+    user       User        @relation(fields: [user_id], references: [id])
+    user_id    Int
+    created_at DateTime    @default(now())
+    PostPhoto  PostPhoto[]
 }
 
 model PostPhoto {
-	id	Int	@id	@default(autoincrement())
-	url	String
-	post Post @relation(fields: [post_id], references: [id])
-	post_id Int
+    id         Int      @id @default(autoincrement())
+    url        String
+    created_at DateTime @default(now())
+    post       Post     @relation(fields: [post_id], references: [id])
+    post_id    Int
 }

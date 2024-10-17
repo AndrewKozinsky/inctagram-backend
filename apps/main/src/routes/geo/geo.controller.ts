@@ -6,37 +6,40 @@ import { RouteDecorators } from '../routesConfig/routesDecorators'
 import { geoRoutesConfig } from './geoRoutesConfig'
 import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
 import {
-	GetCountriesCommand,
 	GetCountriesHandler,
-} from '../../features/countries/GetCountriesCommand'
+	GetCountriesQuery,
+} from '../../features/countries/GetCountries.command'
 import {
 	SWGetCityRouteOut,
 	SWGetCountriesRouteOut,
 	SWGetCountryCitiesRouteOut,
 } from './swaggerTypes'
 import {
-	GetCountryCitiesCommand,
 	GetCountryCitiesHandler,
-} from '../../features/countries/GetCountryCitiesCommand'
+	GetCountryCitiesQuery,
+} from '../../features/countries/GetCountryCities.command'
 import {
 	GetCountryCitiesQueries,
 	GetCountryCitiesQueriesPipe,
 } from '../../models/geo/geo.input.model'
-import { GetCityCommand, GetCityHandler } from '../../features/countries/GetCityCommand'
+import { GetCityHandler, GetCityQuery } from '../../features/countries/GetCity.command'
 
 @ApiTags('Geo')
 @Controller(RouteNames.GEO.value)
 export class GeoController {
-	constructor(private commandBus: CommandBus) {}
+	constructor(
+		private commandBus: CommandBus,
+		private queryBus: CommandBus,
+	) {}
 
 	@Get(RouteNames.GEO.COUNTRIES.value)
 	@RouteDecorators(geoRoutesConfig.getCountries)
 	async getCountries(): Promise<undefined | SWGetCountriesRouteOut> {
 		try {
-			const res = await this.commandBus.execute<
+			const res = await this.queryBus.execute<
 				any,
 				ReturnType<typeof GetCountriesHandler.prototype.execute>
-			>(new GetCountriesCommand())
+			>(new GetCountriesQuery())
 
 			return createSuccessResp(geoRoutesConfig.getCountries, res)
 		} catch (err: any) {
@@ -77,10 +80,10 @@ export class GeoController {
 		@Param('countryCode') countryCode: string,
 	): Promise<undefined | SWGetCountryCitiesRouteOut> {
 		try {
-			const res = await this.commandBus.execute<
+			const res = await this.queryBus.execute<
 				any,
 				ReturnType<typeof GetCountryCitiesHandler.prototype.execute>
-			>(new GetCountryCitiesCommand(countryCode, query))
+			>(new GetCountryCitiesQuery(countryCode, query))
 
 			return createSuccessResp(geoRoutesConfig.getCountryCities, res)
 		} catch (err: any) {
@@ -102,10 +105,10 @@ export class GeoController {
 		@Param('cityId') cityId: number,
 	): Promise<undefined | SWGetCityRouteOut> {
 		try {
-			const city = await this.commandBus.execute<
+			const city = await this.queryBus.execute<
 				any,
 				ReturnType<typeof GetCityHandler.prototype.execute>
-			>(new GetCityCommand(countryCode, cityId))
+			>(new GetCityQuery(countryCode, cityId))
 
 			return createSuccessResp(geoRoutesConfig.getCity, city)
 		} catch (err: any) {

@@ -1,20 +1,15 @@
 import { ErrorCode, SuccessCode } from '../../infrastructure/exceptionFilters/layerResult'
 import { RoutesConfig } from '../routesConfig/routesConfigTypes'
-import { SWAddPostRouteOut, SWGetPostRouteOut, SWUpdatePostRouteOut } from './swaggerTypes'
-import { SWGetAllUsersRouteOut } from '../user/swaggerTypes'
+import {
+	SWAddPostRouteOut,
+	SWGetPostRouteOut,
+	SWGetRecentPostRouteOut,
+	SWUpdatePostRouteOut,
+} from './swaggerTypes'
 import { ErrorMessage } from '@app/shared'
 import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
 
 export const postsRoutesConfig = {
-	getRecentPosts: {
-		response: [
-			{
-				code: SuccessCode.Ok,
-				description: 'Get recent posts',
-				dataClass: SWGetAllUsersRouteOut,
-			},
-		],
-	},
 	createPost: {
 		response: [
 			{
@@ -31,6 +26,10 @@ export const postsRoutesConfig = {
 				description: 'Get post',
 				dataClass: SWGetPostRouteOut,
 			},
+			{
+				code: ErrorCode.NotFound_404,
+				errors: [ErrorMessage.PostNotFound],
+			},
 		],
 	},
 	updatePost: {
@@ -41,8 +40,12 @@ export const postsRoutesConfig = {
 				dataClass: SWUpdatePostRouteOut,
 			},
 			{
+				code: ErrorCode.NotFound_404,
+				errors: [ErrorMessage.PostNotFound],
+			},
+			{
 				code: ErrorCode.BadRequest_400,
-				errors: [ErrorMessage.PostNotFound, ErrorMessage.PostNotBelongToUser],
+				errors: [ErrorMessage.PostNotBelongToUser],
 			},
 		],
 	},
@@ -54,8 +57,21 @@ export const postsRoutesConfig = {
 				dataClass: SWEmptyRouteOut,
 			},
 			{
+				code: ErrorCode.NotFound_404,
+				errors: [ErrorMessage.PostNotFound],
+			},
+			{
 				code: ErrorCode.BadRequest_400,
-				errors: [ErrorMessage.PostNotFound, ErrorMessage.PostNotBelongToUser],
+				errors: [ErrorMessage.PostNotBelongToUser],
+			},
+		],
+	},
+	getRecentPosts: {
+		response: [
+			{
+				code: SuccessCode.Ok,
+				description: 'Get recent posts',
+				dataClass: SWGetRecentPostRouteOut,
 			},
 		],
 	},

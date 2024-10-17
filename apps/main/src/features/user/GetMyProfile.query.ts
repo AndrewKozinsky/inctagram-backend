@@ -1,15 +1,15 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
 import { UserQueryRepository } from '../../repositories/user.queryRepository'
 
-export class GetMyProfileCommand {
+export class GetMyProfileQuery {
 	constructor(public userId: number) {}
 }
 
-@CommandHandler(GetMyProfileCommand)
-export class GetMyProfileHandler implements ICommandHandler<GetMyProfileCommand> {
+@QueryHandler(GetMyProfileQuery)
+export class GetMyProfileHandler implements IQueryHandler<GetMyProfileQuery> {
 	constructor(private userQueryRepository: UserQueryRepository) {}
 
-	async execute(command: GetMyProfileCommand) {
+	async execute(command: GetMyProfileQuery) {
 		const { userId } = command
 
 		const user = await this.userQueryRepository.getUserById(userId)

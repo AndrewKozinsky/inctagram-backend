@@ -82,6 +82,8 @@ model ${tableName} {
 			columnsArr.push(`\t${dbFieldName}	Boolean` + createColumnAttrs(field))
 		} else if (field.type === 'number') {
 			columnsArr.push(`\t${dbFieldName}	Int` + createColumnAttrs(field))
+		} else if (field.type === 'createdAt') {
+			columnsArr.push(`\t${dbFieldName}	DateTime	@default(now())`)
 		} else if (field.type === 'manyToOne') {
 			columnsArr.push(...createManyToOneColumn(field))
 		} else if (field.type === 'oneToMany') {
@@ -108,7 +110,8 @@ function createColumnAttrs(columnConfig: BdConfig.Field) {
 	if (
 		columnConfig.type !== 'index' &&
 		columnConfig.type !== 'manyToOne' &&
-		columnConfig.type !== 'oneToMany'
+		columnConfig.type !== 'oneToMany' &&
+		columnConfig.type !== 'createdAt'
 	) {
 		if (!columnConfig.required) {
 			attrStrings.push('?')

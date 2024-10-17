@@ -1,20 +1,21 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
+import { CommandHandler, ICommandHandler, IQueryHandler, QueryHandler } from '@nestjs/cqrs'
 import { MainConfigService } from '@app/config'
 import { UserRepository } from '../../repositories/user.repository'
 import { ErrorMessage } from '@app/shared'
+import { GetUsersQuery } from './GetUsers.query'
 
-export class GetUserAvatarCommand {
+export class GetUserAvatarQuery {
 	constructor(public userId: number) {}
 }
 
-@CommandHandler(GetUserAvatarCommand)
-export class GetUserAvatarHandler implements ICommandHandler<GetUserAvatarCommand> {
+@QueryHandler(GetUserAvatarQuery)
+export class GetUserAvatarHandler implements IQueryHandler<GetUserAvatarQuery> {
 	constructor(
 		private userRepository: UserRepository,
 		private mainConfig: MainConfigService,
 	) {}
 
-	async execute(command: GetUserAvatarCommand) {
+	async execute(command: GetUserAvatarQuery) {
 		const { userId } = command
 
 		// Set avatar image src to user table in DB

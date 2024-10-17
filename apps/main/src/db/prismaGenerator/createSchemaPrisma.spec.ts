@@ -23,6 +23,13 @@ export const bdTestConfig = {
 				default: false,
 				required: true,
 			},
+			created_at: {
+				type: 'createdAt',
+			},
+			some_date: {
+				type: 'dateString',
+				required: false,
+			},
 			DeviceToken: {
 				type: 'oneToMany',
 			},
@@ -65,6 +72,8 @@ model User {
 	email	String	@unique
 	name	String	@unique
 	is_email_confirmed	Boolean	@default(false)
+	created_at	DateTime	@default(now())
+	some_date	String?
 	DeviceToken	DeviceToken[]
 }
 
