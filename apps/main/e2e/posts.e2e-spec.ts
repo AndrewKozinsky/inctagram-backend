@@ -145,7 +145,7 @@ describe('Posts (e2e)', () => {
 		})
 
 		it('should return 200 if send correct data', async () => {
-			const [accessToken, refreshTokenStr, user] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
 				mainApp,
 				userRepository,
 				defUserName,
@@ -194,7 +194,7 @@ describe('Posts (e2e)', () => {
 		})
 
 		it('should return 200 if send correct data', async () => {
-			const [accessToken, refreshTokenStr, user] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
 				mainApp,
 				userRepository,
 				defUserName,

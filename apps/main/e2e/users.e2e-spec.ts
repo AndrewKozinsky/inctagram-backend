@@ -29,7 +29,7 @@ import { ClientProxy } from '@nestjs/microservices'
 import { of } from 'rxjs'
 import { postUtils } from './utils/postUtils'
 
-it('123', async () => {
+it.only('123', async () => {
 	expect(2).toBe(2)
 })
 
@@ -567,7 +567,7 @@ describe('Users (e2e)', () => {
 			checkSuccessResponse(getUserPostRes.body, 200, expectedRes)
 		})
 
-		it.only('should return 5 posts of the user', async () => {
+		it('should return 5 posts of the user', async () => {
 			const [accessToken, refreshTokenStr, user] = await userUtils.createUserAndLogin(
 				mainApp,
 				userRepository,

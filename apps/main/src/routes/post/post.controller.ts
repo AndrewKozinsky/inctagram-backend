@@ -44,7 +44,6 @@ import {
 	GetRecentPostsQuery,
 	GetRecentPostsHandler,
 } from '../../features/posts/GetRecentPosts.query'
-import { readableStreamLikeToAsyncGenerator } from 'rxjs/internal/util/isReadableStreamLike'
 
 @ApiTags('Post')
 @Controller(RouteNames.POSTS.value)

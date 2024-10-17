@@ -139,7 +139,7 @@ function createApiPropertyOptions(fieldConf: BdConfig.Field) {
 	}
 
 	if ('required' in fieldConf) {
-		apiPropertyOptions.required = fieldConf.required === false ? false : true
+		apiPropertyOptions.required = !fieldConf.required
 	}
 
 	if ('default' in fieldConf) {

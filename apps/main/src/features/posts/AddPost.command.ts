@@ -55,11 +55,4 @@ export class AddPostHandler implements ICommandHandler<AddPostCommand> {
 		const post = await this.postQueryRepository.getPostById(createdPost.id)
 		return post!
 	}
-
-	private async sendFiles(
-		eventName: FileMS_EventNames,
-		sendingDataContract: FileMS_SavePostImagesInContract,
-	) {
-		return await lastValueFrom(this.filesMicroClient.send(eventName, sendingDataContract))
-	}
 }

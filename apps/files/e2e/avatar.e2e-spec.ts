@@ -5,7 +5,8 @@ import fs from 'node:fs/promises'
 import { FileMS_EventNames, FileMS_SaveUserAvatarInContract } from '@app/shared'
 import { Readable } from 'stream'
 import { S3Client } from '@aws-sdk/client-s3'
-import { createFilesApp, createEmitApp } from './utils/createEmitAppAndFilesApp'
+import { createFilesApp } from './utils/createFilesApp'
+import { createEmitApp } from './utils/createEmitApp'
 
 it('123', async () => {
 	expect(2).toBe(2)
@@ -80,7 +81,7 @@ async function readFileAsMulterFile(filePath: string): Promise<Express.Multer.Fi
 	const buffer = await fs.readFile(filePath) // Read the file as a buffer
 	const fileStat = await fs.stat(filePath) // Get file details
 	const originalname = path.basename(filePath) // Extract the original file name
-	const mimetype = 'application/octet-stream' // Default mime type (change if needed)
+	// const mimetype = 'application/octet-stream' // Default mime type (change if needed)
 
 	const stream = new Readable()
 	stream.push(buffer)

@@ -1,22 +1,7 @@
-import { ClientProxyFactory, Transport } from '@nestjs/microservices'
+import { Transport } from '@nestjs/microservices'
 import { Test, TestingModule } from '@nestjs/testing'
 import { FilesModule } from '../../src/filesModule'
 import { S3Client } from '@aws-sdk/client-s3'
-
-export async function createEmitApp() {
-	// Create a client proxy to communicate with the microservice
-	const emitApp = ClientProxyFactory.create({
-		transport: Transport.TCP,
-		options: {
-			host: '127.0.0.1',
-			port: 8877,
-		},
-	})
-
-	await emitApp.connect()
-
-	return emitApp
-}
 
 export async function createFilesApp(s3Client: S3Client) {
 	const moduleFixture: TestingModule = await Test.createTestingModule({
