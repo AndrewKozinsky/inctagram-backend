@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common'
 import { Request } from 'express'
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCookieAuth, ApiTags } from '@nestjs/swagger'
-import { CommandBus } from '@nestjs/cqrs'
+import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { FilesInterceptor } from '@nestjs/platform-express'
 import { ClientProxy } from '@nestjs/microservices'
 import RouteNames from '../routesConfig/routeNames'
@@ -36,25 +36,42 @@ import {
 	UpdatePostDtoModel,
 	UploadPostImagesPipe,
 } from '../../models/post/post.input.model'
-import { GetPostCommand, GetPostHandler } from '../../features/posts/GetPost.command'
+import { GetPostQuery, GetPostHandler } from '../../features/posts/GetPost.query'
 import { UpdatePostCommand, UpdatePostHandler } from '../../features/posts/UpdatePost.command'
 import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
 import { DeletePostCommand, DeletePostHandler } from '../../features/posts/DeletePost.command'
 import {
-	GetRecentPostsCommand,
+	GetRecentPostsQuery,
 	GetRecentPostsHandler,
-} from '../../features/posts/GetRecentPosts.command'
+} from '../../features/posts/GetRecentPosts.query'
+import { readableStreamLikeToAsyncGenerator } from 'rxjs/internal/util/isReadableStreamLike'
 
 @ApiTags('Post')
 @Controller(RouteNames.POSTS.value)
 export class PostController implements OnModuleInit {
 	constructor(
 		private readonly commandBus: CommandBus,
+		private readonly queryBus: QueryBus,
 		@Inject('FILES_MICROSERVICE') private filesMicroClient: ClientProxy,
 	) {}
 
 	async onModuleInit() {
 		await this.filesMicroClient.connect()
+	}
+
+	@Get(RouteNames.POSTS.RECENT.value)
+	@RouteDecorators(postsRoutesConfig.getRecentPosts)
+	async getRecentPost(): Promise<SWGetRecentPostRouteOut | undefined> {
+		try {
+			const commandRes = await this.queryBus.execute<
+				any,
+				ReturnType<typeof GetRecentPostsHandler.prototype.execute>
+			>(new GetRecentPostsQuery())
+
+			return createSuccessResp(postsRoutesConfig.getRecentPosts, commandRes)
+		} catch (err: any) {
+			createFailResp(postsRoutesConfig.getRecentPosts, err)
+		}
 	}
 
 	@ApiConsumes('multipart/form-data')
@@ -81,7 +98,7 @@ export class PostController implements OnModuleInit {
 	@Post()
 	@RouteDecorators(postsRoutesConfig.createPost)
 	@UseInterceptors(FilesInterceptor('photoFiles'))
-	async setPost(
+	async createPost(
 		@Body() body: CreatePostDtoModel,
 		@UploadedFiles(new UploadPostImagesPipe())
 		photoFiles: Express.Multer.File[],
@@ -103,10 +120,10 @@ export class PostController implements OnModuleInit {
 	@RouteDecorators(postsRoutesConfig.getPost)
 	async getPost(@Param('postId') postId: number): Promise<SWGetPostRouteOut | undefined> {
 		try {
-			const commandRes = await this.commandBus.execute<
+			const commandRes = await this.queryBus.execute<
 				any,
 				ReturnType<typeof GetPostHandler.prototype.execute>
-			>(new GetPostCommand(postId))
+			>(new GetPostQuery(postId))
 
 			return createSuccessResp(postsRoutesConfig.getPost, commandRes)
 		} catch (err: any) {
@@ -134,7 +151,7 @@ export class PostController implements OnModuleInit {
 
 			return createSuccessResp(postsRoutesConfig.updatePost, commandRes)
 		} catch (err: any) {
-			createFailResp(postsRoutesConfig.getPost, err)
+			createFailResp(postsRoutesConfig.updatePost, err)
 		}
 	}
 
@@ -158,21 +175,6 @@ export class PostController implements OnModuleInit {
 			return createSuccessResp(postsRoutesConfig.deletePost, null)
 		} catch (err: any) {
 			createFailResp(postsRoutesConfig.deletePost, err)
-		}
-	}
-
-	@Get(RouteNames.POSTS.RECENT.value)
-	@RouteDecorators(postsRoutesConfig.getPost)
-	async getRecentPost(): Promise<SWGetRecentPostRouteOut | undefined> {
-		try {
-			const commandRes = await this.commandBus.execute<
-				any,
-				ReturnType<typeof GetRecentPostsHandler.prototype.execute>
-			>(new GetRecentPostsCommand())
-
-			return createSuccessResp(postsRoutesConfig.getRecentPosts, commandRes)
-		} catch (err: any) {
-			createFailResp(postsRoutesConfig.getRecentPosts, err)
 		}
 	}
 }

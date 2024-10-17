@@ -113,39 +113,59 @@ export class SWGetUserPostsRouteOut {
 	code: number
 
 	@ApiProperty({
-		type: 'array',
-		nullable: true,
-		items: {
-			type: 'object',
-			properties: {
-				id: {
-					type: 'number',
-					default: 1,
-				},
-				text: {
-					type: 'string',
-					default: 'Images of clouded roses and angry green eyes flow through my dreams.',
-					nullable: true,
-				},
-				location: {
-					type: 'string',
-					default: 'Rostov-on-Don, 47.265223, 39.595245',
-					nullable: true,
-				},
-				userId: {
-					type: 'number',
-					default: 1,
-				},
-				photos: {
-					type: 'array',
-					items: {
-						type: 'object',
-						properties: {
-							id: { type: 'number', default: 1 },
-							url: {
-								type: 'number',
-								default:
-									'https://storage.yandexcloud.net/sociable-people/users/100/posts/photo.png',
+		type: 'object',
+		properties: {
+			pagesCount: {
+				type: 'number',
+				default: 7,
+			},
+			page: {
+				type: 'number',
+				default: 1,
+			},
+			pageSize: {
+				type: 'number',
+				default: 10,
+			},
+			totalCount: {
+				type: 'number',
+				default: 10,
+			},
+			items: {
+				type: 'array',
+				items: {
+					type: 'object',
+					properties: {
+						id: {
+							type: 'number',
+							default: 1,
+						},
+						text: {
+							type: 'string',
+							default:
+								'Images of clouded roses and angry green eyes flow through my dreams.',
+							nullable: true,
+						},
+						location: {
+							type: 'string',
+							nullable: true,
+						},
+						userId: {
+							type: 'number',
+							default: 1,
+						},
+						photos: {
+							type: 'array',
+							items: {
+								type: 'object',
+								properties: {
+									id: { type: 'number', default: 10 },
+									url: {
+										type: 'string',
+										default:
+											'https://storage.yandexcloud.net/sociable-people/users/100/posts/photo.png',
+									},
+								},
 							},
 						},
 					},
@@ -153,16 +173,17 @@ export class SWGetUserPostsRouteOut {
 			},
 		},
 	})
-	data:
-		| null
-		| {
-				id: number
-				text: null | string
-				location: null | string
-				userId: number
-				photos: {
-					id: number
-					url: string
-				}[]
-		  }[]
+	data: {
+		pagesCount: number
+		page: number
+		pageSize: number
+		totalCount: number
+		items: {
+			id: number
+			text: null | string
+			location: null | string
+			userId: number
+			photos: { id: number; url: string }[]
+		}[]
+	}
 }

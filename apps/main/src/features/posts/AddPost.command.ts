@@ -35,6 +35,7 @@ export class AddPostHandler implements ICommandHandler<AddPostCommand> {
 		try {
 			const sendingDataContract: FileMS_SavePostImagesInContract = { userId, photoFiles }
 
+			// photoUrls = await this.sendFiles(FileMS_EventNames.SavePostImages, sendingDataContract)
 			photoUrls = await lastValueFrom(
 				this.filesMicroClient.send(FileMS_EventNames.SavePostImages, sendingDataContract),
 			)
@@ -53,5 +54,12 @@ export class AddPostHandler implements ICommandHandler<AddPostCommand> {
 
 		const post = await this.postQueryRepository.getPostById(createdPost.id)
 		return post!
+	}
+
+	private async sendFiles(
+		eventName: FileMS_EventNames,
+		sendingDataContract: FileMS_SavePostImagesInContract,
+	) {
+		return await lastValueFrom(this.filesMicroClient.send(eventName, sendingDataContract))
 	}
 }

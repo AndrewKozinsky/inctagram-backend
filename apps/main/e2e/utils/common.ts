@@ -62,11 +62,11 @@ export function checkErrorResponse(errObj: any, code: number, message: string) {
 	expect(errObj.message).toBe(message)
 }
 
-export function checkSuccessResponse(resObj: any, code: number, data?: any) {
+export function checkSuccessResponse(resObj: any, code: number, expectedData?: any) {
 	expect(resObj.status).toBe('success')
 	expect(resObj.code).toBe(code)
 
-	if (data) {
-		expect(resObj.data).toEqual(data)
+	if (expectedData) {
+		expect(resObj.data).toEqual(expectedData)
 	}
 }

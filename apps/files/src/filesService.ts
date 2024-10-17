@@ -18,7 +18,6 @@ export class FilesService {
 
 		this.s3Client = new S3Client({
 			// Указать регион где должны находиться серверы.
-			// Не нашёл что скрывается за этим названием.
 			region,
 			// Указать адрес сервиса Яндекса
 			endpoint,

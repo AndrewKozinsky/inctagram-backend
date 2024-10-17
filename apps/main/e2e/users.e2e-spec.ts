@@ -26,8 +26,10 @@ import { DevicesRepository } from '../src/repositories/devices.repository'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 import { createMainApp } from './utils/createMainApp'
 import { ClientProxy } from '@nestjs/microservices'
+import { of } from 'rxjs'
+import { postUtils } from './utils/postUtils'
 
-it.only('123', async () => {
+it('123', async () => {
 	expect(2).toBe(2)
 })
 
@@ -488,6 +490,121 @@ describe('Users (e2e)', () => {
 			expect(updatedUser_2.countryCode).toBe('ru')
 			expect(updatedUser_2.cityId).toBe(200)
 			expect(updatedUser_2.aboutMe).toBe('my new text about me')
+		})
+	})
+
+	describe('Get user posts', () => {
+		it('should return an empty array if there is not posts', async () => {
+			const user = await userUtils.createUserWithConfirmedEmail(mainApp, userRepository)
+
+			const getUserPostRes = await getRequest(
+				mainApp,
+				RouteNames.USERS.USER_ID(user.id).POSTS.full,
+			).expect(HTTP_STATUSES.OK_200)
+
+			const expectedData = { page: 1, pageSize: 10, pagesCount: 0, totalCount: 0 }
+			checkSuccessResponse(getUserPostRes.body, 200, expectedData)
+		})
+
+		it('should return 2 posts of the user', async () => {
+			const [accessToken, refreshTokenStr, user] = await userUtils.createUserAndLogin(
+				mainApp,
+				userRepository,
+				defUserName,
+				defUserEmail,
+				defUserPassword,
+			)
+
+			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
+
+			;(filesMicroservice.send as jest.Mock).mockImplementation(() => {
+				return of(['url 1', 'url 2'])
+			})
+
+			for (let i = 0; i < 2; i++) {
+				await postUtils.createPost({
+					app: mainApp,
+					accessToken,
+					mainConfig,
+					refreshTokenValue,
+				})
+			}
+
+			const getUserPostRes = await getRequest(
+				mainApp,
+				RouteNames.USERS.USER_ID(user.id).POSTS.full,
+			).expect(HTTP_STATUSES.OK_200)
+
+			const expectedRes = {
+				pagesCount: 1,
+				page: 1,
+				pageSize: 10,
+				totalCount: 2,
+				items: [
+					{
+						id: 2,
+						text: 'Post description',
+						location: 'Photo location',
+						userId: 1,
+						photos: [
+							{ id: 3, url: 'url 1' },
+							{ id: 4, url: 'url 2' },
+						],
+					},
+					{
+						id: 1,
+						text: 'Post description',
+						location: 'Photo location',
+						userId: 1,
+						photos: [
+							{ id: 1, url: 'url 1' },
+							{ id: 2, url: 'url 2' },
+						],
+					},
+				],
+			}
+
+			checkSuccessResponse(getUserPostRes.body, 200, expectedRes)
+		})
+
+		it.only('should return 5 posts of the user', async () => {
+			const [accessToken, refreshTokenStr, user] = await userUtils.createUserAndLogin(
+				mainApp,
+				userRepository,
+				defUserName,
+				defUserEmail,
+				defUserPassword,
+			)
+
+			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
+
+			;(filesMicroservice.send as jest.Mock).mockImplementation(() => {
+				return of(['url 1', 'url 2'])
+			})
+
+			// Create 12 posts
+			for (let i = 0; i < 12; i++) {
+				await postUtils.createPost({
+					app: mainApp,
+					accessToken,
+					mainConfig,
+					refreshTokenValue,
+				})
+			}
+
+			// Get 5 posts
+			const getUserPostRes = await getRequest(
+				mainApp,
+				RouteNames.USERS.USER_ID(user.id).POSTS.full + '?pageNumber=2&pageSize=5',
+			).expect(HTTP_STATUSES.OK_200)
+			const getUserPost = getUserPostRes.body
+
+			checkSuccessResponse(getUserPostRes.body, 200)
+			expect(getUserPost.data.pagesCount).toBe(3)
+			expect(getUserPost.data.page).toBe(2)
+			expect(getUserPost.data.pageSize).toBe(5)
+			expect(getUserPost.data.totalCount).toBe(12)
+			expect(getUserPost.data.items.length).toBe(5)
 		})
 	})
 })

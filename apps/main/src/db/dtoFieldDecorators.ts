@@ -75,8 +75,7 @@ export function DtoFieldDecorators(
 		if (!updatedFieldConf.required) {
 			decorators.push(IsOptional())
 		}
-	}
-	if (updatedFieldConf.type === 'dateString') {
+	} else if (updatedFieldConf.type === 'dateString') {
 		decorators.push(
 			IsDateString(
 				{},

@@ -1,12 +1,11 @@
 import { INestMicroservice } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
-import { createFilesApp, createEmitApp } from './utils/createEmitAppAndFilesApp'
 import path from 'path'
 import fs from 'node:fs/promises'
 import { FileMS_EventNames, FileMS_SaveUserAvatarInContract } from '@app/shared'
 import { Readable } from 'stream'
-import { EmailAdapterService } from '@app/email-adapter'
 import { S3Client } from '@aws-sdk/client-s3'
+import { createFilesApp, createEmitApp } from './utils/createEmitAppAndFilesApp'
 
 it('123', async () => {
 	expect(2).toBe(2)
@@ -38,7 +37,6 @@ describe('Auth (e2e)', () => {
 
 	it.only('should respond to the request', async () => {
 		const avatarFilePath = path.join(__dirname, 'utils/files/avatar.png')
-		const avatarFileBuffer = await fs.readFile(avatarFilePath)
 
 		const avatarFile = await readFileAsMulterFile(avatarFilePath)
 

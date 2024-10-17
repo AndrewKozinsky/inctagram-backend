@@ -29,7 +29,7 @@ export class DeletePostHandler implements ICommandHandler<DeletePostCommand> {
 			throw new Error(ErrorMessage.PostNotBelongToUser)
 		}
 
-		await this.postRepository.deletePost(postId)
 		await this.postPhotoRepository.deletePostPhotos(postWithId.id)
+		await this.postRepository.deletePost(postId)
 	}
 }

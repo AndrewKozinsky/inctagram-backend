@@ -9,15 +9,17 @@ import { PrismaService } from '../../db/prisma.service'
 import { SetAvatarToMeHandler } from '../../features/user/SetAvatarToMe.command'
 import { MainConfigService } from '@app/config'
 import { UserRepository } from '../../repositories/user.repository'
-import { GetUserAvatarHandler } from '../../features/user/GetUserAvatar.command'
+import { GetUserAvatarHandler } from '../../features/user/GetUserAvatar.query'
 import { DeleteUserAvatarHandler } from '../../features/user/DeleteUserAvatar.command'
-import { GetMyProfileHandler } from '../../features/user/GetMyProfile.command'
+import { GetMyProfileHandler } from '../../features/user/GetMyProfile.query'
 import { EditMyProfileHandler } from '../../features/user/EditMyProfile.command'
 import { UserQueryRepository } from '../../repositories/user.queryRepository'
+import { GetUserPostsHandler } from '../../features/posts/GetUserPosts.query'
+import { PostQueryRepository } from '../../repositories/post.queryRepository'
 
 const services = [PrismaService, BrowserServiceService, JwtAdapterService]
 
-const repositories = [DevicesRepository, UserRepository, UserQueryRepository]
+const repositories = [DevicesRepository, UserRepository, UserQueryRepository, PostQueryRepository]
 
 const commandHandlers = [
 	SetAvatarToMeHandler,
@@ -25,6 +27,7 @@ const commandHandlers = [
 	DeleteUserAvatarHandler,
 	EditMyProfileHandler,
 	GetMyProfileHandler,
+	GetUserPostsHandler,
 ]
 
 @Module({

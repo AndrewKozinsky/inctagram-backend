@@ -61,6 +61,6 @@
       "@app/re-captcha-adapter/*": [
         "libs/re-captcha-adapter/src/*"
       ]
-    },
-  },
+    }
+  }
 }

@@ -15,14 +15,3 @@ export class LoginOutModel {
 	accessToken: string
 	user: UserOutModel
 }
-
-// DELETE
-/*export class RecoveryPasswordOutModel {
-	@ApiProperty({ type: 'string' })
-	recoveryCode: string
-}*/
-
-export class RefreshTokenOutModel {
-	@ApiProperty({ type: 'string' })
-	accessToken: string
-}

@@ -213,14 +213,14 @@ export const bdConfig = {
 				description: 'Photos location',
 				required: false,
 			},
+			created_at: {
+				type: 'createdAt',
+			},
 			user_id: {
 				type: 'manyToOne',
 				thisField: 'user_id',
 				foreignTable: 'User',
 				foreignField: 'id',
-			},
-			created_at: {
-				type: 'createdAt',
 			},
 			PostPhoto: {
 				type: 'oneToMany',
