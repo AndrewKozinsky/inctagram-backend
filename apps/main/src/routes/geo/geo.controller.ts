@@ -1,14 +1,11 @@
 import { Controller, Get, Param, Query } from '@nestjs/common'
-import { CommandBus } from '@nestjs/cqrs'
+import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { ApiQuery, ApiTags } from '@nestjs/swagger'
 import RouteNames from '../routesConfig/routeNames'
 import { RouteDecorators } from '../routesConfig/routesDecorators'
 import { geoRoutesConfig } from './geoRoutesConfig'
 import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
-import {
-	GetCountriesHandler,
-	GetCountriesQuery,
-} from '../../features/countries/GetCountries.command'
+import { GetCountriesHandler, GetCountriesQuery } from '../../features/countries/GetCountries.query'
 import {
 	SWGetCityRouteOut,
 	SWGetCountriesRouteOut,
@@ -17,20 +14,17 @@ import {
 import {
 	GetCountryCitiesHandler,
 	GetCountryCitiesQuery,
-} from '../../features/countries/GetCountryCities.command'
+} from '../../features/countries/GetCountryCities.query'
 import {
 	GetCountryCitiesQueries,
 	GetCountryCitiesQueriesPipe,
 } from '../../models/geo/geo.input.model'
-import { GetCityHandler, GetCityQuery } from '../../features/countries/GetCity.command'
+import { GetCityHandler, GetCityQuery } from '../../features/countries/GetCity.query'
 
 @ApiTags('Geo')
 @Controller(RouteNames.GEO.value)
 export class GeoController {
-	constructor(
-		private commandBus: CommandBus,
-		private queryBus: CommandBus,
-	) {}
+	constructor(private queryBus: QueryBus) {}
 
 	@Get(RouteNames.GEO.COUNTRIES.value)
 	@RouteDecorators(geoRoutesConfig.getCountries)
@@ -43,6 +37,7 @@ export class GeoController {
 
 			return createSuccessResp(geoRoutesConfig.getCountries, res)
 		} catch (err: any) {
+			console.log(err)
 			createFailResp(geoRoutesConfig.getCountries, err)
 		}
 	}

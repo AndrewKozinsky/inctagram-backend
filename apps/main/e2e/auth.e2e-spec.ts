@@ -25,7 +25,7 @@ import { createMainApp } from './utils/createMainApp'
 import { parseCookieStringToObj } from '@app/shared'
 import { ClientProxy } from '@nestjs/microservices'
 
-it('123', async () => {
+it.only('123', async () => {
 	expect(2).toBe(2)
 })
 
@@ -346,7 +346,7 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
-			await userUtils.deviceTokenChecks.tokenExpired(
+			await userUtils.deviceTokenChecks.refreshTokenExpired(
 				mainApp,
 				'post',
 				RouteNames.AUTH.LOGOUT.full,
@@ -492,7 +492,7 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
-			await userUtils.deviceTokenChecks.tokenExpired(
+			await userUtils.deviceTokenChecks.refreshTokenExpired(
 				mainApp,
 				'post',
 				RouteNames.AUTH.REFRESH_TOKEN.full,

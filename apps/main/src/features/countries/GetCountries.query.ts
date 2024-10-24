@@ -1,6 +1,5 @@
-import { CommandHandler, ICommandHandler, IQueryHandler, QueryHandler } from '@nestjs/cqrs'
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
 import { GeoService } from '../../routes/geo/geo.service'
-import { GetUsersQuery } from '../user/GetUsers.query'
 
 export class GetCountriesQuery {
 	constructor() {}

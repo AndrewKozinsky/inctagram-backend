@@ -1,6 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
+import { ErrorMessage, FileMS_EventNames } from '@app/shared'
+import { lastValueFrom } from 'rxjs'
+import { Inject } from '@nestjs/common'
+import { ClientProxy } from '@nestjs/microservices'
+import { FileMS_DeleteFileInContract } from '@app/shared/contracts/fileMS.contracts'
 import { UserRepository } from '../../repositories/user.repository'
-import { ErrorMessage } from '@app/shared'
 
 export class DeleteUserAvatarCommand {
 	constructor(public userId: number) {}
@@ -8,7 +12,10 @@ export class DeleteUserAvatarCommand {
 
 @CommandHandler(DeleteUserAvatarCommand)
 export class DeleteUserAvatarHandler implements ICommandHandler<DeleteUserAvatarCommand> {
-	constructor(private userRepository: UserRepository) {}
+	constructor(
+		@Inject('FILES_MICROSERVICE') private filesMicroClient: ClientProxy,
+		private userRepository: UserRepository,
+	) {}
 
 	async execute(command: DeleteUserAvatarCommand) {
 		const { userId } = command
@@ -18,6 +25,14 @@ export class DeleteUserAvatarHandler implements ICommandHandler<DeleteUserAvatar
 		if (!user) {
 			throw new Error(ErrorMessage.UserNotFound)
 		}
+
+		// Delete avatar file
+		const sendingDataContract: FileMS_DeleteFileInContract = {
+			fileUrl: user.avatar,
+		}
+		await lastValueFrom(
+			this.filesMicroClient.send(FileMS_EventNames.DeleteFile, sendingDataContract),
+		)
 
 		await this.userRepository.updateUser(userId, { avatar: null })
 	}

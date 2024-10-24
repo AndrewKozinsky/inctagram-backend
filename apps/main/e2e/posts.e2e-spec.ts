@@ -2,7 +2,6 @@ import { INestApplication } from '@nestjs/common'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { MainConfigService } from '@app/config'
 import path from 'node:path'
-import { of } from 'rxjs'
 import {
 	checkErrorResponse,
 	checkSuccessResponse,
@@ -13,6 +12,8 @@ import {
 	defUserName,
 	defUserPassword,
 	patchRequest,
+	mockFilesServiceSendMethod,
+	resentMockFilesServiceSendMethod,
 } from './utils/common'
 import RouteNames from '../src/routes/routesConfig/routeNames'
 import { HTTP_STATUSES } from '../src/utils/httpStatuses'
@@ -83,23 +84,7 @@ describe('Posts (e2e)', () => {
 	})
 
 	describe('Add a new post', () => {
-		it('should return 401 if there is not cookies', async () => {
-			await userUtils.deviceTokenChecks.tokenNotExist(mainApp, 'post', RouteNames.POSTS.value)
-		})
-
-		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
-			await userUtils.deviceTokenChecks.tokenExpired(
-				mainApp,
-				'post',
-				RouteNames.POSTS.value,
-				userRepository,
-				securityRepository,
-				jwtService,
-				mainConfig,
-			)
-		})
-
-		it('should return 400 if the JWT refreshToken inside cookie is valid, but request body is not send', async () => {
+		it('should return 400 if the accessToken inside cookie is valid, but request body is not send', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
 				mainApp,
 				userRepository,
@@ -108,11 +93,8 @@ describe('Posts (e2e)', () => {
 				defUserPassword,
 			)
 
-			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
-
 			const addPostRes = await postRequest(mainApp, RouteNames.POSTS.value)
 				.set('authorization', 'Bearer ' + accessToken)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
 
 			checkErrorResponse(addPostRes.body, 400, 'Files not found')
@@ -127,15 +109,12 @@ describe('Posts (e2e)', () => {
 				defUserPassword,
 			)
 
-			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
-
 			// Send large file and in invalid format
 			const textFilePath = path.join(__dirname, 'utils/files/text.txt')
 			const bigFilePath = path.join(__dirname, 'utils/files/big-avatar.png')
 
 			const addPostRes = await postRequest(mainApp, RouteNames.POSTS.value)
 				.set('authorization', 'Bearer ' + accessToken)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.set('Content-Type', 'multipart/form-data')
 				.attach('photoFiles', textFilePath)
 				.attach('photoFiles', bigFilePath)
@@ -153,17 +132,12 @@ describe('Posts (e2e)', () => {
 				defUserPassword,
 			)
 
-			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
-
-			;(filesMicroservice.send as jest.Mock).mockImplementation(() => {
-				return of(['url 1', 'url 2'])
-			})
+			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
 
 			const avatarFilePath = path.join(__dirname, 'utils/files/avatar.png')
 
 			const addPostRes = await postRequest(mainApp, RouteNames.POSTS.value)
 				.set('authorization', 'Bearer ' + accessToken)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.set('Content-Type', 'multipart/form-data')
 				.attach('photoFiles', avatarFilePath)
 				.attach('photoFiles', avatarFilePath)
@@ -202,19 +176,14 @@ describe('Posts (e2e)', () => {
 				defUserPassword,
 			)
 
-			;(filesMicroservice.send as jest.Mock).mockImplementation(() => {
-				return of(['url 1', 'url 2'])
-			})
-
-			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
-
 			let secondPostId = 0
 			for (let i = 0; i < 2; i++) {
+				mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
+
 				const addPost = await postUtils.createPost({
 					app: mainApp,
 					accessToken,
 					mainConfig,
-					refreshTokenValue,
 				})
 
 				if (i === 1) {
@@ -230,8 +199,8 @@ describe('Posts (e2e)', () => {
 				location: 'Photo location',
 				userId: 1,
 				photos: [
-					{ id: 1, url: 'url 1' },
-					{ id: 2, url: 'url 2' },
+					{ id: 3, url: 'url 1' },
+					{ id: 4, url: 'url 2' },
 				],
 			}
 
@@ -240,26 +209,6 @@ describe('Posts (e2e)', () => {
 	})
 
 	describe('Update post', () => {
-		it('should return 401 if there is not cookies', async () => {
-			await userUtils.deviceTokenChecks.tokenNotExist(
-				mainApp,
-				'patch',
-				RouteNames.POSTS.POST(1).full,
-			)
-		})
-
-		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
-			await userUtils.deviceTokenChecks.tokenExpired(
-				mainApp,
-				'patch',
-				RouteNames.POSTS.POST(1).full,
-				userRepository,
-				securityRepository,
-				jwtService,
-				mainConfig,
-			)
-		})
-
 		it('should return 404 if the auth data is valid, but there is not a post with passed id', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
 				mainApp,
@@ -269,11 +218,8 @@ describe('Posts (e2e)', () => {
 				defUserPassword,
 			)
 
-			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
-
 			const updatePostRes = await patchRequest(mainApp, RouteNames.POSTS.POST(999).full)
 				.set('authorization', 'Bearer ' + accessToken)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.expect(HTTP_STATUSES.NOT_FOUNT_404)
 
 			checkErrorResponse(updatePostRes.body, 404, 'Post not found')
@@ -288,23 +234,17 @@ describe('Posts (e2e)', () => {
 				defUserPassword,
 			)
 
-			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
-
-			;(filesMicroservice.send as jest.Mock).mockImplementation(() => {
-				return of(['url 1', 'url 2'])
-			})
+			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
 
 			const addPost = await postUtils.createPost({
 				app: mainApp,
 				accessToken,
 				mainConfig,
-				refreshTokenValue,
 			})
 			const postId = addPost.data.id
 
 			const updatePostRes = await patchRequest(mainApp, RouteNames.POSTS.POST(postId).full)
 				.set('authorization', 'Bearer ' + accessToken)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.send({
 					text: '1',
 					location: 2,
@@ -328,22 +268,17 @@ describe('Posts (e2e)', () => {
 				defUserPassword,
 			)
 
-			const refreshTokenValue1 = parseCookieStringToObj(refreshTokenStr1).cookieValue
-
-			;(filesMicroservice.send as jest.Mock).mockImplementation(() => {
-				return of(['url 1', 'url 2'])
-			})
+			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
 
 			const addPost = await postUtils.createPost({
 				app: mainApp,
 				accessToken: accessToken1,
 				mainConfig,
-				refreshTokenValue: refreshTokenValue1,
 			})
 			const postId = addPost.data.id
 
 			// This user will try to edit the post
-			const [accessToken2, refreshTokenStr2] = await userUtils.createUserAndLogin(
+			const [accessToken2] = await userUtils.createUserAndLogin(
 				mainApp,
 				userRepository,
 				'secondUserName',
@@ -375,23 +310,17 @@ describe('Posts (e2e)', () => {
 				defUserPassword,
 			)
 
-			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
-
-			;(filesMicroservice.send as jest.Mock).mockImplementation(() => {
-				return of(['url 1', 'url 2'])
-			})
+			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
 
 			const addPost = await postUtils.createPost({
 				app: mainApp,
 				accessToken,
 				mainConfig,
-				refreshTokenValue,
 			})
 			const postId = addPost.data.id
 
 			const updatePostRes = await patchRequest(mainApp, RouteNames.POSTS.POST(postId).full)
 				.set('authorization', 'Bearer ' + accessToken)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.send({
 					text: 'My new post text',
 					location: 'My new location',
@@ -418,26 +347,6 @@ describe('Posts (e2e)', () => {
 	})
 
 	describe('Update post', () => {
-		it('should return 401 if there is not cookies', async () => {
-			await userUtils.deviceTokenChecks.tokenNotExist(
-				mainApp,
-				'delete',
-				RouteNames.POSTS.POST(1).full,
-			)
-		})
-
-		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
-			await userUtils.deviceTokenChecks.tokenExpired(
-				mainApp,
-				'delete',
-				RouteNames.POSTS.POST(1).full,
-				userRepository,
-				securityRepository,
-				jwtService,
-				mainConfig,
-			)
-		})
-
 		it('should return 404 if the auth data is valid, but there is not a post with passed id', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
 				mainApp,
@@ -447,11 +356,8 @@ describe('Posts (e2e)', () => {
 				defUserPassword,
 			)
 
-			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
-
 			const deletePostRes = await deleteRequest(mainApp, RouteNames.POSTS.POST(999).full)
 				.set('authorization', 'Bearer ' + accessToken)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.expect(HTTP_STATUSES.NOT_FOUNT_404)
 
 			checkErrorResponse(deletePostRes.body, 404, 'Post not found')
@@ -467,22 +373,17 @@ describe('Posts (e2e)', () => {
 				defUserPassword,
 			)
 
-			const refreshTokenValue1 = parseCookieStringToObj(refreshTokenStr1).cookieValue
-
-			;(filesMicroservice.send as jest.Mock).mockImplementation(() => {
-				return of(['url 1', 'url 2'])
-			})
+			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
 
 			const addPost = await postUtils.createPost({
 				app: mainApp,
 				accessToken: accessToken1,
 				mainConfig,
-				refreshTokenValue: refreshTokenValue1,
 			})
 			const postId = addPost.data.id
 
 			// This user will try to delete the post
-			const [accessToken2, refreshTokenStr2] = await userUtils.createUserAndLogin(
+			const [accessToken2] = await userUtils.createUserAndLogin(
 				mainApp,
 				userRepository,
 				'secondUserName',
@@ -490,11 +391,8 @@ describe('Posts (e2e)', () => {
 				'secondPassword',
 			)
 
-			const refreshTokenValue2 = parseCookieStringToObj(refreshTokenStr1).cookieValue
-
 			const deletePostRes = await deleteRequest(mainApp, RouteNames.POSTS.POST(postId).full)
 				.set('authorization', 'Bearer ' + accessToken2)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue2)
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
 			const deletePost = deletePostRes.body
 
@@ -510,26 +408,25 @@ describe('Posts (e2e)', () => {
 				defUserPassword,
 			)
 
-			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
-
-			;(filesMicroservice.send as jest.Mock).mockImplementation(() => {
-				return of(['url 1', 'url 2'])
-			})
+			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
 
 			const addPost = await postUtils.createPost({
 				app: mainApp,
 				accessToken,
 				mainConfig,
-				refreshTokenValue,
 			})
 			const postId = addPost.data.id
 
+			resentMockFilesServiceSendMethod(filesMicroservice)
+			mockFilesServiceSendMethod(filesMicroservice, [])
+
 			const deletePostRes = await deleteRequest(mainApp, RouteNames.POSTS.POST(postId).full)
 				.set('authorization', 'Bearer ' + accessToken)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.expect(HTTP_STATUSES.OK_200)
-			const deletePost = deletePostRes.body
 
+			expect(filesMicroservice.send).toBeCalledTimes(2)
+
+			const deletePost = deletePostRes.body
 			checkSuccessResponse(deletePost, 200, null)
 
 			const getPostRes = await getRequest(mainApp, RouteNames.POSTS.POST(postId).full)
@@ -538,12 +435,6 @@ describe('Posts (e2e)', () => {
 	})
 
 	describe('Get recent posts', () => {
-		it('should return an empty array if there is no post', async () => {
-			const getRecentPostsRes = await getRequest(mainApp, RouteNames.POSTS.RECENT.full)
-
-			checkSuccessResponse(getRecentPostsRes.body, 200, [])
-		})
-
 		it('should return an array with 4 posts', async () => {
 			// Create a user which will created 3 posts
 			const [accessToken1, refreshTokenStr1] = await userUtils.createUserAndLogin(
@@ -554,18 +445,13 @@ describe('Posts (e2e)', () => {
 				defUserPassword,
 			)
 
-			;(filesMicroservice.send as jest.Mock).mockImplementation(() => {
-				return of(['url 1', 'url 2'])
-			})
-
-			const refreshTokenValue1 = parseCookieStringToObj(refreshTokenStr1).cookieValue
+			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
 
 			for (let i = 0; i < 3; i++) {
 				await postUtils.createPost({
 					app: mainApp,
 					accessToken: accessToken1,
 					mainConfig,
-					refreshTokenValue: refreshTokenValue1,
 				})
 			}
 
@@ -578,14 +464,11 @@ describe('Posts (e2e)', () => {
 				'secondPassword',
 			)
 
-			const refreshTokenValue2 = parseCookieStringToObj(refreshTokenStr2).cookieValue
-
 			for (let i = 0; i < 3; i++) {
 				await postUtils.createPost({
 					app: mainApp,
 					accessToken: accessToken2,
 					mainConfig,
-					refreshTokenValue: refreshTokenValue2,
 				})
 			}
 

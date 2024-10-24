@@ -2,8 +2,9 @@ import { Transport } from '@nestjs/microservices'
 import { Test, TestingModule } from '@nestjs/testing'
 import { FilesModule } from '../../src/filesModule'
 import { S3Client } from '@aws-sdk/client-s3'
+import { FilesService } from '../../src/filesService'
 
-export async function createFilesApp(s3Client: S3Client) {
+export async function createFilesApp(filesService: FilesService) {
 	const moduleFixture: TestingModule = await Test.createTestingModule({
 		imports: [FilesModule],
 	})
@@ -23,10 +24,10 @@ export async function createFilesApp(s3Client: S3Client) {
 
 	await filesApp.listen()
 
-	s3Client = moduleFixture.get<S3Client>(S3Client)
+	filesService = moduleFixture.get<FilesService>(FilesService)
 
 	return {
-		s3Client,
+		filesService,
 		filesApp,
 	}
 }

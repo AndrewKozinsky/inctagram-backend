@@ -21,7 +21,6 @@ import { ClientProxy } from '@nestjs/microservices'
 import RouteNames from '../routesConfig/routeNames'
 import { RouteDecorators } from '../routesConfig/routesDecorators'
 import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
-import { CheckDeviceRefreshTokenGuard } from '../../infrastructure/guards/checkDeviceRefreshToken.guard'
 import { CheckAccessTokenGuard } from '../../infrastructure/guards/checkAccessToken.guard'
 import { postsRoutesConfig } from './postsRoutesConfig'
 import {
@@ -91,9 +90,7 @@ export class PostController implements OnModuleInit {
 	})
 	@ApiCookieAuth()
 	@ApiBearerAuth('access-token')
-	@ApiBearerAuth('refresh-token')
 	@UseGuards(CheckAccessTokenGuard)
-	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Post()
 	@RouteDecorators(postsRoutesConfig.createPost)
 	@UseInterceptors(FilesInterceptor('photoFiles'))
@@ -132,9 +129,7 @@ export class PostController implements OnModuleInit {
 
 	@ApiCookieAuth()
 	@ApiBearerAuth('access-token')
-	@ApiBearerAuth('refresh-token')
 	@UseGuards(CheckAccessTokenGuard)
-	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Patch(':postId')
 	@RouteDecorators(postsRoutesConfig.getPost)
 	async updatePost(
@@ -156,9 +151,7 @@ export class PostController implements OnModuleInit {
 
 	@ApiCookieAuth()
 	@ApiBearerAuth('access-token')
-	@ApiBearerAuth('refresh-token')
 	@UseGuards(CheckAccessTokenGuard)
-	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Delete(':postId')
 	@RouteDecorators(postsRoutesConfig.deletePost)
 	async deletePost(

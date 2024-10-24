@@ -36,11 +36,9 @@ export class UpdatePostHandler implements ICommandHandler<UpdatePostCommand> {
 			throw new Error(ErrorMessage.PostNotBelongToUser)
 		}
 
-		/*await this.postRepository.updatePost(postId, dto)
+		await this.postRepository.updatePost(postId, dto)
 
 		const updatedPost = await this.postQueryRepository.getPostById(postId)
-		return updatedPost!*/
-		// ---
-		return '' as any
+		return updatedPost!
 	}
 }

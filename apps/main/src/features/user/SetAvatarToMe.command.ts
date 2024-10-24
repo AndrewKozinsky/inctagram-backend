@@ -25,17 +25,15 @@ export class SetAvatarToMeHandler implements ICommandHandler<SetAvatarToMeComman
 		let avatarUrl: null | string = null
 
 		// Save file
-		try {
-			const sendingDataContract: FileMS_SaveUserAvatarInContract = { userId, avatarFile }
-			avatarUrl = await lastValueFrom(
-				this.filesMicroClient.send(FileMS_EventNames.SaveUserAvatar, sendingDataContract),
-			)
+		const sendingDataContract: FileMS_SaveUserAvatarInContract = { userId, avatarFile }
+		avatarUrl = await lastValueFrom(
+			this.filesMicroClient.send(FileMS_EventNames.SaveUserAvatar, sendingDataContract),
+		)
 
-			// Set avatar image src to user table in DB
-			await this.userRepository.updateUser(userId, {
-				avatar: avatarUrl,
-			})
-		} catch (err: any) {}
+		// Set avatar image src to user table in DB
+		await this.userRepository.updateUser(userId, {
+			avatar: avatarUrl,
+		})
 
 		return {
 			avatarUrl,

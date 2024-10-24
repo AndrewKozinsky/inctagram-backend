@@ -110,7 +110,6 @@ describe('Auth (e2e)', () => {
 			const citiesRes = getCitiesRes.body
 			checkSuccessResponse(citiesRes, 200)
 			expect(citiesRes.data.cities.length).toBe(20)
-			console.log(citiesRes.data.cities[0])
 			expect(citiesRes.data.cities[0].name).toBe('Monchegorsk')
 			expect(citiesRes.data.cities[19].name).toBe('Moshkovskiy Rayon')
 		})

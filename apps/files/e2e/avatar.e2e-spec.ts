@@ -4,9 +4,9 @@ import path from 'path'
 import fs from 'node:fs/promises'
 import { FileMS_EventNames, FileMS_SaveUserAvatarInContract } from '@app/shared'
 import { Readable } from 'stream'
-import { S3Client } from '@aws-sdk/client-s3'
 import { createFilesApp } from './utils/createFilesApp'
 import { createEmitApp } from './utils/createEmitApp'
+import { FilesService } from '../src/filesService'
 
 it('123', async () => {
 	expect(2).toBe(2)
@@ -15,12 +15,12 @@ it('123', async () => {
 describe('Auth (e2e)', () => {
 	let emitApp: ClientProxy
 	let filesApp: INestMicroservice
-	let s3Client: S3Client
+	let filesService: FilesService
 
 	beforeAll(async () => {
-		const createFilesAppRes = await createFilesApp(s3Client)
+		const createFilesAppRes = await createFilesApp(filesService)
 		filesApp = createFilesAppRes.filesApp
-		s3Client = createFilesAppRes.s3Client
+		filesService = createFilesAppRes.filesService
 
 		emitApp = await createEmitApp()
 	})
@@ -37,8 +37,9 @@ describe('Auth (e2e)', () => {
 	})
 
 	it.only('should respond to the request', async () => {
-		const avatarFilePath = path.join(__dirname, 'utils/files/avatar.png')
+		filesService.s3Client.send = jest.fn().mockResolvedValueOnce('mockResponse')
 
+		const avatarFilePath = path.join(__dirname, 'utils/files/avatar.png')
 		const avatarFile = await readFileAsMulterFile(avatarFilePath)
 
 		// Send a request to the microservice
@@ -48,8 +49,8 @@ describe('Auth (e2e)', () => {
 			avatarFile,
 		}
 
-		const response = await emitApp.send(eventName, payload).toPromise()
-		expect(s3Client.send).toBeCalledTimes(1)
+		await emitApp.send(eventName, payload).toPromise()
+		expect(filesService.s3Client.send).toBeCalledTimes(1)
 	})
 })
 

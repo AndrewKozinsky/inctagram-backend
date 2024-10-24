@@ -22,7 +22,6 @@ import { ClientProxy } from '@nestjs/microservices'
 import RouteNames from '../routesConfig/routeNames'
 import { RouteDecorators } from '../routesConfig/routesDecorators'
 import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
-import { CheckDeviceRefreshTokenGuard } from '../../infrastructure/guards/checkDeviceRefreshToken.guard'
 import {
 	EditMyProfileDtoModel,
 	GetUserPostsQueries,
@@ -86,9 +85,7 @@ export class UserController implements OnModuleInit {
 	}
 
 	@ApiBearerAuth('access-token')
-	@ApiBearerAuth('refresh-token')
 	@UseGuards(CheckAccessTokenGuard)
-	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Patch(RouteNames.USERS.ME.value)
 	@RouteDecorators(usersRoutesConfig.me.editProfile)
 	async editMyProfile(
@@ -108,9 +105,7 @@ export class UserController implements OnModuleInit {
 	}
 
 	@ApiBearerAuth('access-token')
-	@ApiBearerAuth('refresh-token')
 	@UseGuards(CheckAccessTokenGuard)
-	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Get(RouteNames.USERS.ME.value)
 	@RouteDecorators(usersRoutesConfig.me.getProfile)
 	async getMyProfile(@Req() req: Request): Promise<SWUserProfileRouteOut | undefined> {
@@ -161,9 +156,7 @@ export class UserController implements OnModuleInit {
 	})
 	@ApiCookieAuth()
 	@ApiBearerAuth('access-token')
-	@ApiBearerAuth('refresh-token')
 	@UseGuards(CheckAccessTokenGuard)
-	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Post([RouteNames.USERS.ME.value, RouteNames.USERS.ME.AVATAR.value].join('/'))
 	@RouteDecorators(usersRoutesConfig.me.setAvatar)
 	@UseInterceptors(FileInterceptor('avatarFile'))
@@ -185,9 +178,7 @@ export class UserController implements OnModuleInit {
 	}
 
 	@ApiBearerAuth('access-token')
-	@ApiBearerAuth('refresh-token')
 	@UseGuards(CheckAccessTokenGuard)
-	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Get([RouteNames.USERS.ME.value, RouteNames.USERS.ME.AVATAR.value].join('/'))
 	@RouteDecorators(usersRoutesConfig.me.getAvatar)
 	async getMyAvatar(@Req() req: Request): Promise<SWUserMeGetAvatarRouteOut | undefined> {
@@ -204,9 +195,7 @@ export class UserController implements OnModuleInit {
 	}
 
 	@ApiBearerAuth('access-token')
-	@ApiBearerAuth('refresh-token')
 	@UseGuards(CheckAccessTokenGuard)
-	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Delete([RouteNames.USERS.ME.value, RouteNames.USERS.ME.AVATAR.value].join('/'))
 	@RouteDecorators(usersRoutesConfig.me.deleteAvatar)
 	async deleteMyAvatar(@Req() req: Request): Promise<SWEmptyRouteOut | undefined> {

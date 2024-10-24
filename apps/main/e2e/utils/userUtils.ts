@@ -144,7 +144,7 @@ export const userUtils = {
 			checkErrorResponse(req, 401, 'Refresh token is not valid')
 		},
 		// should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect
-		async tokenExpired(
+		async refreshTokenExpired(
 			app: INestApplication,
 			methodType: 'get' | 'post' | 'put' | 'patch' | 'delete',
 			routeUrl: string,

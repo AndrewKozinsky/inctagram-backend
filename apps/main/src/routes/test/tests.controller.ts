@@ -8,10 +8,7 @@ import { ApiTags } from '@nestjs/swagger'
 @ApiTags('Testing')
 @Controller(RouteNames.TESTING.value)
 export class TestsController {
-	constructor(
-		private dbService: DbService,
-		private mainConfig: MainConfigService,
-	) {}
+	constructor(private dbService: DbService) {}
 
 	@Delete(RouteNames.TESTING.ALL_DATA.value)
 	async deleteAllData(@Res() res: Response) {

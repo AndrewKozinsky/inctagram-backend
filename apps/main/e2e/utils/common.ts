@@ -1,5 +1,7 @@
 import { agent as request } from 'supertest'
 import { INestApplication } from '@nestjs/common'
+import { of } from 'rxjs'
+import { ClientProxy } from '@nestjs/microservices'
 
 export const adminAuthorizationValue = 'Basic YWRtaW46cXdlcnR5'
 export const defUserName = 'myUserName'
@@ -69,4 +71,17 @@ export function checkSuccessResponse(resObj: any, code: number, expectedData?: a
 	if (expectedData) {
 		expect(resObj.data).toEqual(expectedData)
 	}
+}
+
+export function mockFilesServiceSendMethod(
+	filesMicroservice: ClientProxy,
+	returnValue: string | string[],
+) {
+	;(filesMicroservice.send as jest.Mock).mockImplementation(() => {
+		return of(returnValue)
+	})
+}
+
+export function resentMockFilesServiceSendMethod(filesMicroservice: ClientProxy) {
+	;(filesMicroservice.send as jest.Mock).mockReset()
 }

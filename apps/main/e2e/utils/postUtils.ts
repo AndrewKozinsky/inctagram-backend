@@ -25,7 +25,6 @@ export const postUtils = {
 		app: INestApplication
 		accessToken: string
 		mainConfig: MainConfigService
-		refreshTokenValue: string
 		postText?: string
 		postLocation?: string
 	}) {
@@ -33,7 +32,6 @@ export const postUtils = {
 			app,
 			accessToken,
 			mainConfig,
-			refreshTokenValue,
 			postText = 'Post description',
 			postLocation = 'Photo location',
 		} = params
@@ -42,7 +40,6 @@ export const postUtils = {
 
 		const addPostRes = await postRequest(app, RouteNames.POSTS.value)
 			.set('authorization', 'Bearer ' + accessToken)
-			.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 			.set('Content-Type', 'multipart/form-data')
 			.attach('photoFiles', avatarFilePath)
 			.attach('photoFiles', avatarFilePath)

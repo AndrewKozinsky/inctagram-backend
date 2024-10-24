@@ -6,7 +6,10 @@ import {
 	FileMS_SaveFileInContract,
 	FileMS_SaveUserAvatarInContract,
 } from '@app/shared'
-import { FileMS_SavePostImagesInContract } from '@app/shared/contracts/fileMS.contracts'
+import {
+	FileMS_DeleteFileInContract,
+	FileMS_SavePostImagesInContract,
+} from '@app/shared/contracts/fileMS.contracts'
 import { createUniqString } from '@app/shared'
 
 @Injectable()
@@ -22,9 +25,9 @@ export class FilesService {
 			// Указать адрес сервиса Яндекса
 			endpoint,
 			credentials: {
-				// Указать ключ доступа к учётной записи
+				// Ключ доступа к учётной записи
 				accessKeyId,
-				// Указать секретный ключ доступа к учётной записи
+				// Секретный ключ доступа к учётной записи
 				secretAccessKey,
 			},
 		})
@@ -52,6 +55,11 @@ export class FilesService {
 		}
 	}
 
+	async deleteUserAvatar(deleteUserAvatarInContract: FileMS_DeleteFileInContract) {
+		const { fileUrl } = deleteUserAvatarInContract
+		await this.deleteFile(fileUrl)
+	}
+
 	async savePostImages(savePostImagesInContract: FileMS_SavePostImagesInContract) {
 		const { userId, photoFiles } = savePostImagesInContract
 
@@ -70,7 +78,7 @@ export class FilesService {
 			}
 
 			try {
-				await this.saveFile(setUserAvatarContract)
+				const res = await this.saveFile(setUserAvatarContract)
 				imagesUrls.push(imageUrl)
 			} catch (error: any) {
 				throw new Error(ErrorMessage.CannotSaveFile)
@@ -87,7 +95,7 @@ export class FilesService {
 	async saveFile(fileData: FileMS_SaveFileInContract) {
 		const { bucket } = this.mainConfig.get().s3
 
-		return await this.s3Client.send(
+		await this.s3Client.send(
 			// Класс PutObjectCommand создаёт экземпляр класса создающего файл.
 			new PutObjectCommand({
 				Bucket: bucket,
@@ -101,16 +109,21 @@ export class FilesService {
 		)
 	}
 
-	async deleteFile(filePath: string) {
+	async deleteFile(filePath: null | string) {
+		if (!filePath) return
+
 		const { bucket } = this.mainConfig.get().s3
 
-		return await this.s3Client.send(
-			// DeleteObjectCommand creates an instance deleting a file.
-			new DeleteObjectCommand({
-				Bucket: bucket,
-				// Путь до файла
-				Key: filePath,
-			}),
-		)
+		try {
+			return await this.s3Client.send(
+				// DeleteObjectCommand creates an instance deleting a file.
+				new DeleteObjectCommand({
+					Bucket: bucket,
+					Key: filePath,
+				}),
+			)
+		} catch (error) {
+			console.log(error)
+		}
 	}
 }

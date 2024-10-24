@@ -12,6 +12,7 @@ import {
 	defUserName,
 	defUserPassword,
 	patchRequest,
+	mockFilesServiceSendMethod,
 } from './utils/common'
 import RouteNames from '../src/routes/routesConfig/routeNames'
 import { HTTP_STATUSES } from '../src/utils/httpStatuses'
@@ -26,7 +27,6 @@ import { DevicesRepository } from '../src/repositories/devices.repository'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 import { createMainApp } from './utils/createMainApp'
 import { ClientProxy } from '@nestjs/microservices'
-import { of } from 'rxjs'
 import { postUtils } from './utils/postUtils'
 
 it.only('123', async () => {
@@ -92,7 +92,7 @@ describe('Users (e2e)', () => {
 		})
 
 		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
-			await userUtils.deviceTokenChecks.tokenExpired(
+			await userUtils.deviceTokenChecks.refreshTokenExpired(
 				mainApp,
 				'post',
 				RouteNames.USERS.ME.AVATAR.full,
@@ -112,11 +112,8 @@ describe('Users (e2e)', () => {
 				defUserPassword,
 			)
 
-			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
-
 			const addAvatarRes = await postRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
 				.set('authorization', 'Bearer ' + accessToken)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
 
 			checkErrorResponse(addAvatarRes.body, 400, 'File not found')
@@ -131,14 +128,11 @@ describe('Users (e2e)', () => {
 				defUserPassword,
 			)
 
-			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
-
 			// Send file in invalid format
 			const textFilePath = path.join(__dirname, 'utils/files/text.txt')
 
 			const addAvatarRes1 = await postRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
 				.set('authorization', 'Bearer ' + accessToken)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.set('Content-Type', 'multipart/form-data')
 				.attach('avatarFile', textFilePath)
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
@@ -150,7 +144,6 @@ describe('Users (e2e)', () => {
 
 			const addAvatarRes2 = await postRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
 				.set('authorization', 'Bearer ' + accessToken)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.set('Content-Type', 'multipart/form-data')
 				.attach('avatarFile', bigFilePath)
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
@@ -167,13 +160,12 @@ describe('Users (e2e)', () => {
 				defUserPassword,
 			)
 
-			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
-
 			const avatarFilePath = path.join(__dirname, 'utils/files/avatar.png')
 
-			const addAvatarRes = await postRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
+			mockFilesServiceSendMethod(filesMicroservice, '')
+
+			await postRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
 				.set('authorization', 'Bearer ' + accessToken)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.set('Content-Type', 'multipart/form-data')
 				.attach('avatarFile', avatarFilePath)
 				.expect(HTTP_STATUSES.OK_200)
@@ -192,7 +184,7 @@ describe('Users (e2e)', () => {
 		})
 
 		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
-			await userUtils.deviceTokenChecks.tokenExpired(
+			await userUtils.deviceTokenChecks.refreshTokenExpired(
 				mainApp,
 				'get',
 				RouteNames.USERS.ME.AVATAR.full,
@@ -212,24 +204,22 @@ describe('Users (e2e)', () => {
 				defUserPassword,
 			)
 
-			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
+			mockFilesServiceSendMethod(filesMicroservice, 'url-1')
 
 			const avatarFilePath = path.join(__dirname, 'utils/files/avatar.png')
 
-			const addAvatarRes = await postRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
+			await postRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
 				.set('Content-Type', 'multipart/form-data')
 				.attach('avatarFile', avatarFilePath)
 				.set('authorization', 'Bearer ' + accessToken)
 				.expect(HTTP_STATUSES.OK_200)
 
 			const getAvatarRes = await getRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.set('authorization', 'Bearer ' + accessToken)
 				.expect(HTTP_STATUSES.OK_200)
 
 			checkSuccessResponse(getAvatarRes.body, 200, {
-				avatarUrl: 'https://sociable-people.storage.yandexcloud.net/null',
+				avatarUrl: 'https://sociable-people.storage.yandexcloud.net/url-1',
 			})
 
 			expect(filesMicroservice.send).toBeCalledTimes(1)
@@ -237,16 +227,8 @@ describe('Users (e2e)', () => {
 	})
 
 	describe('Delete current user avatar file', () => {
-		it('should return 401 if there is not cookies', async () => {
-			await userUtils.deviceTokenChecks.tokenNotExist(
-				mainApp,
-				'delete',
-				RouteNames.USERS.ME.AVATAR.full,
-			)
-		})
-
 		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
-			await userUtils.deviceTokenChecks.tokenExpired(
+			await userUtils.deviceTokenChecks.refreshTokenExpired(
 				mainApp,
 				'delete',
 				RouteNames.USERS.ME.AVATAR.full,
@@ -266,47 +248,38 @@ describe('Users (e2e)', () => {
 				defUserPassword,
 			)
 
-			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
-
 			const avatarFilePath = path.join(__dirname, 'utils/files/avatar.png')
 
+			mockFilesServiceSendMethod(filesMicroservice, 'url-1')
+
 			// Add avatar
-			const addAvatarRes = await postRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
+			await postRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
 				.set('Content-Type', 'multipart/form-data')
 				.attach('avatarFile', avatarFilePath)
 				.set('authorization', 'Bearer ' + accessToken)
 				.expect(HTTP_STATUSES.OK_200)
 
+			mockFilesServiceSendMethod(filesMicroservice, '')
+
 			// Delete avatar
-			const deleteAvatarRes = await deleteRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
+			await deleteRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
 				.set('authorization', 'Bearer ' + accessToken)
 				.expect(HTTP_STATUSES.OK_200)
 
+			expect(filesMicroservice.send).toBeCalledTimes(2)
+
 			// Check avatar is gone
 			const getAvatarRes = await getRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.set('authorization', 'Bearer ' + accessToken)
 				.expect(HTTP_STATUSES.OK_200)
 
 			checkSuccessResponse(getAvatarRes.body, 200, null)
-
-			expect(filesMicroservice.send).toBeCalledTimes(1)
 		})
 	})
 
 	describe('Update user profile', () => {
-		it('should return 401 if there is not cookies', async () => {
-			await userUtils.deviceTokenChecks.tokenNotExist(
-				mainApp,
-				'patch',
-				RouteNames.USERS.ME.full,
-			)
-		})
-
 		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
-			await userUtils.deviceTokenChecks.tokenExpired(
+			await userUtils.deviceTokenChecks.refreshTokenExpired(
 				mainApp,
 				'patch',
 				RouteNames.USERS.ME.full,
@@ -325,7 +298,6 @@ describe('Users (e2e)', () => {
 				defUserEmail,
 				defUserPassword,
 			)
-			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
 
 			// ============================
 
@@ -341,7 +313,6 @@ describe('Users (e2e)', () => {
 			}
 
 			const updateProfileRes_1 = await patchRequest(mainApp, RouteNames.USERS.ME.full)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.set('authorization', 'Bearer ' + accessToken)
 				.send(updateProfileBody_1)
 				.expect(HTTP_STATUSES.OK_200)
@@ -352,7 +323,6 @@ describe('Users (e2e)', () => {
 
 			// Check if user properties was changed
 			const getProfileRes_1 = await getRequest(mainApp, RouteNames.USERS.ME.full)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.set('authorization', 'Bearer ' + accessToken)
 				.expect(HTTP_STATUSES.OK_200)
 
@@ -381,7 +351,6 @@ describe('Users (e2e)', () => {
 			}
 
 			const updateProfileRes_2 = await patchRequest(mainApp, RouteNames.USERS.ME.full)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.set('authorization', 'Bearer ' + accessToken)
 				.send(updateProfileBody_2)
 				.expect(HTTP_STATUSES.OK_200)
@@ -392,7 +361,6 @@ describe('Users (e2e)', () => {
 
 			// Check if user properties was changed
 			const getProfileRes_2 = await getRequest(mainApp, RouteNames.USERS.ME.full)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.set('authorization', 'Bearer ' + accessToken)
 				.expect(HTTP_STATUSES.OK_200)
 
@@ -410,16 +378,8 @@ describe('Users (e2e)', () => {
 	})
 
 	describe('Get user profile', () => {
-		it('should return 401 if there is not cookies', async () => {
-			await userUtils.deviceTokenChecks.tokenNotExist(
-				mainApp,
-				'get',
-				RouteNames.USERS.ME.full,
-			)
-		})
-
 		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
-			await userUtils.deviceTokenChecks.tokenExpired(
+			await userUtils.deviceTokenChecks.refreshTokenExpired(
 				mainApp,
 				'get',
 				RouteNames.USERS.ME.full,
@@ -438,11 +398,9 @@ describe('Users (e2e)', () => {
 				defUserEmail,
 				defUserPassword,
 			)
-			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
 
 			// Get user profile
 			const getProfileRes_1 = await getRequest(mainApp, RouteNames.USERS.ME.full)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.set('authorization', 'Bearer ' + accessToken)
 				.expect(HTTP_STATUSES.OK_200)
 
@@ -468,15 +426,13 @@ describe('Users (e2e)', () => {
 				aboutMe: 'my new text about me',
 			}
 
-			const updateProfileRes = await patchRequest(mainApp, RouteNames.USERS.ME.full)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
+			await patchRequest(mainApp, RouteNames.USERS.ME.full)
 				.set('authorization', 'Bearer ' + accessToken)
 				.send(updateProfileBody_1)
 				.expect(HTTP_STATUSES.OK_200)
 
 			// Get user properties again
 			const getProfileRes_2 = await getRequest(mainApp, RouteNames.USERS.ME.full)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.set('authorization', 'Bearer ' + accessToken)
 				.expect(HTTP_STATUSES.OK_200)
 
@@ -502,7 +458,7 @@ describe('Users (e2e)', () => {
 				RouteNames.USERS.USER_ID(user.id).POSTS.full,
 			).expect(HTTP_STATUSES.OK_200)
 
-			const expectedData = { page: 1, pageSize: 10, pagesCount: 0, totalCount: 0 }
+			const expectedData = { page: 1, pageSize: 10, pagesCount: 0, totalCount: 0, items: [] }
 			checkSuccessResponse(getUserPostRes.body, 200, expectedData)
 		})
 
@@ -515,18 +471,13 @@ describe('Users (e2e)', () => {
 				defUserPassword,
 			)
 
-			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
-
-			;(filesMicroservice.send as jest.Mock).mockImplementation(() => {
-				return of(['url 1', 'url 2'])
-			})
+			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
 
 			for (let i = 0; i < 2; i++) {
 				await postUtils.createPost({
 					app: mainApp,
 					accessToken,
 					mainConfig,
-					refreshTokenValue,
 				})
 			}
 
@@ -576,11 +527,7 @@ describe('Users (e2e)', () => {
 				defUserPassword,
 			)
 
-			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
-
-			;(filesMicroservice.send as jest.Mock).mockImplementation(() => {
-				return of(['url 1', 'url 2'])
-			})
+			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
 
 			// Create 12 posts
 			for (let i = 0; i < 12; i++) {
@@ -588,7 +535,6 @@ describe('Users (e2e)', () => {
 					app: mainApp,
 					accessToken,
 					mainConfig,
-					refreshTokenValue,
 				})
 			}
 
