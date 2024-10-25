@@ -1,18 +1,19 @@
-import { Injectable } from '@nestjs/common'
-import { Post, PostPhoto, User } from '@prisma/client'
-import { add } from 'date-fns'
-import { HashAdapterService } from '@app/hash-adapter'
-import { PrismaService } from '../db/prisma.service'
-import { CreateUserDtoModel } from '../models/user/user.input.model'
-import { UserServiceModel } from '../models/user/user.service.model'
-import { createUniqString } from '@app/shared'
-import { JwtAdapterService } from '@app/jwt-adapter'
-import { CreatePostDtoModel } from '../models/post/post.input.model'
-import { PostServiceModel } from '../models/post/post.service.model'
-import { PostPhotoServiceModel } from '../models/postPhoto/post.service.model'
+// import { Injectable } from '@nestjs/common'
+// import { Post, PostPhoto, User } from '@prisma/client'
+// import { add } from 'date-fns'
+// import { HashAdapterService } from '@app/hash-adapter'
+// import { PrismaService } from '../db/prisma.service'
+// import { CreateUserDtoModel } from '../models/user/user.input.model'
+// import { UserServiceModel } from '../models/user/user.service.model'
+// import { createUniqString } from '@app/shared'
+// import { JwtAdapterService } from '@app/jwt-adapter'
+// import { CreatePostDtoModel } from '../models/post/post.input.model'
+// import { PostServiceModel } from '../models/post/post.service.model'
+// import { PostPhotoServiceModel } from '../models/postPhoto/post.service.model'
 
-@Injectable()
-export class PostPhotoRepository {
+// DELETE FILE!!!
+// @Injectable()
+/*export class PostPhotoRepository {
 	constructor(private prisma: PrismaService) {}
 
 	async createPostPhoto(postId: number, photoUrl: string) {
@@ -40,4 +41,4 @@ export class PostPhotoRepository {
 			url: dbPostPhoto.url,
 		}
 	}
-}
+}*/

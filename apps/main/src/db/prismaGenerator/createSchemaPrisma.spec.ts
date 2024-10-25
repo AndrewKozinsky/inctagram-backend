@@ -64,7 +64,7 @@ describe('createSchemaPrisma', () => {
 
 datasource db {
 	provider = "postgresql"
-	url      = env("DATABASE_URL")
+	url      = env("POSTGRES_DB_URL")
 }
 
 model User {

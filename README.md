@@ -46,7 +46,7 @@ $ yarn run migrate:generate-types
 ```
 
 ## Run database migration in publish mode
-Change value DATABASE_URL in .env
+Change value POSTGRES_DB_URL in .env
 from
 ```
 postgres://user:123@localhost:5432/inctagram

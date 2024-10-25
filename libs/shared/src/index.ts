@@ -1,9 +1,5 @@
 export * from './shared.module'
 export * from './shared.service'
 export { ErrorMessage } from './errorMessage'
-export {
-	FileMS_EventNames,
-	FileMS_SaveUserAvatarInContract,
-	FileMS_SaveFileInContract,
-} from './contracts/fileMS.contracts'
-export { createUniqString, parseCookieStringToObj } from './utils/stringUtils'
+export * from './contracts/fileMS.contracts'
+export * from './utils/stringUtils'

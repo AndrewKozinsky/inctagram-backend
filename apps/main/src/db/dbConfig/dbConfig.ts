@@ -85,10 +85,16 @@ export const bdConfig = {
 				example: 'Kozinsky',
 				required: false,
 			},
-			avatar: {
+			/*avatar: {
 				type: 'string',
 				description: "User's avatar image",
 				example: 'https://sociable-people.storage.yandexcloud.net/users/1/avatar.png',
+				required: false,
+			},*/
+			files_ms_avatar_id: {
+				type: 'string',
+				description: "User's avatar id in Files microservice",
+				example: 'gfysa252fjd',
 				required: false,
 			},
 			date_of_birth: {

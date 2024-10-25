@@ -1,26 +1,36 @@
 export enum FileMS_EventNames {
 	SaveUserAvatar = 'saveUserAvatar',
-	DeleteFile = 'deleteFile',
+	GetUserAvatar = 'getUserAvatar',
+	DeleteUserAvatar = 'deleteUserAvatar',
 	SavePostImages = 'savePostImages',
+	DeletePostImages = 'deletePostImages',
 }
 
 export type FileMS_SaveUserAvatarInContract = {
 	userId: number
 	avatarFile: Express.Multer.File
 }
+export type FileMS_SaveUserAvatarOutContract = {
+	avatarId: string
+	avatarUrl: string
+}
+
+export type FileMS_GetUserAvatarInContract = {
+	userId: number
+}
+export type FileMS_GetUserAvatarOutContract = {
+	avatarUrl: null | string
+}
 
 export type FileMS_DeleteFileInContract = {
-	fileUrl: null | string
+	userId: number
 }
 
 export type FileMS_SavePostImagesInContract = {
-	userId: number
+	postId: number
 	photoFiles: Express.Multer.File[]
 }
 
-export type FileMS_SaveFileInContract = {
-	mimetype: string
-	filePath: string
-	fileBuffer: Buffer
-	fileSize: number
+export type FileMS_DeletePostImagesInContract = {
+	postId: number
 }

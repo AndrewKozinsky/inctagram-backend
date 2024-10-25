@@ -7,7 +7,6 @@ import { PostRepository } from '../../repositories/post.repository'
 import { CreatePostDtoModel } from '../../models/post/post.input.model'
 import { FileMS_SavePostImagesInContract } from '@app/shared/contracts/fileMS.contracts'
 import { PostQueryRepository } from '../../repositories/post.queryRepository'
-import { PostPhotoRepository } from '../../repositories/postPhoto.repository'
 
 export class AddPostCommand {
 	constructor(
@@ -23,33 +22,27 @@ export class AddPostHandler implements ICommandHandler<AddPostCommand> {
 		@Inject('FILES_MICROSERVICE') private filesMicroClient: ClientProxy,
 		private postRepository: PostRepository,
 		private postQueryRepository: PostQueryRepository,
-		private postPhotoRepository: PostPhotoRepository,
 	) {}
 
 	async execute(command: AddPostCommand) {
 		const { userId, dto, photoFiles } = command
 
-		let photoUrls: string[] = []
+		// Create a post
+		const createdPost = await this.postRepository.createPost(userId, dto)
 
-		// Save photos
+		// Save photos files
 		try {
-			const sendingDataContract: FileMS_SavePostImagesInContract = { userId, photoFiles }
+			const sendingDataContract: FileMS_SavePostImagesInContract = {
+				postId: createdPost.id,
+				photoFiles,
+			}
 
-			// photoUrls = await this.sendFiles(FileMS_EventNames.SavePostImages, sendingDataContract)
-			photoUrls = await lastValueFrom(
+			await lastValueFrom(
 				this.filesMicroClient.send(FileMS_EventNames.SavePostImages, sendingDataContract),
 			)
 		} catch (err: any) {
 			console.log(err)
 			throw new Error(ErrorMessage.CannotSaveFiles)
-		}
-
-		// Create a post
-		const createdPost = await this.postRepository.createPost(userId, dto)
-
-		// Create post photos
-		for (const photoUrl of photoUrls) {
-			await this.postPhotoRepository.createPostPhoto(createdPost.id, photoUrl)
 		}
 
 		const post = await this.postQueryRepository.getPostById(createdPost.id)

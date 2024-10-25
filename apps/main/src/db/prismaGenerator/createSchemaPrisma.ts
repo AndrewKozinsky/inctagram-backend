@@ -10,7 +10,7 @@ import { BdConfig } from '../dbConfig/dbConfigType'
  *
  * datasource db {
  *     provider = "postgresql"
- *     url      = env("DATABASE_URL")
+ *     url      = env("POSTGRES_DB_URL")
  * }
  *
  * model User {
@@ -44,7 +44,7 @@ function getTopPrismaSchema() {
 
 datasource db {
 	provider = "postgresql"
-	url      = env("DATABASE_URL")
+	url      = env("POSTGRES_DB_URL")
 }`
 }
 

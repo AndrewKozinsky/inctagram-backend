@@ -10,7 +10,6 @@ import { AddPostHandler } from '../../features/posts/AddPost.command'
 import { PostRepository } from '../../repositories/post.repository'
 import { DevicesRepository } from '../../repositories/devices.repository'
 import { PostQueryRepository } from '../../repositories/post.queryRepository'
-import { PostPhotoRepository } from '../../repositories/postPhoto.repository'
 import { GetPostHandler } from '../../features/posts/GetPost.query'
 import { UpdatePostHandler } from '../../features/posts/UpdatePost.command'
 import { DeletePostHandler } from '../../features/posts/DeletePost.command'
@@ -18,7 +17,7 @@ import { GetRecentPostsHandler } from '../../features/posts/GetRecentPosts.query
 
 const services = [PrismaService, BrowserServiceService, JwtAdapterService]
 
-const repositories = [DevicesRepository, PostRepository, PostQueryRepository, PostPhotoRepository]
+const repositories = [DevicesRepository, PostRepository, PostQueryRepository]
 
 const commandHandlers = [
 	AddPostHandler,

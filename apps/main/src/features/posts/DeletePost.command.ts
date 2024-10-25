@@ -1,10 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
-import { ErrorMessage, FileMS_EventNames } from '@app/shared'
-import { FileMS_DeleteFileInContract } from '@app/shared/contracts/fileMS.contracts'
+import { ErrorMessage, FileMS_DeletePostImagesInContract, FileMS_EventNames } from '@app/shared'
 import { lastValueFrom } from 'rxjs'
 import { Inject } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
-import { PostPhotoRepository } from '../../repositories/postPhoto.repository'
 import { PostRepository } from '../../repositories/post.repository'
 
 export class DeletePostCommand {
@@ -19,7 +17,6 @@ export class DeletePostHandler implements ICommandHandler<DeletePostCommand> {
 	constructor(
 		@Inject('FILES_MICROSERVICE') private filesMicroClient: ClientProxy,
 		private postRepository: PostRepository,
-		private postPhotoRepository: PostPhotoRepository,
 	) {}
 
 	async execute(command: DeletePostCommand) {
@@ -35,16 +32,13 @@ export class DeletePostHandler implements ICommandHandler<DeletePostCommand> {
 			throw new Error(ErrorMessage.PostNotBelongToUser)
 		}
 
-		for (const photo of thisPost.photos) {
-			const sendingDataContract: FileMS_DeleteFileInContract = {
-				fileUrl: photo.url,
-			}
-			await lastValueFrom(
-				this.filesMicroClient.send(FileMS_EventNames.DeleteFile, sendingDataContract),
-			)
+		const sendingDataContract: FileMS_DeletePostImagesInContract = {
+			postId: thisPost.id,
 		}
+		await lastValueFrom(
+			this.filesMicroClient.send(FileMS_EventNames.DeletePostImages, sendingDataContract),
+		)
 
-		await this.postPhotoRepository.deletePostPhotos(thisPost.id)
 		await this.postRepository.deletePost(postId)
 	}
 }

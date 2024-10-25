@@ -1,11 +1,21 @@
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { User } from '@prisma/client'
 import { PrismaService } from '../db/prisma.service'
 import { UserOutModel } from '../models/user/user.out.model'
+import {
+	FileMS_EventNames,
+	FileMS_GetUserAvatarInContract,
+	FileMS_SaveUserAvatarOutContract,
+} from '@app/shared'
+import { lastValueFrom } from 'rxjs'
+import { ClientProxy } from '@nestjs/microservices'
 
 @Injectable()
 export class UserQueryRepository {
-	constructor(private prisma: PrismaService) {}
+	constructor(
+		private prisma: PrismaService,
+		@Inject('FILES_MICROSERVICE') private filesMicroClient: ClientProxy,
+	) {}
 
 	async getUsers() {
 		const totalUsersCount = await this.prisma.user.count()
@@ -24,10 +34,21 @@ export class UserQueryRepository {
 			return null
 		}
 
-		return this.mapDbUserToServiceUser(user)
+		const userAvatarUrl = await this.getUserAvatarUrl(user.id)
+
+		return this.mapDbUserToServiceUser(user, userAvatarUrl)
 	}
 
-	mapDbUserToServiceUser(dbUser: User): UserOutModel {
+	async getUserAvatarUrl(userId: number) {
+		const sendingDataContract: FileMS_GetUserAvatarInContract = { userId }
+		const filesMSRes: FileMS_SaveUserAvatarOutContract = await lastValueFrom(
+			this.filesMicroClient.send(FileMS_EventNames.GetUserAvatar, sendingDataContract),
+		)
+
+		return filesMSRes.avatarUrl
+	}
+
+	mapDbUserToServiceUser(dbUser: User, userAvatarUrl: null | string): UserOutModel {
 		return {
 			id: dbUser.id,
 			email: dbUser.email,
@@ -38,7 +59,7 @@ export class UserQueryRepository {
 			countryCode: dbUser.country_code,
 			cityId: dbUser.city_id,
 			aboutMe: dbUser.about_me,
-			avatar: dbUser.avatar,
+			avatar: userAvatarUrl,
 		}
 	}
 }

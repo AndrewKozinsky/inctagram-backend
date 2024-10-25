@@ -3,7 +3,16 @@ import { UserRepository } from '../../repositories/user.repository'
 import { EditMyProfileDtoModel } from '../../models/user/user.input.model'
 import { UserQueryRepository } from '../../repositories/user.queryRepository'
 import { UserOutModel } from '../../models/user/user.out.model'
-import { ErrorMessage } from '@app/shared'
+import {
+	ErrorMessage,
+	FileMS_EventNames,
+	FileMS_GetUserAvatarInContract,
+	FileMS_SaveUserAvatarInContract,
+	FileMS_SaveUserAvatarOutContract,
+} from '@app/shared'
+import { lastValueFrom } from 'rxjs'
+import { Inject } from '@nestjs/common'
+import { ClientProxy } from '@nestjs/microservices'
 
 export class EditMyProfileCommand {
 	constructor(

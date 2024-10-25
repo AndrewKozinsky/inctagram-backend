@@ -28,12 +28,12 @@ export class DeleteUserAvatarHandler implements ICommandHandler<DeleteUserAvatar
 
 		// Delete avatar file
 		const sendingDataContract: FileMS_DeleteFileInContract = {
-			fileUrl: user.avatar,
+			userId: user.id,
 		}
 		await lastValueFrom(
-			this.filesMicroClient.send(FileMS_EventNames.DeleteFile, sendingDataContract),
+			this.filesMicroClient.send(FileMS_EventNames.DeleteUserAvatar, sendingDataContract),
 		)
 
-		await this.userRepository.updateUser(userId, { avatar: null })
+		await this.userRepository.updateUser(userId, { files_ms_avatar_id: null })
 	}
 }

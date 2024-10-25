@@ -14,7 +14,7 @@ declare global {
 	namespace NodeJS {
 		interface ProcessEnv {
 			MODE: 'TEST'
-			DATABASE_URL: string
+			POSTGRES_DB_URL: string
 			MAIN_MICROSERVICE_PORT: number
 			OAUT_GITHUB_CLIENT_ID_LOCAL_TO_LOCAL: string
 			OAUT_GITHUB_CLIENT_SECRET_LOCAL_TO_LOCAL: string

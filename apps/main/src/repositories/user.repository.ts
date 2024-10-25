@@ -1,12 +1,19 @@
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { User } from '@prisma/client'
 import { add } from 'date-fns'
 import { HashAdapterService } from '@app/hash-adapter'
 import { PrismaService } from '../db/prisma.service'
 import { CreateUserDtoModel } from '../models/user/user.input.model'
 import { UserServiceModel } from '../models/user/user.service.model'
-import { createUniqString } from '@app/shared'
+import {
+	createUniqString,
+	FileMS_EventNames,
+	FileMS_GetUserAvatarInContract,
+	FileMS_SaveUserAvatarOutContract,
+} from '@app/shared'
 import { JwtAdapterService } from '@app/jwt-adapter'
+import { lastValueFrom } from 'rxjs'
+import { ClientProxy } from '@nestjs/microservices'
 
 @Injectable()
 export class UserRepository {
@@ -14,6 +21,7 @@ export class UserRepository {
 		private prisma: PrismaService,
 		private hashAdapter: HashAdapterService,
 		private jwtAdapter: JwtAdapterService,
+		@Inject('FILES_MICROSERVICE') private filesMicroClient: ClientProxy,
 	) {}
 
 	async getUserById(id: number) {
@@ -25,7 +33,8 @@ export class UserRepository {
 			return null
 		}
 
-		return this.mapDbUserToServiceUser(user)
+		const userAvatarUrl = await this.getUserAvatarUrl(user.id)
+		return this.mapDbUserToServiceUser(user, userAvatarUrl)
 	}
 
 	async getUserByEmail(email: string) {
@@ -36,7 +45,8 @@ export class UserRepository {
 
 			if (!user) return null
 
-			return this.mapDbUserToServiceUser(user)
+			const userAvatarUrl = await this.getUserAvatarUrl(user.id)
+			return this.mapDbUserToServiceUser(user, userAvatarUrl)
 		} catch (err: unknown) {
 			console.log(err)
 		}
@@ -52,7 +62,8 @@ export class UserRepository {
 
 			if (!user) return null
 
-			return this.mapDbUserToServiceUser(user)
+			const userAvatarUrl = await this.getUserAvatarUrl(user.id)
+			return this.mapDbUserToServiceUser(user, userAvatarUrl)
 		} catch (err: unknown) {
 			console.log(err)
 		}
@@ -67,7 +78,8 @@ export class UserRepository {
 		const isPasswordMath = await this.hashAdapter.compare(password, user.hashed_password)
 		if (!isPasswordMath) return null
 
-		return this.mapDbUserToServiceUser(user)
+		const userAvatarUrl = await this.getUserAvatarUrl(user.id)
+		return this.mapDbUserToServiceUser(user, userAvatarUrl)
 	}
 
 	async getUserByUserName(userName: string) {
@@ -77,7 +89,8 @@ export class UserRepository {
 
 		if (!user) return null
 
-		return this.mapDbUserToServiceUser(user)
+		const userAvatarUrl = await this.getUserAvatarUrl(user.id)
+		return this.mapDbUserToServiceUser(user, userAvatarUrl)
 	}
 
 	async getUserByConfirmationCode(confirmationCode: string) {
@@ -87,7 +100,8 @@ export class UserRepository {
 
 		if (!user) return null
 
-		return this.mapDbUserToServiceUser(user)
+		const userAvatarUrl = await this.getUserAvatarUrl(user.id)
+		return this.mapDbUserToServiceUser(user, userAvatarUrl)
 	}
 
 	async getConfirmedUserByEmailAndPassword(
@@ -110,7 +124,8 @@ export class UserRepository {
 
 		if (!user) return null
 
-		return this.mapDbUserToServiceUser(user)
+		const userAvatarUrl = await this.getUserAvatarUrl(user.id)
+		return this.mapDbUserToServiceUser(user, userAvatarUrl)
 	}
 
 	async getUserByRefreshToken(refreshTokenStr: string) {
@@ -128,7 +143,8 @@ export class UserRepository {
 
 		if (!user) return null
 
-		return this.mapDbUserToServiceUser(user)
+		const userAvatarUrl = await this.getUserAvatarUrl(user.id)
+		return this.mapDbUserToServiceUser(user, userAvatarUrl)
 	}
 
 	async createUser(
@@ -168,7 +184,8 @@ export class UserRepository {
 			data: newUserParams,
 		})
 
-		return this.mapDbUserToServiceUser(user)
+		const userAvatarUrl = await this.getUserAvatarUrl(user.id)
+		return this.mapDbUserToServiceUser(user, userAvatarUrl)
 	}
 
 	async updateUser(userId: number, data: Partial<User>) {
@@ -192,12 +209,21 @@ export class UserRepository {
 		})
 	}
 
-	mapDbUserToServiceUser(dbUser: User): UserServiceModel {
+	async getUserAvatarUrl(userId: number) {
+		const sendingDataContract: FileMS_GetUserAvatarInContract = { userId }
+		const filesMSRes: FileMS_SaveUserAvatarOutContract = await lastValueFrom(
+			this.filesMicroClient.send(FileMS_EventNames.GetUserAvatar, sendingDataContract),
+		)
+
+		return filesMSRes.avatarUrl
+	}
+
+	mapDbUserToServiceUser(dbUser: User, userAvatarUrl: null | string): UserServiceModel {
 		return {
 			id: dbUser.id,
 			email: dbUser.email,
 			userName: dbUser.user_name,
-			avatar: dbUser.avatar,
+			avatar: userAvatarUrl,
 			hashedPassword: dbUser.hashed_password,
 			emailConfirmationCode: dbUser.email_confirmation_code,
 			confirmationCodeExpirationDate: dbUser.email_confirmation_code_expiration_date,
