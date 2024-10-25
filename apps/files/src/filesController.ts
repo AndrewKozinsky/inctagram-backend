@@ -11,13 +11,15 @@ import {
 	FileMS_DeleteFileInContract,
 	FileMS_SavePostImagesInContract,
 } from '@app/shared/contracts/fileMS.contracts'
-import { PostService } from './postService'
+import { PostPhotoService } from './postPhotoService'
+import { CommonService } from './commonService'
 
 @Controller()
 export class FilesController {
 	constructor(
+		private readonly commonService: CommonService,
 		private readonly avatarService: AvatarService,
-		private readonly postService: PostService,
+		private readonly postService: PostPhotoService,
 	) {}
 
 	@MessagePattern(FileMS_EventNames.SaveUserAvatar)
@@ -43,5 +45,10 @@ export class FilesController {
 	@MessagePattern(FileMS_EventNames.DeletePostImages)
 	async deletePostImages(deletePostImagesInContract: FileMS_DeletePostImagesInContract) {
 		return await this.postService.deletePostImages(deletePostImagesInContract)
+	}
+
+	@MessagePattern(FileMS_EventNames.EraseDatabase)
+	async eraseDatabase() {
+		// return await this.commonService.eraseDatabase()
 	}
 }

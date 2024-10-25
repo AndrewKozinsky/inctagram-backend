@@ -74,10 +74,6 @@ describe('Users (e2e)', () => {
 		await clearAllDB(mainApp)
 	})
 
-	afterAll(async () => {
-		await clearAllDB(mainApp)
-	})
-
 	afterEach(async () => {
 		jest.clearAllMocks()
 	})

@@ -6,7 +6,7 @@ import { FilesController } from './filesController'
 import { AvatarService } from './avatarService'
 import { UserAvatar, UserAvatarSchema } from './schemas/userAvatar.schema'
 import { CommonService } from './commonService'
-import { PostService } from './postService'
+import { PostPhotoService } from './postPhotoService'
 import { PostPhoto, PostPhotoSchema } from './schemas/postPhoto.schema'
 
 @Module({
@@ -27,6 +27,6 @@ import { PostPhoto, PostPhotoSchema } from './schemas/postPhoto.schema'
 		]),
 	],
 	controllers: [FilesController],
-	providers: [CommonService, AvatarService, PostService, S3Client],
+	providers: [CommonService, AvatarService, PostPhotoService, S3Client],
 })
 export class FilesModule {}

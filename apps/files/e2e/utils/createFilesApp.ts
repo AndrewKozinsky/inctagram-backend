@@ -3,8 +3,14 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { FilesModule } from '../../src/filesModule'
 import { S3Client } from '@aws-sdk/client-s3'
 import { AvatarService } from '../../src/avatarService'
+import { PostPhotoService } from '../../src/postPhotoService'
+import { CommonService } from '../../src/commonService'
 
-export async function createFilesApp(filesService: AvatarService) {
+export async function createFilesApp(
+	commonService: CommonService,
+	avatarService: AvatarService,
+	postPhotoService: PostPhotoService,
+) {
 	const moduleFixture: TestingModule = await Test.createTestingModule({
 		imports: [FilesModule],
 	})
@@ -14,7 +20,7 @@ export async function createFilesApp(filesService: AvatarService) {
 		})
 		.compile()
 
-	const filesApp = moduleFixture.createNestMicroservice({
+	/*const filesApp = moduleFixture.createNestMicroservice({
 		transport: Transport.TCP,
 		options: {
 			host: '127.0.0.1',
@@ -24,10 +30,14 @@ export async function createFilesApp(filesService: AvatarService) {
 
 	await filesApp.listen()
 
-	filesService = moduleFixture.get<AvatarService>(AvatarService)
+	commonService = moduleFixture.get<CommonService>(CommonService)
+	avatarService = moduleFixture.get<AvatarService>(AvatarService)
+	postPhotoService = moduleFixture.get<PostPhotoService>(PostPhotoService)
 
 	return {
-		filesService,
+		commonService,
+		avatarService,
+		postPhotoService,
 		filesApp,
-	}
+	}*/
 }

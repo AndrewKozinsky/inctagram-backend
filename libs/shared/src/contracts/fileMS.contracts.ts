@@ -4,6 +4,8 @@ export enum FileMS_EventNames {
 	DeleteUserAvatar = 'deleteUserAvatar',
 	SavePostImages = 'savePostImages',
 	DeletePostImages = 'deletePostImages',
+
+	EraseDatabase = 'eraseDatabase',
 }
 
 export type FileMS_SaveUserAvatarInContract = {

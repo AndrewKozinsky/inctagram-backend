@@ -7,6 +7,9 @@ import { Readable } from 'stream'
 import { createFilesApp } from './utils/createFilesApp'
 import { createEmitApp } from './utils/createEmitApp'
 import { AvatarService } from '../src/avatarService'
+import { PostPhotoService } from '../src/postPhotoService'
+import { CommonService } from '../src/commonService'
+import { clearAllDB } from './utils/db'
 
 it('123', async () => {
 	expect(2).toBe(2)
@@ -15,68 +18,52 @@ it('123', async () => {
 describe('Auth (e2e)', () => {
 	let emitApp: ClientProxy
 	let filesApp: INestMicroservice
-	let filesService: AvatarService
+	let commonService: CommonService
+	let avatarService: AvatarService
+	let postPhotoService: PostPhotoService
 
 	beforeAll(async () => {
-		const createFilesAppRes = await createFilesApp(filesService)
-		filesApp = createFilesAppRes.filesApp
-		filesService = createFilesAppRes.filesService
-
-		emitApp = await createEmitApp()
+		const createFilesAppRes = await createFilesApp(
+			commonService,
+			avatarService,
+			postPhotoService,
+		)
+		// emitApp = await createEmitApp()
+		// filesApp = createFilesAppRes.filesApp
+		// commonService = createFilesAppRes.commonService
+		// avatarService = createFilesAppRes.avatarService
+		// postPhotoService = createFilesAppRes.postPhotoService
 	})
 
-	beforeEach(async () => {})
+	beforeEach(async () => {
+		// await clearAllDB(emitApp)
+	})
 
 	afterEach(() => {
-		jest.clearAllMocks()
+		// jest.clearAllMocks()
 	})
 
 	afterAll(async () => {
-		await emitApp.close()
-		await filesApp.close()
+		// await emitApp.close()
+		// await filesApp.close()
 	})
 
-	/*it.only('should respond to the request', async () => {
-		filesService.s3Client.send = jest.fn().mockResolvedValueOnce('mockResponse')
-
+	it.only('should respond to the request', async () => {
+		// commonService.s3Client.send = jest.fn().mockResolvedValueOnce('mockResponse')
 		const avatarFilePath = path.join(__dirname, 'utils/files/avatar.png')
 		const avatarFile = await readFileAsMulterFile(avatarFilePath)
 
 		// Send a request to the microservice
-		const eventName = FileMS_EventNames.SaveUserAvatar
+		/*const eventName = FileMS_EventNames.SaveUserAvatar
 		const payload: FileMS_SaveUserAvatarInContract = {
 			userId: 2,
 			avatarFile,
-		}
+		}*/
 
-		await emitApp.send(eventName, payload).toPromise()
-		expect(filesService.s3Client.send).toBeCalledTimes(1)
-	})*/
+		// await emitApp.send(eventName, payload).toPromise()
+		// expect(commonService.s3Client.send).toBeCalledTimes(1)
+	})
 })
-
-/*function bufferToMulterFile(params: {
-	buffer: Buffer
-	originalName: string
-	mimeType: string
-}): Express.Multer.File {
-	const stream = new Readable()
-	stream.push(params.buffer)
-	stream.push(null) // Signals the end of the stream
-
-	return {
-		fieldname: 'file', // Name of the field that this file is attached to
-		originalname: params.originalName, // The original file name (e.g., 'image.png')
-		encoding: '7bit', // Encoding type (can be based on your requirements)
-		mimetype: params.mimeType, // Mime type (e.g., 'image/png')
-		size: params.buffer.length, // File size based on the buffer length
-		buffer: params.buffer, // The actual buffer data
-
-		stream,
-		destination: '',
-		filename: '',
-		path: '',
-	}
-}*/
 
 async function readFileAsMulterFile(filePath: string): Promise<Express.Multer.File> {
 	const buffer = await fs.readFile(filePath) // Read the file as a buffer

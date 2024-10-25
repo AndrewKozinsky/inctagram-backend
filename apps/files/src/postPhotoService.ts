@@ -8,7 +8,7 @@ import { CommonService, SaveFileDetails } from './commonService'
 import { PostPhoto } from './schemas/postPhoto.schema'
 
 @Injectable()
-export class PostService {
+export class PostPhotoService {
 	constructor(
 		private commonService: CommonService,
 		@InjectModel(PostPhoto.name) private postPhotoModel: Model<PostPhoto>,
