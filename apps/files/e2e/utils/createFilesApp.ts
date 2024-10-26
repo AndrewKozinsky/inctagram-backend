@@ -1,7 +1,8 @@
 import { Transport } from '@nestjs/microservices'
 import { Test, TestingModule } from '@nestjs/testing'
-import { FilesModule } from '../../src/filesModule'
+import { connect, Connection } from 'mongoose'
 import { S3Client } from '@aws-sdk/client-s3'
+import { FilesModule } from '../../src/filesModule'
 import { AvatarService } from '../../src/avatarService'
 import { PostPhotoService } from '../../src/postPhotoService'
 import { CommonService } from '../../src/commonService'
@@ -10,7 +11,11 @@ export async function createFilesApp(
 	commonService: CommonService,
 	avatarService: AvatarService,
 	postPhotoService: PostPhotoService,
+	mongoConnection: Connection,
 ) {
+	const uri = process.env.MONGO_DB_URL || 'mongodb://localhost:27017/files'
+	mongoConnection = (await connect(uri)).connection
+
 	const moduleFixture: TestingModule = await Test.createTestingModule({
 		imports: [FilesModule],
 	})
@@ -39,5 +44,6 @@ export async function createFilesApp(
 		avatarService,
 		postPhotoService,
 		filesApp,
+		mongoConnection,
 	}
 }

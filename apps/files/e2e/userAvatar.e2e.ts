@@ -7,6 +7,7 @@ import { PostPhotoService } from '../src/postPhotoService'
 import { CommonService } from '../src/commonService'
 import { clearAllDB } from './utils/db'
 import { avatarUtils } from './utils/avatarUtils'
+import { Connection } from 'mongoose'
 
 it.only('123', async () => {
 	expect(2).toBe(2)
@@ -18,31 +19,35 @@ describe('User avatar (e2e)', () => {
 	let commonService: CommonService
 	let avatarService: AvatarService
 	let postPhotoService: PostPhotoService
+	let mongoConnection: Connection
 
 	beforeAll(async () => {
 		const createFilesAppRes = await createFilesApp(
 			commonService,
 			avatarService,
 			postPhotoService,
+			mongoConnection,
 		)
 		emitApp = await createEmitApp()
 		filesApp = createFilesAppRes.filesApp
 		commonService = createFilesAppRes.commonService
 		avatarService = createFilesAppRes.avatarService
 		postPhotoService = createFilesAppRes.postPhotoService
+		mongoConnection = createFilesAppRes.mongoConnection
 	})
 
 	beforeEach(async () => {
-		await clearAllDB(emitApp)
+		await mongoConnection.dropDatabase()
 	})
 
-	afterEach(() => {
+	afterEach(async () => {
 		jest.clearAllMocks()
 	})
 
 	afterAll(async () => {
 		await emitApp.close()
 		await filesApp.close()
+		await mongoConnection.close()
 	})
 
 	describe('Create user avatar', () => {

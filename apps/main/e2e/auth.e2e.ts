@@ -113,7 +113,11 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return an error if the entered email is already registered and confirmed', async () => {
-			const user = await userUtils.createUserWithConfirmedEmail(mainApp, userRepository)
+			const user = await userUtils.createUserWithConfirmedEmail({
+				mainApp,
+				filesMicroservice,
+				userRepository,
+			})
 			expect(emailAdapter.sendEmailConfirmationMessage).toBeCalledTimes(1)
 
 			const secondRegRes = await postRequest(mainApp, RouteNames.AUTH.REGISTRATION.full)
@@ -171,7 +175,11 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 400 if email verification allowed time is over', async () => {
-			const user = await userUtils.createUserWithUnconfirmedEmail(mainApp, userRepository)
+			const user = await userUtils.createUserWithUnconfirmedEmail({
+				mainApp,
+				userRepository,
+				filesMicroservice,
+			})
 
 			// Try to confirm email with a wrong confirmation code
 			const confirmEmailRes = await getRequest(
@@ -184,7 +192,11 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 400 if email verification allowed time is over', async () => {
-			const user = await userUtils.createUserWithUnconfirmedEmail(mainApp, userRepository)
+			const user = await userUtils.createUserWithUnconfirmedEmail({
+				mainApp,
+				userRepository,
+				filesMicroservice,
+			})
 
 			// Change email confirmation allowed time to past
 			await userRepository.updateUser(user!.id, {
@@ -202,7 +214,11 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 200 if email successfully confirmed', async () => {
-			const user = await userUtils.createUserWithUnconfirmedEmail(mainApp, userRepository)
+			const user = await userUtils.createUserWithUnconfirmedEmail({
+				mainApp,
+				userRepository,
+				filesMicroservice,
+			})
 
 			// Try to confirm email
 			const confirmEmailRes = await getRequest(
@@ -215,7 +231,11 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 400 if they tries confirm email second time', async () => {
-			const user = await userUtils.createUserWithConfirmedEmail(mainApp, userRepository)
+			const user = await userUtils.createUserWithConfirmedEmail({
+				mainApp,
+				filesMicroservice,
+				userRepository,
+			})
 
 			// Try to confirm email second time
 			const confirmEmailSecondTimeRes = await getRequest(
@@ -250,7 +270,11 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 400 if email and password does not match', async () => {
-			const user = await userUtils.createUserWithConfirmedEmail(mainApp, userRepository)
+			const user = await userUtils.createUserWithConfirmedEmail({
+				mainApp,
+				filesMicroservice,
+				userRepository,
+			})
 
 			const loginRes = await postRequest(mainApp, RouteNames.AUTH.LOGIN.full)
 				.send({ password: 'mywrongpassword', email: defUserEmail })
@@ -262,7 +286,11 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 403 if email is not confirmed', async () => {
-			const user = await userUtils.createUserWithUnconfirmedEmail(mainApp, userRepository)
+			const user = await userUtils.createUserWithUnconfirmedEmail({
+				mainApp,
+				userRepository,
+				filesMicroservice,
+			})
 
 			const loginRes = await postRequest(mainApp, RouteNames.AUTH.LOGIN.full)
 				.send({ password: defUserPassword, email: defUserEmail })
@@ -273,7 +301,11 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 200 if dto has correct values and email is confirmed', async () => {
-			const user = await userUtils.createUserWithConfirmedEmail(mainApp, userRepository)
+			const user = await userUtils.createUserWithConfirmedEmail({
+				mainApp,
+				filesMicroservice,
+				userRepository,
+			})
 
 			const loginRes = await postRequest(mainApp, RouteNames.AUTH.LOGIN.full)
 				.send({ password: defUserPassword, email: defUserEmail })
@@ -320,7 +352,11 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 201 if dto has correct values', async () => {
-			const user = await userUtils.createUserWithConfirmedEmail(mainApp, userRepository)
+			const user = await userUtils.createUserWithConfirmedEmail({
+				mainApp,
+				filesMicroservice,
+				userRepository,
+			})
 			jest.clearAllMocks()
 
 			const resendConfirmEmailRes = await postRequest(
@@ -346,25 +382,27 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
-			await userUtils.deviceTokenChecks.refreshTokenExpired(
+			await userUtils.deviceTokenChecks.refreshTokenExpired({
 				mainApp,
-				'post',
-				RouteNames.AUTH.LOGOUT.full,
+				filesMicroservice,
+				methodType: 'post',
+				routeUrl: RouteNames.AUTH.LOGOUT.full,
 				userRepository,
 				securityRepository,
 				jwtService,
 				mainConfig,
-			)
+			})
 		})
 
 		it('should return 200 if the JWT refreshToken inside cookie is valid', async () => {
-			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 
 			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
 
@@ -403,7 +441,11 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 200 if email is registered and email is sent', async () => {
-			const user = await userUtils.createUserWithConfirmedEmail(mainApp, userRepository)
+			const user = await userUtils.createUserWithConfirmedEmail({
+				mainApp,
+				filesMicroservice,
+				userRepository,
+			})
 
 			const recoverRes = await postRequest(mainApp, RouteNames.AUTH.PASSWORD_RECOVERY.full)
 				.send({ email: user!.email, recaptchaValue: 'recaptchaValue' })
@@ -458,7 +500,11 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 200 if user is really made request to reset password', async () => {
-			const user = await userUtils.createUserWithConfirmedEmail(mainApp, userRepository)
+			const user = await userUtils.createUserWithConfirmedEmail({
+				mainApp,
+				filesMicroservice,
+				userRepository,
+			})
 
 			const recoverRes = await postRequest(mainApp, RouteNames.AUTH.PASSWORD_RECOVERY.full)
 				.send({ email: user!.email, recaptchaValue: 'recaptchaValue' })
@@ -492,24 +538,26 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
-			await userUtils.deviceTokenChecks.refreshTokenExpired(
+			await userUtils.deviceTokenChecks.refreshTokenExpired({
 				mainApp,
-				'post',
-				RouteNames.AUTH.REFRESH_TOKEN.full,
+				filesMicroservice,
+				methodType: 'post',
+				routeUrl: RouteNames.AUTH.REFRESH_TOKEN.full,
 				userRepository,
 				securityRepository,
 				jwtService,
 				mainConfig,
-			)
+			})
 		})
 
 		it('should return 200 if the JWT refreshToken inside cookie is valid', async () => {
-			await userUtils.deviceTokenChecks.tokenValid(
+			await userUtils.deviceTokenChecks.tokenValid({
 				mainApp,
-				RouteNames.AUTH.REFRESH_TOKEN.full,
+				filesMicroservice,
+				routeUrl: RouteNames.AUTH.REFRESH_TOKEN.full,
 				userRepository,
 				mainConfig,
-			)
+			})
 		})
 	})
 
@@ -550,7 +598,11 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('register an existing user by Github', async () => {
-			const user = await userUtils.createUserWithUnconfirmedEmail(mainApp, userRepository)
+			const user = await userUtils.createUserWithUnconfirmedEmail({
+				mainApp,
+				userRepository,
+				filesMicroservice,
+			})
 
 			const registerRes = await getRequest(
 				mainApp,

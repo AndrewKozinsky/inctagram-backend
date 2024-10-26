@@ -4,6 +4,7 @@ import { AvatarService } from './avatarService'
 import {
 	FileMS_DeletePostImagesInContract,
 	FileMS_EventNames,
+	FileMS_GetPostImagesInContract,
 	FileMS_GetUserAvatarInContract,
 	FileMS_SaveUserAvatarInContract,
 } from '@app/shared'
@@ -37,10 +38,15 @@ export class FilesController {
 		return await this.avatarService.deleteUserAvatar(deleteUserAvatarInContract)
 	}
 
-	////////////////////////////////
 	@MessagePattern(FileMS_EventNames.SavePostImages)
 	async savePostImages(savePostImagesInContract: FileMS_SavePostImagesInContract) {
 		return await this.postService.savePostImages(savePostImagesInContract)
+	}
+
+	////////////////////////////////
+	@MessagePattern(FileMS_EventNames.GetPostImages)
+	async getPostImages(getPostImagesInContract: FileMS_GetPostImagesInContract) {
+		return await this.postService.getPostImages(getPostImagesInContract)
 	}
 
 	////////////////////////////////

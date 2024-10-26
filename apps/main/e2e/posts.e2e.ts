@@ -85,13 +85,14 @@ describe('Posts (e2e)', () => {
 
 	describe('Add a new post', () => {
 		it('should return 400 if the accessToken inside cookie is valid, but request body is not send', async () => {
-			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 
 			const addPostRes = await postRequest(mainApp, RouteNames.POSTS.value)
 				.set('authorization', 'Bearer ' + accessToken)
@@ -101,13 +102,14 @@ describe('Posts (e2e)', () => {
 		})
 
 		it('should return 400 if the JWT refreshToken inside cookie is valid, but send wrong files', async () => {
-			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 
 			// Send large file and in invalid format
 			const textFilePath = path.join(__dirname, 'utils/files/text.txt')
@@ -124,13 +126,14 @@ describe('Posts (e2e)', () => {
 		})
 
 		it('should return 200 if send correct data', async () => {
-			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 
 			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
 
@@ -168,13 +171,14 @@ describe('Posts (e2e)', () => {
 		})
 
 		it('should return 200 if send correct data', async () => {
-			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 
 			let secondPostId = 0
 			for (let i = 0; i < 2; i++) {
@@ -210,13 +214,14 @@ describe('Posts (e2e)', () => {
 
 	describe('Update post', () => {
 		it('should return 404 if the auth data is valid, but there is not a post with passed id', async () => {
-			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 
 			const updatePostRes = await patchRequest(mainApp, RouteNames.POSTS.POST(999).full)
 				.set('authorization', 'Bearer ' + accessToken)
@@ -226,13 +231,14 @@ describe('Posts (e2e)', () => {
 		})
 
 		it('should return 400 if the auth data is valid, but body is wrong', async () => {
-			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 
 			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
 
@@ -260,13 +266,14 @@ describe('Posts (e2e)', () => {
 
 		it('should return 400 if non post owner tries to update it', async () => {
 			// This user will create a post
-			const [accessToken1, refreshTokenStr1] = await userUtils.createUserAndLogin(
+			const [accessToken1, refreshTokenStr1] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 
 			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
 
@@ -278,13 +285,14 @@ describe('Posts (e2e)', () => {
 			const postId = addPost.data.id
 
 			// This user will try to edit the post
-			const [accessToken2] = await userUtils.createUserAndLogin(
+			const [accessToken2] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				'secondUserName',
-				'second@mail.com',
-				'secondPassword',
-			)
+				userName: 'secondUserName',
+				email: 'second@mail.com',
+				password: 'secondPassword',
+			})
 
 			const refreshTokenValue2 = parseCookieStringToObj(refreshTokenStr1).cookieValue
 
@@ -302,13 +310,14 @@ describe('Posts (e2e)', () => {
 		})
 
 		it('should return 200 if send correct data', async () => {
-			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 
 			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
 
@@ -348,13 +357,14 @@ describe('Posts (e2e)', () => {
 
 	describe('Update post', () => {
 		it('should return 404 if the auth data is valid, but there is not a post with passed id', async () => {
-			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 
 			const deletePostRes = await deleteRequest(mainApp, RouteNames.POSTS.POST(999).full)
 				.set('authorization', 'Bearer ' + accessToken)
@@ -365,13 +375,14 @@ describe('Posts (e2e)', () => {
 
 		it('should return 400 if non post owner tries to delete it', async () => {
 			// This user will create a post
-			const [accessToken1, refreshTokenStr1] = await userUtils.createUserAndLogin(
+			const [accessToken1, refreshTokenStr1] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 
 			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
 
@@ -383,13 +394,14 @@ describe('Posts (e2e)', () => {
 			const postId = addPost.data.id
 
 			// This user will try to delete the post
-			const [accessToken2] = await userUtils.createUserAndLogin(
+			const [accessToken2] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				'secondUserName',
-				'second@mail.com',
-				'secondPassword',
-			)
+				userName: 'secondUserName',
+				email: 'second@mail.com',
+				password: 'secondPassword',
+			})
 
 			const deletePostRes = await deleteRequest(mainApp, RouteNames.POSTS.POST(postId).full)
 				.set('authorization', 'Bearer ' + accessToken2)
@@ -400,13 +412,14 @@ describe('Posts (e2e)', () => {
 		})
 
 		it('should return 200 if the post owner tries to delete his post', async () => {
-			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 
 			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
 
@@ -437,13 +450,14 @@ describe('Posts (e2e)', () => {
 	describe('Get recent posts', () => {
 		it('should return an array with 4 posts', async () => {
 			// Create a user which will created 3 posts
-			const [accessToken1, refreshTokenStr1] = await userUtils.createUserAndLogin(
+			const [accessToken1, refreshTokenStr1] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 
 			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
 
@@ -456,13 +470,14 @@ describe('Posts (e2e)', () => {
 			}
 
 			// Create a user which will created 2 posts
-			const [accessToken2, refreshTokenStr2] = await userUtils.createUserAndLogin(
+			const [accessToken2, refreshTokenStr2] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				'secondUserName',
-				'second@mail.com',
-				'secondPassword',
-			)
+				userName: 'secondUserName',
+				email: 'second@mail.com',
+				password: 'secondPassword',
+			})
 
 			for (let i = 0; i < 3; i++) {
 				await postUtils.createPost({

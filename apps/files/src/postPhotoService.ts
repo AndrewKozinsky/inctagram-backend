@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import { Model } from 'mongoose'
 import { InjectModel } from '@nestjs/mongoose'
-import { ErrorMessage, FileMS_DeletePostImagesInContract } from '@app/shared'
+import {
+	ErrorMessage,
+	FileMS_DeletePostImagesInContract,
+	FileMS_GetPostImagesInContract,
+} from '@app/shared'
 import { FileMS_SavePostImagesInContract } from '@app/shared/contracts/fileMS.contracts'
 import { createUniqString } from '@app/shared'
 import { CommonService, SaveFileDetails } from './commonService'
@@ -45,6 +49,16 @@ export class PostPhotoService {
 		}
 
 		return imagesUrls
+	}
+
+	async getPostImages(getPostImagesInContract: FileMS_GetPostImagesInContract) {
+		const { postId } = getPostImagesInContract
+
+		const postPhotos = await this.postPhotoModel.find({ postId })
+
+		return postPhotos.map((postPhoto) => {
+			return postPhoto.url
+		})
 	}
 
 	async deletePostImages(deletePostImagesInContract: FileMS_DeletePostImagesInContract) {

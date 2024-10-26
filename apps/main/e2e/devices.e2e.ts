@@ -78,13 +78,14 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return an array of devices data if a refreshToken inside cookie is valid', async () => {
-			const [accessToken, refreshToken] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshToken] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 			const refreshToken1Str = userUtils.convertCookieRefreshTokenToTokenStr(refreshToken)
 
 			const getUserDevicesRes1 = await getRequest(mainApp, RouteNames.SECURITY.DEVICES.full)
@@ -122,7 +123,11 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should forbid a request from a user with an expired device refresh token', async () => {
-			const user = await userUtils.createUserWithConfirmedEmail(mainApp, userRepository)
+			const user = await userUtils.createUserWithConfirmedEmail({
+				mainApp,
+				filesMicroservice,
+				userRepository,
+			})
 			const userId = user.id
 
 			// Create expired token
@@ -148,13 +153,14 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 404 if client tries to terminate a non existed device', async () => {
-			const [accessToken, refreshToken] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshToken] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 			const refreshTokenStr = userUtils.convertCookieRefreshTokenToTokenStr(refreshToken)
 
 			await deleteRequest(mainApp, RouteNames.SECURITY.DEVICES.DEVICE_ID('999').full)
@@ -165,13 +171,14 @@ describe('Auth (e2e)', () => {
 
 		it('should return 403 if a client tries to terminate a device which does not belong to him', async () => {
 			// Create a user 1
-			const [accessToken1, refreshToken1] = await userUtils.createUserAndLogin(
+			const [accessToken1, refreshToken1] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 			const refreshToken1Str = userUtils.convertCookieRefreshTokenToTokenStr(refreshToken1)
 
 			const deviceId = jwtService.getRefreshTokenDataFromTokenStr(refreshToken1Str)!.deviceId
@@ -181,13 +188,14 @@ describe('Auth (e2e)', () => {
 			const password2 = 'password-2'
 			const email2 = 'email-2@email.ru'
 
-			await userUtils.createUserWithConfirmedEmail(
+			await userUtils.createUserWithConfirmedEmail({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				userName2,
-				email2,
-				password2,
-			)
+				userName: userName2,
+				email: email2,
+				password: password2,
+			})
 			const [accessToken2, refreshToken2] = await userUtils.loginUser(
 				mainApp,
 				email2,
@@ -201,13 +209,14 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 204 if a client tries to terminate his device', async () => {
-			const [accessToken, refreshToken] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshToken] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 			const refreshTokenStr = userUtils.convertCookieRefreshTokenToTokenStr(refreshToken)
 
 			const deviceId = jwtService.getRefreshTokenDataFromTokenStr(refreshTokenStr)!.deviceId
@@ -230,7 +239,11 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should forbid a request from a user with an expired device refresh token', async () => {
-			const user = await userUtils.createUserWithConfirmedEmail(mainApp, userRepository)
+			const user = await userUtils.createUserWithConfirmedEmail({
+				mainApp,
+				filesMicroservice,
+				userRepository,
+			})
 			const userId = user.id
 
 			// Create expired token
@@ -256,13 +269,14 @@ describe('Auth (e2e)', () => {
 		})
 
 		it('should return 204 if a client tries to terminate current device', async () => {
-			const [accessToken, refreshToken] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshToken] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 
 			const deviceRefreshTokenStr =
 				userUtils.convertCookieRefreshTokenToTokenStr(refreshToken)

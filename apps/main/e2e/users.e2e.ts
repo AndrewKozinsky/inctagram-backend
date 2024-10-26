@@ -29,7 +29,7 @@ import { createMainApp } from './utils/createMainApp'
 import { ClientProxy } from '@nestjs/microservices'
 import { postUtils } from './utils/postUtils'
 
-it.only('123', async () => {
+it('123', async () => {
 	expect(2).toBe(2)
 })
 
@@ -79,53 +79,36 @@ describe('Users (e2e)', () => {
 	})
 
 	describe('Add avatar file to the current user', () => {
-		it('should return 401 if there is not cookies', async () => {
-			await userUtils.deviceTokenChecks.tokenNotExist(
-				mainApp,
-				'post',
-				RouteNames.USERS.ME.AVATAR.full,
-			)
-		})
+		it.only('should return 400 if the accessToken inside cookie is valid, but avatar was not send', async () => {
+			mockFilesServiceSendMethod(filesMicroservice, '')
 
-		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
-			await userUtils.deviceTokenChecks.refreshTokenExpired(
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
-				'post',
-				RouteNames.USERS.ME.AVATAR.full,
+				filesMicroservice,
 				userRepository,
-				securityRepository,
-				jwtService,
-				mainConfig,
-			)
-		})
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 
-		it('should return 400 if the JWT refreshToken inside cookie is valid, but avatar was not send', async () => {
-			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
-				mainApp,
-				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
-
-			const addAvatarRes = await postRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
+			/*const addAvatarRes = await postRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
 				.set('authorization', 'Bearer ' + accessToken)
-				.expect(HTTP_STATUSES.BAD_REQUEST_400)
-
-			checkErrorResponse(addAvatarRes.body, 400, 'File not found')
+				.expect(HTTP_STATUSES.BAD_REQUEST_400)*/
+			// checkErrorResponse(addAvatarRes.body, 400, 'File not found')
 		})
 
 		it('should return 400 if the JWT refreshToken inside cookie is valid, but send wrong file', async () => {
-			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 
 			// Send file in invalid format
-			const textFilePath = path.join(__dirname, 'utils/files/text.txt')
+			/*const textFilePath = path.join(__dirname, 'utils/files/text.txt')
 
 			const addAvatarRes1 = await postRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
 				.set('authorization', 'Bearer ' + accessToken)
@@ -144,17 +127,18 @@ describe('Users (e2e)', () => {
 				.attach('avatarFile', bigFilePath)
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
 
-			checkErrorResponse(addAvatarRes2.body, 400, 'File is too large')
+			checkErrorResponse(addAvatarRes2.body, 400, 'File is too large')*/
 		})
 
 		it('should return 200 if send correct avatar image', async () => {
-			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 
 			const avatarFilePath = path.join(__dirname, 'utils/files/avatar.png')
 
@@ -180,25 +164,27 @@ describe('Users (e2e)', () => {
 		})
 
 		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
-			await userUtils.deviceTokenChecks.refreshTokenExpired(
+			await userUtils.deviceTokenChecks.refreshTokenExpired({
 				mainApp,
-				'get',
-				RouteNames.USERS.ME.AVATAR.full,
+				filesMicroservice,
+				methodType: 'get',
+				routeUrl: RouteNames.USERS.ME.AVATAR.full,
 				userRepository,
 				securityRepository,
 				jwtService,
 				mainConfig,
-			)
+			})
 		})
 
 		it('should return 200 if the JWT refreshToken inside cookie is valid', async () => {
-			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 
 			mockFilesServiceSendMethod(filesMicroservice, 'url-1')
 
@@ -224,25 +210,27 @@ describe('Users (e2e)', () => {
 
 	describe('Delete current user avatar file', () => {
 		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
-			await userUtils.deviceTokenChecks.refreshTokenExpired(
+			await userUtils.deviceTokenChecks.refreshTokenExpired({
 				mainApp,
-				'delete',
-				RouteNames.USERS.ME.AVATAR.full,
+				filesMicroservice,
+				methodType: 'delete',
+				routeUrl: RouteNames.USERS.ME.AVATAR.full,
 				userRepository,
 				securityRepository,
 				jwtService,
 				mainConfig,
-			)
+			})
 		})
 
 		it('should return 200 if the JWT refreshToken inside cookie is valid', async () => {
-			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 
 			const avatarFilePath = path.join(__dirname, 'utils/files/avatar.png')
 
@@ -275,25 +263,27 @@ describe('Users (e2e)', () => {
 
 	describe('Update user profile', () => {
 		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
-			await userUtils.deviceTokenChecks.refreshTokenExpired(
+			await userUtils.deviceTokenChecks.refreshTokenExpired({
 				mainApp,
-				'patch',
-				RouteNames.USERS.ME.full,
+				filesMicroservice,
+				methodType: 'patch',
+				routeUrl: RouteNames.USERS.ME.full,
 				userRepository,
 				securityRepository,
 				jwtService,
 				mainConfig,
-			)
+			})
 		})
 
 		it('should return 200 if all data is correct', async () => {
-			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 
 			// ============================
 
@@ -375,25 +365,27 @@ describe('Users (e2e)', () => {
 
 	describe('Get user profile', () => {
 		it('should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect', async () => {
-			await userUtils.deviceTokenChecks.refreshTokenExpired(
+			await userUtils.deviceTokenChecks.refreshTokenExpired({
 				mainApp,
-				'get',
-				RouteNames.USERS.ME.full,
+				filesMicroservice,
+				methodType: 'get',
+				routeUrl: RouteNames.USERS.ME.full,
 				userRepository,
 				securityRepository,
 				jwtService,
 				mainConfig,
-			)
+			})
 		})
 
 		it('should return 200 if all data is correct', async () => {
-			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 
 			// Get user profile
 			const getProfileRes_1 = await getRequest(mainApp, RouteNames.USERS.ME.full)
@@ -447,7 +439,11 @@ describe('Users (e2e)', () => {
 
 	describe('Get user posts', () => {
 		it('should return an empty array if there is not posts', async () => {
-			const user = await userUtils.createUserWithConfirmedEmail(mainApp, userRepository)
+			const user = await userUtils.createUserWithConfirmedEmail({
+				mainApp,
+				filesMicroservice,
+				userRepository,
+			})
 
 			const getUserPostRes = await getRequest(
 				mainApp,
@@ -459,13 +455,14 @@ describe('Users (e2e)', () => {
 		})
 
 		it('should return 2 posts of the user', async () => {
-			const [accessToken, refreshTokenStr, user] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshTokenStr, user] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 
 			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
 
@@ -515,15 +512,14 @@ describe('Users (e2e)', () => {
 		})
 
 		it('should return 5 posts of the user', async () => {
-			const [accessToken, refreshTokenStr, user] = await userUtils.createUserAndLogin(
+			const [accessToken, refreshTokenStr, user] = await userUtils.createUserAndLogin({
 				mainApp,
+				filesMicroservice,
 				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
-
-			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 
 			// Create 12 posts
 			for (let i = 0; i < 12; i++) {

@@ -1,6 +1,8 @@
 import {
+	FileMS_DeletePostImagesInContract,
 	FileMS_DeleteUserAvatarInContract,
 	FileMS_EventNames,
+	FileMS_GetPostImagesInContract,
 	FileMS_GetUserAvatarInContract,
 	FileMS_SavePostImagesInContract,
 	FileMS_SaveUserAvatarInContract,
@@ -30,24 +32,24 @@ export const postPhotosUtils = {
 		// Send a request to the microservice
 		return await emitApp.send(eventName, payload).toPromise()
 	},
-	/*async getUserAvatar(emitApp: ClientProxy, userId: number) {
+	async getPostPhotos(emitApp: ClientProxy, postId: number) {
 		// Prepare a payload for the microservice
-		const eventName = FileMS_EventNames.GetUserAvatar
-		const payload: FileMS_GetUserAvatarInContract = {
-			userId,
+		const eventName = FileMS_EventNames.GetPostImages
+		const payload: FileMS_GetPostImagesInContract = {
+			postId,
 		}
 
 		// Send a request to the microservice
 		return await emitApp.send(eventName, payload).toPromise()
-	},*/
-	/*async deleteUserAvatar(emitApp: ClientProxy, userId: number) {
+	},
+	async deletePostPhotos(emitApp: ClientProxy, postId: number) {
 		// Prepare a payload for the microservice
-		const eventName = FileMS_EventNames.DeleteUserAvatar
-		const payload: FileMS_DeleteUserAvatarInContract = {
-			userId,
+		const eventName = FileMS_EventNames.DeletePostImages
+		const payload: FileMS_DeletePostImagesInContract = {
+			postId,
 		}
 
 		// Send a request to the microservice
 		return await emitApp.send(eventName, payload).toPromise()
-	},*/
+	},
 }
