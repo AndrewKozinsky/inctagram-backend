@@ -13,7 +13,7 @@ import {
 	defUserPassword,
 	patchRequest,
 	mockFilesServiceSendMethod,
-	resentMockFilesServiceSendMethod,
+	resetMockFilesServiceSendMethod,
 } from './utils/common'
 import RouteNames from '../src/routes/routesConfig/routeNames'
 import { HTTP_STATUSES } from '../src/utils/httpStatuses'
@@ -430,7 +430,7 @@ describe('Posts (e2e)', () => {
 			})
 			const postId = addPost.data.id
 
-			resentMockFilesServiceSendMethod(filesMicroservice)
+			resetMockFilesServiceSendMethod(filesMicroservice)
 			mockFilesServiceSendMethod(filesMicroservice, [])
 
 			const deletePostRes = await deleteRequest(mainApp, RouteNames.POSTS.POST(postId).full)

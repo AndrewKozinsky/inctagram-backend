@@ -82,6 +82,6 @@ export function mockFilesServiceSendMethod(
 	})
 }
 
-export function resentMockFilesServiceSendMethod(filesMicroservice: ClientProxy) {
+export function resetMockFilesServiceSendMethod(filesMicroservice: ClientProxy) {
 	;(filesMicroservice.send as jest.Mock).mockReset()
 }

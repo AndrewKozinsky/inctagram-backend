@@ -13,6 +13,7 @@ import {
 	defUserPassword,
 	patchRequest,
 	mockFilesServiceSendMethod,
+	resetMockFilesServiceSendMethod,
 } from './utils/common'
 import RouteNames from '../src/routes/routesConfig/routeNames'
 import { HTTP_STATUSES } from '../src/utils/httpStatuses'
@@ -79,9 +80,7 @@ describe('Users (e2e)', () => {
 	})
 
 	describe('Add avatar file to the current user', () => {
-		it.only('should return 400 if the accessToken inside cookie is valid, but avatar was not send', async () => {
-			mockFilesServiceSendMethod(filesMicroservice, '')
-
+		it('should return 400 if the accessToken inside cookie is valid, but avatar was not send', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
 				filesMicroservice,
@@ -91,13 +90,13 @@ describe('Users (e2e)', () => {
 				password: defUserPassword,
 			})
 
-			/*const addAvatarRes = await postRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
+			const addAvatarRes = await postRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
 				.set('authorization', 'Bearer ' + accessToken)
-				.expect(HTTP_STATUSES.BAD_REQUEST_400)*/
-			// checkErrorResponse(addAvatarRes.body, 400, 'File not found')
+				.expect(HTTP_STATUSES.BAD_REQUEST_400)
+			checkErrorResponse(addAvatarRes.body, 400, 'File not found')
 		})
 
-		it('should return 400 if the JWT refreshToken inside cookie is valid, but send wrong file', async () => {
+		it('should return 400 if the JWT accessToken inside cookie is valid, but send wrong file', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
 				filesMicroservice,
@@ -108,7 +107,7 @@ describe('Users (e2e)', () => {
 			})
 
 			// Send file in invalid format
-			/*const textFilePath = path.join(__dirname, 'utils/files/text.txt')
+			const textFilePath = path.join(__dirname, 'utils/files/text.txt')
 
 			const addAvatarRes1 = await postRequest(mainApp, RouteNames.USERS.ME.AVATAR.full)
 				.set('authorization', 'Bearer ' + accessToken)
@@ -127,10 +126,10 @@ describe('Users (e2e)', () => {
 				.attach('avatarFile', bigFilePath)
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
 
-			checkErrorResponse(addAvatarRes2.body, 400, 'File is too large')*/
+			checkErrorResponse(addAvatarRes2.body, 400, 'File is too large')
 		})
 
-		it('should return 200 if send correct avatar image', async () => {
+		it.only('should return 200 if send correct avatar image', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
 				filesMicroservice,

@@ -10,6 +10,7 @@ import {
 	defUserPassword,
 	patchRequest,
 	mockFilesServiceSendMethod,
+	resetMockFilesServiceSendMethod,
 } from './common'
 import RouteNames from '../../src/routes/routesConfig/routeNames'
 import { HTTP_STATUSES } from '../../src/utils/httpStatuses'
@@ -41,7 +42,11 @@ export const userUtils = {
 			.expect(HTTP_STATUSES.CREATED_201)
 
 		const userId = firstRegRes.body.data.id
-		return await props.userRepository.getUserById(userId)
+		const user = await props.userRepository.getUserById(userId)
+
+		resetMockFilesServiceSendMethod(props.filesMicroservice)
+
+		return user
 	},
 
 	async createUserWithConfirmedEmail(props: {
@@ -77,16 +82,16 @@ export const userUtils = {
 		email?: string
 		password?: string
 	}) {
-		const user = await this.createUserWithConfirmedEmail(
-			props.mainApp,
-			props.userRepository,
-			props.userName,
-			props.email,
-			props.password,
-		)
+		const user = await this.createUserWithConfirmedEmail({
+			mainApp: props.mainApp,
+			filesMicroservice: props.filesMicroservice,
+			userRepository: props.userRepository,
+			userName: props.userName,
+			email: props.email,
+			password: props.password,
+		})
 
 		return this.loginUser(props.mainApp, props.email, props.password)
-		// return ['1', '2', { id: 1 } as any]
 	},
 	async loginUser(app: INestApplication, email: string, password: string) {
 		const loginRes = await postRequest(app, RouteNames.AUTH.LOGIN.full)
