@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import { MainConfigService } from '@app/config'
-import mongoose, { Connection } from 'mongoose'
+import { Connection } from 'mongoose'
 import { InjectConnection } from '@nestjs/mongoose'
 
 export type SaveFileDetails = {
@@ -17,7 +17,7 @@ export class CommonService {
 
 	constructor(
 		private mainConfig: MainConfigService,
-		@InjectConnection('files') private connection: Connection,
+		@InjectConnection() private connection: Connection,
 	) {
 		const { region, endpoint, accessKeyId, secretAccessKey } = this.mainConfig.get().s3
 
@@ -75,13 +75,13 @@ export class CommonService {
 	}
 
 	async eraseDatabase() {
-		/*const collections = this.connection.collections
-		console.log(collections)
+		if (this.connection.readyState !== 1) return
+		const collections = this.connection.collections
 
 		await Promise.all(
 			Object.values(collections).map(
 				(collection) => collection.deleteMany({}), // an empty mongodb selector object ({}) must be passed as the filter argument
 			),
-		)*/
+		)
 	}
 }

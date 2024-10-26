@@ -24,7 +24,7 @@ export type FileMS_GetUserAvatarOutContract = {
 	avatarUrl: null | string
 }
 
-export type FileMS_DeleteFileInContract = {
+export type FileMS_DeleteUserAvatarInContract = {
 	userId: number
 }
 

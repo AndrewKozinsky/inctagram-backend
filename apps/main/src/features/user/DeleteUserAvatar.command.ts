@@ -3,7 +3,7 @@ import { ErrorMessage, FileMS_EventNames } from '@app/shared'
 import { lastValueFrom } from 'rxjs'
 import { Inject } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
-import { FileMS_DeleteFileInContract } from '@app/shared/contracts/fileMS.contracts'
+import { FileMS_DeleteUserAvatarInContract } from '@app/shared/contracts/fileMS.contracts'
 import { UserRepository } from '../../repositories/user.repository'
 
 export class DeleteUserAvatarCommand {
@@ -27,7 +27,7 @@ export class DeleteUserAvatarHandler implements ICommandHandler<DeleteUserAvatar
 		}
 
 		// Delete avatar file
-		const sendingDataContract: FileMS_DeleteFileInContract = {
+		const sendingDataContract: FileMS_DeleteUserAvatarInContract = {
 			userId: user.id,
 		}
 		await lastValueFrom(

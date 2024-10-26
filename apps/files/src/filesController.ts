@@ -8,7 +8,7 @@ import {
 	FileMS_SaveUserAvatarInContract,
 } from '@app/shared'
 import {
-	FileMS_DeleteFileInContract,
+	FileMS_DeleteUserAvatarInContract,
 	FileMS_SavePostImagesInContract,
 } from '@app/shared/contracts/fileMS.contracts'
 import { PostPhotoService } from './postPhotoService'
@@ -33,15 +33,17 @@ export class FilesController {
 	}
 
 	@MessagePattern(FileMS_EventNames.DeleteUserAvatar)
-	async deleteUserAvatar(deleteUserAvatarInContract: FileMS_DeleteFileInContract) {
+	async deleteUserAvatar(deleteUserAvatarInContract: FileMS_DeleteUserAvatarInContract) {
 		return await this.avatarService.deleteUserAvatar(deleteUserAvatarInContract)
 	}
 
+	////////////////////////////////
 	@MessagePattern(FileMS_EventNames.SavePostImages)
 	async savePostImages(savePostImagesInContract: FileMS_SavePostImagesInContract) {
 		return await this.postService.savePostImages(savePostImagesInContract)
 	}
 
+	////////////////////////////////
 	@MessagePattern(FileMS_EventNames.DeletePostImages)
 	async deletePostImages(deletePostImagesInContract: FileMS_DeletePostImagesInContract) {
 		return await this.postService.deletePostImages(deletePostImagesInContract)
@@ -49,6 +51,6 @@ export class FilesController {
 
 	@MessagePattern(FileMS_EventNames.EraseDatabase)
 	async eraseDatabase() {
-		// return await this.commonService.eraseDatabase()
+		return await this.commonService.eraseDatabase()
 	}
 }

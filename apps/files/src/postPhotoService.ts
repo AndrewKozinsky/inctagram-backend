@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common'
+import { Model } from 'mongoose'
+import { InjectModel } from '@nestjs/mongoose'
 import { ErrorMessage, FileMS_DeletePostImagesInContract } from '@app/shared'
 import { FileMS_SavePostImagesInContract } from '@app/shared/contracts/fileMS.contracts'
 import { createUniqString } from '@app/shared'
-import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
 import { CommonService, SaveFileDetails } from './commonService'
 import { PostPhoto } from './schemas/postPhoto.schema'
 

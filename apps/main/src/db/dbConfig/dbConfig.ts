@@ -85,12 +85,6 @@ export const bdConfig = {
 				example: 'Kozinsky',
 				required: false,
 			},
-			/*avatar: {
-				type: 'string',
-				description: "User's avatar image",
-				example: 'https://sociable-people.storage.yandexcloud.net/users/1/avatar.png',
-				required: false,
-			},*/
 			files_ms_avatar_id: {
 				type: 'string',
 				description: "User's avatar id in Files microservice",
@@ -226,31 +220,6 @@ export const bdConfig = {
 				type: 'manyToOne',
 				thisField: 'user_id',
 				foreignTable: 'User',
-				foreignField: 'id',
-			},
-			PostPhoto: {
-				type: 'oneToMany',
-			},
-		},
-	},
-	PostPhoto: {
-		dtoProps: {},
-		dbFields: {
-			id: {
-				type: 'index',
-			},
-			url: {
-				type: 'string',
-				description: 'Photo url',
-				required: true,
-			},
-			created_at: {
-				type: 'createdAt',
-			},
-			post_id: {
-				type: 'manyToOne',
-				thisField: 'post_id',
-				foreignTable: 'Post',
 				foreignField: 'id',
 			},
 		},

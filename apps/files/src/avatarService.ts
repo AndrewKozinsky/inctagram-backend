@@ -6,7 +6,7 @@ import {
 	FileMS_SaveUserAvatarInContract,
 } from '@app/shared'
 import {
-	FileMS_DeleteFileInContract,
+	FileMS_DeleteUserAvatarInContract,
 	FileMS_SaveUserAvatarOutContract,
 } from '@app/shared/contracts/fileMS.contracts'
 import { InjectModel } from '@nestjs/mongoose'
@@ -82,7 +82,7 @@ export class AvatarService {
 		}
 	}
 
-	async deleteUserAvatar(deleteUserAvatarInContract: FileMS_DeleteFileInContract) {
+	async deleteUserAvatar(deleteUserAvatarInContract: FileMS_DeleteUserAvatarInContract) {
 		const { userId } = deleteUserAvatarInContract
 
 		const existingAvatarInDb = await this.userAvatarModel.findOne({ userId })

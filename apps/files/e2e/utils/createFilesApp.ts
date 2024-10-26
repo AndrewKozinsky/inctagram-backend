@@ -20,7 +20,7 @@ export async function createFilesApp(
 		})
 		.compile()
 
-	/*const filesApp = moduleFixture.createNestMicroservice({
+	const filesApp = moduleFixture.createNestMicroservice({
 		transport: Transport.TCP,
 		options: {
 			host: '127.0.0.1',
@@ -39,5 +39,5 @@ export async function createFilesApp(
 		avatarService,
 		postPhotoService,
 		filesApp,
-	}*/
+	}
 }
