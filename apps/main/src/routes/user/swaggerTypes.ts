@@ -159,7 +159,6 @@ export class SWGetUserPostsRouteOut {
 							items: {
 								type: 'object',
 								properties: {
-									id: { type: 'number', default: 10 },
 									url: {
 										type: 'string',
 										default:
@@ -183,7 +182,7 @@ export class SWGetUserPostsRouteOut {
 			text: null | string
 			location: null | string
 			userId: number
-			photos: { id: number; url: string }[]
+			photos: { url: string }[]
 		}[]
 	}
 }

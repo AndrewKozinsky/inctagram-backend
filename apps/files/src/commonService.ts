@@ -62,7 +62,7 @@ export class CommonService {
 		const { bucket } = this.mainConfig.get().s3
 
 		try {
-			return await this.s3Client.send(
+			await this.s3Client.send(
 				// DeleteObjectCommand creates an instance deleting a file.
 				new DeleteObjectCommand({
 					Bucket: bucket,

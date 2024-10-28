@@ -1,0 +1,38 @@
+import { Inject, Injectable } from '@nestjs/common'
+import {
+	FileMS_DeletePostImagesInContract,
+	FileMS_DeletePostImagesOutContract,
+	FileMS_EventNames,
+	FileMS_GetPostImagesInContract,
+	FileMS_GetPostImagesOutContract,
+	FileMS_GetPostsImagesInContract,
+	FileMS_GetPostsImagesOutContract,
+} from '@app/shared'
+import { lastValueFrom } from 'rxjs'
+import { ClientProxy } from '@nestjs/microservices'
+
+@Injectable()
+export class PostBaseRepository {
+	constructor(@Inject('FILES_MICROSERVICE') private filesMicroClient: ClientProxy) {}
+
+	async getPostsPhotos(postsIds: number[]): Promise<FileMS_GetPostsImagesOutContract> {
+		const sendingDataContract: FileMS_GetPostsImagesInContract = { postsIds }
+		return lastValueFrom(
+			this.filesMicroClient.send(FileMS_EventNames.GetPostsImages, sendingDataContract),
+		)
+	}
+
+	async getPostPhotos(postId: number): Promise<FileMS_GetPostImagesOutContract> {
+		const sendingDataContract: FileMS_GetPostImagesInContract = { postId }
+		return lastValueFrom(
+			this.filesMicroClient.send(FileMS_EventNames.GetPostImages, sendingDataContract),
+		)
+	}
+
+	async deletePostPhotos(postId: number): Promise<FileMS_DeletePostImagesOutContract> {
+		const sendingDataContract: FileMS_DeletePostImagesInContract = { postId }
+		return lastValueFrom(
+			this.filesMicroClient.send(FileMS_EventNames.DeletePostImages, sendingDataContract),
+		)
+	}
+}

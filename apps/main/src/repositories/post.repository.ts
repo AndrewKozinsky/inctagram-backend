@@ -1,21 +1,16 @@
 import { Injectable } from '@nestjs/common'
-import { Post, PostPhoto, User } from '@prisma/client'
-import { add } from 'date-fns'
-import { HashAdapterService } from '@app/hash-adapter'
+import { Post } from '@prisma/client'
 import { PrismaService } from '../db/prisma.service'
-import { CreateUserDtoModel } from '../models/user/user.input.model'
-import { UserServiceModel } from '../models/user/user.service.model'
-import { JwtAdapterService } from '@app/jwt-adapter'
 import { CreatePostDtoModel, UpdatePostDtoModel } from '../models/post/post.input.model'
 import { PostServiceModel } from '../models/post/post.service.model'
-
-type DBPostWithPhotos = Post & {
-	PostPhoto: PostPhoto[]
-}
+import { PostBaseRepository } from './post.baseRepository'
 
 @Injectable()
 export class PostRepository {
-	constructor(private prisma: PrismaService) {}
+	constructor(
+		private prisma: PrismaService,
+		private postBaseRepository: PostBaseRepository,
+	) {}
 
 	async createPost(userId: number, dto: CreatePostDtoModel) {
 		const post = await this.prisma.post.create({
@@ -24,27 +19,23 @@ export class PostRepository {
 				location: dto.location,
 				user_id: userId,
 			},
-			include: {
-				PostPhoto: true,
-			},
 		})
 
-		return this.mapDbPostToServicePost(post)
+		return this.mapDbPostToServicePost(post, [])
 	}
 
-	async getPostById(id: number) {
+	async getPostById(postId: number) {
 		const post = await this.prisma.post.findFirst({
-			where: { id },
-			include: {
-				PostPhoto: true,
-			},
+			where: { id: postId },
 		})
 
 		if (!post) {
 			return null
 		}
 
-		return this.mapDbPostToServicePost(post)
+		const photos = await this.postBaseRepository.getPostPhotos(postId)
+
+		return this.mapDbPostToServicePost(post, photos.imagesUrls)
 	}
 
 	async updatePost(postId: number, dto: UpdatePostDtoModel) {
@@ -63,21 +54,22 @@ export class PostRepository {
 	}
 
 	async deletePost(postId: number) {
+		await this.postBaseRepository.deletePostPhotos(postId)
+
 		await this.prisma.post.delete({
 			where: { id: postId },
 		})
 	}
 
-	mapDbPostToServicePost(dbPost: DBPostWithPhotos): PostServiceModel {
+	mapDbPostToServicePost(dbPost: Post, postImages: string[]): PostServiceModel {
 		return {
 			id: dbPost.id,
 			text: dbPost.text,
 			location: dbPost.location,
 			userId: dbPost.user_id,
-			photos: dbPost.PostPhoto.map((photo) => {
+			photos: postImages.map((imageUrl) => {
 				return {
-					id: photo.id,
-					url: photo.url,
+					url: imageUrl,
 				}
 			}),
 		}

@@ -85,12 +85,6 @@ export const bdConfig = {
 				example: 'Kozinsky',
 				required: false,
 			},
-			files_ms_avatar_id: {
-				type: 'string',
-				description: "User's avatar id in Files microservice",
-				example: 'gfysa252fjd',
-				required: false,
-			},
 			date_of_birth: {
 				type: 'dateString',
 				description: "User's date of birth",

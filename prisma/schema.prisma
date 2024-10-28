@@ -16,7 +16,6 @@ model User {
 	user_name	String	@unique
 	first_name	String?
 	last_name	String?
-	files_ms_avatar_id	String?
 	date_of_birth	String?
 	country_code	String?
 	city_id	Int?
@@ -48,13 +47,4 @@ model Post {
 	created_at	DateTime	@default(now())
 	user User @relation(fields: [user_id], references: [id])
 	user_id Int
-	PostPhoto	PostPhoto[]
-}
-
-model PostPhoto {
-	id	Int	@id	@default(autoincrement())
-	url	String
-	created_at	DateTime	@default(now())
-	post Post @relation(fields: [post_id], references: [id])
-	post_id Int
 }

@@ -21,7 +21,7 @@ import { clearAllDB } from './utils/db'
 import { EmailAdapterService } from '@app/email-adapter'
 import { UserRepository } from '../src/repositories/user.repository'
 import { userUtils } from './utils/userUtils'
-import { parseCookieStringToObj } from '@app/shared'
+import { FileMS_SavePostImagesOutContract, parseCookieStringToObj } from '@app/shared'
 import { GitHubService } from '../src/routes/auth/gitHubService'
 import { GoogleService } from '../src/routes/auth/googleService'
 import { DevicesRepository } from '../src/repositories/devices.repository'
@@ -135,7 +135,9 @@ describe('Posts (e2e)', () => {
 				password: defUserPassword,
 			})
 
-			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
+			mockFilesServiceSendMethod(filesMicroservice, {
+				images: ['url 1', 'url 2'],
+			} satisfies FileMS_SavePostImagesOutContract)
 
 			const avatarFilePath = path.join(__dirname, 'utils/files/avatar.png')
 
@@ -182,7 +184,9 @@ describe('Posts (e2e)', () => {
 
 			let secondPostId = 0
 			for (let i = 0; i < 2; i++) {
-				mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
+				mockFilesServiceSendMethod(filesMicroservice, {
+					images: ['url 1', 'url 2'],
+				} satisfies FileMS_SavePostImagesOutContract)
 
 				const addPost = await postUtils.createPost({
 					app: mainApp,
@@ -240,7 +244,9 @@ describe('Posts (e2e)', () => {
 				password: defUserPassword,
 			})
 
-			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
+			mockFilesServiceSendMethod(filesMicroservice, {
+				images: ['url 1', 'url 2'],
+			} satisfies FileMS_SavePostImagesOutContract)
 
 			const addPost = await postUtils.createPost({
 				app: mainApp,
@@ -275,7 +281,9 @@ describe('Posts (e2e)', () => {
 				password: defUserPassword,
 			})
 
-			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
+			mockFilesServiceSendMethod(filesMicroservice, {
+				images: ['url 1', 'url 2'],
+			} satisfies FileMS_SavePostImagesOutContract)
 
 			const addPost = await postUtils.createPost({
 				app: mainApp,
@@ -319,7 +327,9 @@ describe('Posts (e2e)', () => {
 				password: defUserPassword,
 			})
 
-			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
+			mockFilesServiceSendMethod(filesMicroservice, {
+				images: ['url 1', 'url 2'],
+			} satisfies FileMS_SavePostImagesOutContract)
 
 			const addPost = await postUtils.createPost({
 				app: mainApp,
@@ -384,7 +394,9 @@ describe('Posts (e2e)', () => {
 				password: defUserPassword,
 			})
 
-			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
+			mockFilesServiceSendMethod(filesMicroservice, {
+				images: ['url 1', 'url 2'],
+			} satisfies FileMS_SavePostImagesOutContract)
 
 			const addPost = await postUtils.createPost({
 				app: mainApp,
@@ -421,7 +433,9 @@ describe('Posts (e2e)', () => {
 				password: defUserPassword,
 			})
 
-			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
+			mockFilesServiceSendMethod(filesMicroservice, {
+				images: ['url 1', 'url 2'],
+			} satisfies FileMS_SavePostImagesOutContract)
 
 			const addPost = await postUtils.createPost({
 				app: mainApp,
@@ -431,6 +445,7 @@ describe('Posts (e2e)', () => {
 			const postId = addPost.data.id
 
 			resetMockFilesServiceSendMethod(filesMicroservice)
+			// TODO
 			mockFilesServiceSendMethod(filesMicroservice, [])
 
 			const deletePostRes = await deleteRequest(mainApp, RouteNames.POSTS.POST(postId).full)
@@ -459,7 +474,9 @@ describe('Posts (e2e)', () => {
 				password: defUserPassword,
 			})
 
-			mockFilesServiceSendMethod(filesMicroservice, ['url 1', 'url 2'])
+			mockFilesServiceSendMethod(filesMicroservice, {
+				images: ['url 1', 'url 2'],
+			} satisfies FileMS_SavePostImagesOutContract)
 
 			for (let i = 0; i < 3; i++) {
 				await postUtils.createPost({

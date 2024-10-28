@@ -4,7 +4,12 @@ import { InjectModel } from '@nestjs/mongoose'
 import {
 	ErrorMessage,
 	FileMS_DeletePostImagesInContract,
+	FileMS_DeletePostImagesOutContract,
 	FileMS_GetPostImagesInContract,
+	FileMS_GetPostImagesOutContract,
+	FileMS_GetPostsImagesInContract,
+	FileMS_GetPostsImagesOutContract,
+	FileMS_SavePostImagesOutContract,
 } from '@app/shared'
 import { FileMS_SavePostImagesInContract } from '@app/shared/contracts/fileMS.contracts'
 import { createUniqString } from '@app/shared'
@@ -18,7 +23,9 @@ export class PostPhotoService {
 		@InjectModel(PostPhoto.name) private postPhotoModel: Model<PostPhoto>,
 	) {}
 
-	async savePostImages(savePostImagesInContract: FileMS_SavePostImagesInContract) {
+	async savePostImages(
+		savePostImagesInContract: FileMS_SavePostImagesInContract,
+	): Promise<FileMS_SavePostImagesOutContract> {
 		const { postId, photoFiles } = savePostImagesInContract
 
 		const imagesUrls: string[] = []
@@ -48,20 +55,57 @@ export class PostPhotoService {
 			})
 		}
 
-		return imagesUrls
+		return { images: imagesUrls }
 	}
 
-	async getPostImages(getPostImagesInContract: FileMS_GetPostImagesInContract) {
+	async getPostsImages(
+		getPostsImagesInContract: FileMS_GetPostsImagesInContract,
+	): Promise<FileMS_GetPostsImagesOutContract> {
+		const { postsIds } = getPostsImagesInContract
+
+		const posts = await this.postPhotoModel.find({ postId: { $in: postsIds } })
+
+		const preparedPosts: FileMS_GetPostsImagesOutContract = []
+
+		posts.forEach((post) => {
+			let postInPreparedPosts = findPostInPreparedPosts(preparedPosts, post.postId)
+
+			if (!postInPreparedPosts) {
+				preparedPosts.push({ postId: post.postId, imagesUrls: [] })
+			}
+
+			postInPreparedPosts = findPostInPreparedPosts(preparedPosts, post.postId)
+			postInPreparedPosts!.imagesUrls.push(post.url)
+		})
+
+		return preparedPosts
+
+		function findPostInPreparedPosts(
+			preparedPosts: FileMS_GetPostsImagesOutContract,
+			postId: number,
+		) {
+			return preparedPosts.find((thisPost) => thisPost.postId === postId)
+		}
+	}
+
+	async getPostImages(
+		getPostImagesInContract: FileMS_GetPostImagesInContract,
+	): Promise<FileMS_GetPostImagesOutContract> {
 		const { postId } = getPostImagesInContract
 
 		const postPhotos = await this.postPhotoModel.find({ postId })
 
-		return postPhotos.map((postPhoto) => {
-			return postPhoto.url
-		})
+		return {
+			postId,
+			imagesUrls: postPhotos.map((postPhoto) => {
+				return postPhoto.url
+			}),
+		}
 	}
 
-	async deletePostImages(deletePostImagesInContract: FileMS_DeletePostImagesInContract) {
+	async deletePostImages(
+		deletePostImagesInContract: FileMS_DeletePostImagesInContract,
+	): Promise<FileMS_DeletePostImagesOutContract> {
 		const { postId } = deletePostImagesInContract
 
 		const postPhotosDetails = await this.postPhotoModel.find({ postId })
@@ -73,5 +117,7 @@ export class PostPhotoService {
 		}
 
 		await this.postPhotoModel.deleteMany({ postId })
+
+		return null
 	}
 }

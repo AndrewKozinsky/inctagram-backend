@@ -32,11 +32,6 @@ export class SetAvatarToMeHandler implements ICommandHandler<SetAvatarToMeComman
 			this.filesMicroClient.send(FileMS_EventNames.SaveUserAvatar, sendingDataContract),
 		)
 
-		// Set avatar image src to user table in DB
-		await this.userRepository.updateUser(userId, {
-			files_ms_avatar_id: filesMSRes.avatarId,
-		})
-
 		return {
 			avatarUrl: filesMSRes.avatarUrl,
 		}

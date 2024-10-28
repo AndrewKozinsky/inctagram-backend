@@ -33,7 +33,5 @@ export class DeleteUserAvatarHandler implements ICommandHandler<DeleteUserAvatar
 		await lastValueFrom(
 			this.filesMicroClient.send(FileMS_EventNames.DeleteUserAvatar, sendingDataContract),
 		)
-
-		await this.userRepository.updateUser(userId, { files_ms_avatar_id: null })
 	}
 }

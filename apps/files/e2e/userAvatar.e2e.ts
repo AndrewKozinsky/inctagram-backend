@@ -5,7 +5,6 @@ import { createEmitApp } from './utils/createEmitApp'
 import { AvatarService } from '../src/avatarService'
 import { PostPhotoService } from '../src/postPhotoService'
 import { CommonService } from '../src/commonService'
-import { clearAllDB } from './utils/db'
 import { avatarUtils } from './utils/avatarUtils'
 import { Connection } from 'mongoose'
 

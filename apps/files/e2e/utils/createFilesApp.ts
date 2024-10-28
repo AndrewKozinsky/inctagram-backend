@@ -1,7 +1,6 @@
 import { Transport } from '@nestjs/microservices'
 import { Test, TestingModule } from '@nestjs/testing'
 import { connect, Connection } from 'mongoose'
-import { S3Client } from '@aws-sdk/client-s3'
 import { FilesModule } from '../../src/filesModule'
 import { AvatarService } from '../../src/avatarService'
 import { PostPhotoService } from '../../src/postPhotoService'
@@ -18,12 +17,7 @@ export async function createFilesApp(
 
 	const moduleFixture: TestingModule = await Test.createTestingModule({
 		imports: [FilesModule],
-	})
-		.overrideProvider(S3Client)
-		.useValue({
-			send: jest.fn().mockResolvedValue('Mocked S3Client send() method'),
-		})
-		.compile()
+	}).compile()
 
 	const filesApp = moduleFixture.createNestMicroservice({
 		transport: Transport.TCP,
@@ -32,6 +26,10 @@ export async function createFilesApp(
 			port: 8877,
 		},
 	})
+
+	commonService = moduleFixture.get(CommonService)
+	jest.spyOn(commonService, 'saveFile').mockImplementation(() => Promise.resolve())
+	jest.spyOn(commonService, 'deleteFile').mockImplementation(() => Promise.resolve())
 
 	await filesApp.listen()
 

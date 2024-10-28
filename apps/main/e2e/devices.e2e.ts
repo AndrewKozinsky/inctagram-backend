@@ -98,11 +98,12 @@ describe('Auth (e2e)', () => {
 
 			// Second login
 
-			const [accessToken2, refreshToken2] = await userUtils.loginUser(
+			const [accessToken2, refreshToken2] = await userUtils.loginUser({
 				mainApp,
-				defUserEmail,
-				defUserPassword,
-			)
+				filesMicroservice,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 			const refreshToken2Str = userUtils.convertCookieRefreshTokenToTokenStr(refreshToken2)
 
 			const getUserDevicesRes2 = await getRequest(mainApp, RouteNames.SECURITY.DEVICES.full)
@@ -196,11 +197,12 @@ describe('Auth (e2e)', () => {
 				email: email2,
 				password: password2,
 			})
-			const [accessToken2, refreshToken2] = await userUtils.loginUser(
+			const [accessToken2, refreshToken2] = await userUtils.loginUser({
 				mainApp,
-				email2,
-				password2,
-			)
+				filesMicroservice,
+				email: email2,
+				password: password2,
+			})
 			const refreshToken2Str = userUtils.convertCookieRefreshTokenToTokenStr(refreshToken2)
 
 			await deleteRequest(mainApp, RouteNames.SECURITY.DEVICES.DEVICE_ID(deviceId).full)

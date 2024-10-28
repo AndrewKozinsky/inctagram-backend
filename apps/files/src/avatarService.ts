@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import {
 	ErrorMessage,
+	FileMS_DeleteUserAvatarOutContract,
 	FileMS_GetUserAvatarInContract,
 	FileMS_GetUserAvatarOutContract,
 	FileMS_SaveUserAvatarInContract,
@@ -46,20 +47,19 @@ export class AvatarService {
 
 		// Save details in DB
 		const existingAvatarInDb = await this.userAvatarModel.exists({ userId })
-		let avatarIdInDb = ''
+
 		if (existingAvatarInDb) {
-			avatarIdInDb = existingAvatarInDb._id.toString()
+			await this.userAvatarModel.findByIdAndUpdate(existingAvatarInDb._id, {
+				url: avatarUrl,
+			})
 		} else {
-			const res = await this.userAvatarModel.create<UserAvatar>({
+			await this.userAvatarModel.create<UserAvatar>({
 				url: avatarUrl,
 				userId,
 			})
-
-			avatarIdInDb = res._id.toString()
 		}
 
 		return {
-			avatarId: avatarIdInDb,
 			avatarUrl,
 		}
 	}
@@ -82,7 +82,9 @@ export class AvatarService {
 		}
 	}
 
-	async deleteUserAvatar(deleteUserAvatarInContract: FileMS_DeleteUserAvatarInContract) {
+	async deleteUserAvatar(
+		deleteUserAvatarInContract: FileMS_DeleteUserAvatarInContract,
+	): Promise<FileMS_DeleteUserAvatarOutContract> {
 		const { userId } = deleteUserAvatarInContract
 
 		const existingAvatarInDb = await this.userAvatarModel.findOne({ userId })
@@ -93,5 +95,7 @@ export class AvatarService {
 			// Remove user avatar details in DB
 			await this.userAvatarModel.deleteOne({ userId })
 		}
+
+		return null
 	}
 }

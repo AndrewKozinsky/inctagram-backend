@@ -1,21 +1,14 @@
 import { INestMicroservice } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
-import path from 'path'
-import fs from 'node:fs/promises'
-import { FileMS_EventNames, FileMS_SaveUserAvatarInContract } from '@app/shared'
-import { Readable } from 'stream'
 import { createFilesApp } from './utils/createFilesApp'
 import { createEmitApp } from './utils/createEmitApp'
 import { AvatarService } from '../src/avatarService'
 import { PostPhotoService } from '../src/postPhotoService'
 import { CommonService } from '../src/commonService'
-import { clearAllDB } from './utils/db'
-import { avatarUtils } from './utils/avatarUtils'
 import { postPhotosUtils } from './utils/postPhotosUtils'
 import { Connection } from 'mongoose'
-import { UserAvatar } from '../src/schemas/userAvatar.schema'
 
-it.only('123', async () => {
+it('123', async () => {
 	expect(2).toBe(2)
 })
 
@@ -85,6 +78,29 @@ describe('Post photos (e2e)', () => {
 			expect(getPostPhotosResp.length).toBe(2)
 			expect(getPostPhotosResp[0]).toBe(postPhotosFromDB[0].url)
 			expect(getPostPhotosResp[1]).toBe(postPhotosFromDB[1].url)
+		})
+	})
+
+	describe('Get posts photos', () => {
+		it.only('Get posts photos', async () => {
+			await postPhotosUtils.createFivePostsPhotos(emitApp)
+
+			// Try to get created post photos by additional request
+			const getPostPhotos = await postPhotosUtils.getPostsPhotos(emitApp, [2, 3, 4])
+
+			expect(getPostPhotos.length).toBe(3)
+
+			expect(getPostPhotos[0].postId).toBe(2)
+			expect(getPostPhotos[0].imagesUrls.length).toBe(1)
+			expect(getPostPhotos[0].imagesUrls[0].startsWith('posts/2/')).toBeTruthy()
+
+			expect(getPostPhotos[1].postId).toBe(3)
+			expect(getPostPhotos[1].imagesUrls.length).toBe(1)
+			expect(getPostPhotos[1].imagesUrls[0].startsWith('posts/3/')).toBeTruthy()
+
+			expect(getPostPhotos[2].postId).toBe(4)
+			expect(getPostPhotos[2].imagesUrls.length).toBe(1)
+			expect(getPostPhotos[2].imagesUrls[0].startsWith('posts/4/')).toBeTruthy()
 		})
 	})
 

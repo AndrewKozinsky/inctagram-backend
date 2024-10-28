@@ -35,6 +35,7 @@ export const userUtils = {
 		const fixedEmail = props.email ?? defUserEmail
 		const fixedPassword = props.password ?? defUserPassword
 
+		// TODO
 		mockFilesServiceSendMethod(props.filesMicroservice, '')
 
 		const firstRegRes = await postRequest(props.mainApp, RouteNames.AUTH.REGISTRATION.full)
@@ -66,11 +67,16 @@ export const userUtils = {
 			password: props.password,
 		})
 
+		// TODO
+		mockFilesServiceSendMethod(props.filesMicroservice, '')
+
 		// Confirm email
 		await getRequest(
 			props.mainApp,
 			RouteNames.AUTH.EMAIL_CONFIRMATION.full + '?code=' + user!.emailConfirmationCode,
 		).expect(HTTP_STATUSES.OK_200)
+
+		resetMockFilesServiceSendMethod(props.filesMicroservice)
 
 		return user
 	},
@@ -91,12 +97,27 @@ export const userUtils = {
 			password: props.password,
 		})
 
-		return this.loginUser(props.mainApp, props.email, props.password)
+		return this.loginUser({
+			mainApp: props.mainApp,
+			filesMicroservice: props.filesMicroservice,
+			email: props.email,
+			password: props.password,
+		})
 	},
-	async loginUser(app: INestApplication, email: string, password: string) {
-		const loginRes = await postRequest(app, RouteNames.AUTH.LOGIN.full)
-			.send({ password, email })
+	async loginUser(props: {
+		mainApp: INestApplication
+		filesMicroservice: ClientProxy
+		email: string
+		password: string
+	}) {
+		// TODO
+		mockFilesServiceSendMethod(props.filesMicroservice, '')
+
+		const loginRes = await postRequest(props.mainApp, RouteNames.AUTH.LOGIN.full)
+			.send({ password: props.password, email: props.email })
 			.expect(HTTP_STATUSES.OK_200)
+
+		resetMockFilesServiceSendMethod(props.filesMicroservice)
 
 		const { accessToken } = loginRes.body.data
 		const refreshTokenStr = loginRes.headers['set-cookie'][0]
@@ -117,6 +138,7 @@ export const userUtils = {
 		this.checkNullOrString(user.countryCode)
 		this.checkNullOrNumber(user.cityId)
 		this.checkNullOrString(user.aboutMe)
+		this.checkNullOrString(user.avatar)
 
 		expect(user.hashedPassword).toBeUndefined()
 		expect(user.emailConfirmationCode).toBeUndefined()

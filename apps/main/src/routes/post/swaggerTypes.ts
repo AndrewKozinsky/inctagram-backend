@@ -33,7 +33,6 @@ export class SWAddPostRouteOut {
 				items: {
 					type: 'object',
 					properties: {
-						id: { type: 'number' },
 						url: {
 							type: 'string',
 							default:
@@ -50,7 +49,6 @@ export class SWAddPostRouteOut {
 		location: null | string
 		userId: number
 		photos: {
-			id: number
 			url: string
 		}[]
 	}
@@ -90,7 +88,6 @@ export class SWGetPostRouteOut {
 				items: {
 					type: 'object',
 					properties: {
-						id: { type: 'number' },
 						url: {
 							type: 'string',
 							default:
@@ -107,7 +104,6 @@ export class SWGetPostRouteOut {
 		location: null | string
 		userId: number
 		photos: {
-			id: number
 			url: string
 		}[]
 	}
@@ -163,7 +159,6 @@ export class SWUpdatePostRouteOut {
 		location: null | string
 		userId: number
 		photos: {
-			id: number
 			url: string
 		}[]
 	}
@@ -214,7 +209,6 @@ export class SWGetRecentPostRouteOut {
 					items: {
 						type: 'object',
 						properties: {
-							id: { type: 'number' },
 							url: {
 								type: 'string',
 								default:
@@ -231,6 +225,6 @@ export class SWGetRecentPostRouteOut {
 		text: string
 		createdAt: string
 		user: { id: number; name: string; avatar: null | string }
-		photos: { id: number; url: string }[]
+		photos: { url: string }[]
 	}[]
 }

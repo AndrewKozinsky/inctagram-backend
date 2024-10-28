@@ -73,10 +73,7 @@ export function checkSuccessResponse(resObj: any, code: number, expectedData?: a
 	}
 }
 
-export function mockFilesServiceSendMethod(
-	filesMicroservice: ClientProxy,
-	returnValue: string | string[],
-) {
+export function mockFilesServiceSendMethod(filesMicroservice: ClientProxy, returnValue: any) {
 	;(filesMicroservice.send as jest.Mock).mockImplementation(() => {
 		return of(returnValue)
 	})
