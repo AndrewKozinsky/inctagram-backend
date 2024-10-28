@@ -7,6 +7,8 @@ import {
 	FileMS_GetPostImagesOutContract,
 	FileMS_GetPostsImagesInContract,
 	FileMS_GetPostsImagesOutContract,
+	FileMS_GetUsersAvatarsInContract,
+	FileMS_GetUsersAvatarsOutContract,
 } from '@app/shared'
 import { lastValueFrom } from 'rxjs'
 import { ClientProxy } from '@nestjs/microservices'
@@ -14,6 +16,13 @@ import { ClientProxy } from '@nestjs/microservices'
 @Injectable()
 export class PostBaseRepository {
 	constructor(@Inject('FILES_MICROSERVICE') private filesMicroClient: ClientProxy) {}
+
+	async getUsersAvatars(usersIds: number[]): Promise<FileMS_GetUsersAvatarsOutContract> {
+		const sendingDataContract: FileMS_GetUsersAvatarsInContract = { usersIds }
+		return lastValueFrom(
+			this.filesMicroClient.send(FileMS_EventNames.GetUsersAvatars, sendingDataContract),
+		)
+	}
 
 	async getPostsPhotos(postsIds: number[]): Promise<FileMS_GetPostsImagesOutContract> {
 		const sendingDataContract: FileMS_GetPostsImagesInContract = { postsIds }

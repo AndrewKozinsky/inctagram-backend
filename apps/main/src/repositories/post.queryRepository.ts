@@ -42,12 +42,18 @@ export class PostQueryRepository {
 		const postsPhotos = await this.postBaseRepository.getPostsPhotos(
 			rowPosts.map((post) => post.id),
 		)
+		const usersAvatars = await this.postBaseRepository.getUsersAvatars(
+			rowPosts.map((post) => post.user_id),
+		)
 
 		const userPosts: UserPost[] = []
 
 		rowPosts.forEach((rawPost) => {
 			const postPhotos = postsPhotos.find((postPhotos) => postPhotos.postId === rawPost.id)
 			const imagesUrls = postPhotos ? postPhotos.imagesUrls : []
+
+			const userAvatarDetails = usersAvatars.find((user) => user.userId === rawPost.user_id)
+			const userAvatar = userAvatarDetails ? userAvatarDetails.avatarUrl : null
 
 			userPosts.push({
 				id: rawPost.id,
@@ -56,7 +62,7 @@ export class PostQueryRepository {
 				user: {
 					id: rawPost.user_id,
 					name: rawPost.user_name,
-					avatar: null,
+					avatar: userAvatar,
 				},
 				photos: imagesUrls.map((imageUrl) => {
 					return { url: imageUrl }

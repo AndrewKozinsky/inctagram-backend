@@ -7,6 +7,7 @@ import {
 	FileMS_GetPostImagesInContract,
 	FileMS_GetPostsImagesInContract,
 	FileMS_GetUserAvatarInContract,
+	FileMS_GetUsersAvatarsInContract,
 	FileMS_SaveUserAvatarInContract,
 } from '@app/shared'
 import {
@@ -27,6 +28,11 @@ export class FilesController {
 	@MessagePattern(FileMS_EventNames.SaveUserAvatar)
 	async saveUserAvatar(saveUserAvatarInContract: FileMS_SaveUserAvatarInContract) {
 		return await this.avatarService.saveUserAvatar(saveUserAvatarInContract)
+	}
+
+	@MessagePattern(FileMS_EventNames.GetUsersAvatars)
+	async getUsersAvatar(getUsersAvatarsInContract: FileMS_GetUsersAvatarsInContract) {
+		return await this.avatarService.getUsersAvatars(getUsersAvatarsInContract)
 	}
 
 	@MessagePattern(FileMS_EventNames.GetUserAvatar)

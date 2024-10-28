@@ -1,5 +1,6 @@
 export enum FileMS_EventNames {
 	SaveUserAvatar = 'saveUserAvatar',
+	GetUsersAvatars = 'getUsersAvatars',
 	GetUserAvatar = 'getUserAvatar',
 	DeleteUserAvatar = 'deleteUserAvatar',
 	SavePostImages = 'savePostImages',
@@ -19,6 +20,14 @@ export type FileMS_SaveUserAvatarInContract = {
 export type FileMS_SaveUserAvatarOutContract = {
 	avatarUrl: string
 }
+
+export type FileMS_GetUsersAvatarsInContract = {
+	usersIds: number[]
+}
+export type FileMS_GetUsersAvatarsOutContract = {
+	userId: number
+	avatarUrl: null | string
+}[]
 
 export type FileMS_GetUserAvatarInContract = {
 	userId: number

@@ -2,8 +2,11 @@ import { Injectable } from '@nestjs/common'
 import {
 	ErrorMessage,
 	FileMS_DeleteUserAvatarOutContract,
+	FileMS_GetPostsImagesOutContract,
 	FileMS_GetUserAvatarInContract,
 	FileMS_GetUserAvatarOutContract,
+	FileMS_GetUsersAvatarsInContract,
+	FileMS_GetUsersAvatarsOutContract,
 	FileMS_SaveUserAvatarInContract,
 } from '@app/shared'
 import {
@@ -61,6 +64,39 @@ export class AvatarService {
 
 		return {
 			avatarUrl,
+		}
+	}
+
+	async getUsersAvatars(
+		getUsersAvatarsInContract: FileMS_GetUsersAvatarsInContract,
+	): Promise<FileMS_GetUsersAvatarsOutContract> {
+		const { usersIds } = getUsersAvatarsInContract
+
+		const usersAvatars = await this.userAvatarModel.find({ postId: { $in: usersIds } })
+
+		const preparedUsersAvatars: FileMS_GetUsersAvatarsOutContract = []
+
+		usersAvatars.forEach((userAvatar) => {
+			let postInPreparedPosts = findPostInPreparedPosts(
+				preparedUsersAvatars,
+				userAvatar.userId,
+			)
+
+			if (!postInPreparedPosts) {
+				preparedUsersAvatars.push({ userId: userAvatar.userId, avatarUrl: userAvatar.url })
+			}
+
+			postInPreparedPosts = findPostInPreparedPosts(preparedUsersAvatars, userAvatar.userId)
+			postInPreparedPosts!.avatarUrl = userAvatar.url
+		})
+
+		return preparedUsersAvatars
+
+		function findPostInPreparedPosts(
+			preparedUsersAvatars: FileMS_GetUsersAvatarsOutContract,
+			userId: number,
+		) {
+			return preparedUsersAvatars.find((thisPost) => thisPost.userId === userId)
 		}
 	}
 
