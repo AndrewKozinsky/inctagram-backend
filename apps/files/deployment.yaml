@@ -77,6 +77,16 @@ spec:
                  secretKeyRef:
                    name: inctagram-backend-files-production-config-secret
                    key: S3_SECRET_ACCESS_KEY_ID
+             - name: POSTGRES_DB_URL
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-backend-files-production-config-secret
+                   key: POSTGRES_DB_URL
+             - name: MONGO_DB_URL
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-backend-files-production-config-secret
+                   key: MONGO_DB_URL
              - name: MAIN_MICROSERVICE_PORT
                valueFrom:
                  secretKeyRef:
