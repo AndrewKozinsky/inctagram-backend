@@ -75,6 +75,6 @@ deployment, preparingDeploy, Jenkinsfile and Dockerfile.
 ```
 To publish the code to the server make a Pull Request and leave a comment with text
 ```
-run build production paiments
+run build production payments
 ```
 The last word in a comment means a microservice name which will be published.
