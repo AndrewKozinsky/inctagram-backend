@@ -6,7 +6,7 @@ export class PostPhoto {
 	url: string
 
 	@Prop({ required: true })
-	postId: number
+	createdAt: string
 }
 
 export const PostPhotoSchema = SchemaFactory.createForClass(PostPhoto)

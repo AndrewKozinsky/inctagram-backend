@@ -14,6 +14,7 @@ export namespace BdConfig {
 		| BooleanField
 		| EmailField
 		| NumberField
+		| StringsArrayField
 		| CreatedAtField
 		| ManyToOneField
 		| OneToManyField
@@ -59,6 +60,10 @@ export namespace BdConfig {
 		type: 'number'
 		min?: number
 		max?: number
+	}
+
+	export type StringsArrayField = {
+		type: 'stringsArray'
 	}
 
 	export type CreatedAtField = {

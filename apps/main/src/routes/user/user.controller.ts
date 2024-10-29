@@ -53,7 +53,7 @@ import {
 } from '../../features/user/EditMyProfile.command'
 import { GetMyProfileQuery, GetMyProfileHandler } from '../../features/user/GetMyProfile.query'
 import { postsRoutesConfig } from '../post/postsRoutesConfig'
-import { GetUserPostsHandler, GetUserPostsQuery } from '../../features/posts/GetUserPosts.query'
+// import { GetUserPostsHandler, GetUserPostsQuery } from '../../features/posts/GetUserPosts.query'
 import { GetUsersHandler, GetUsersQuery } from '../../features/user/GetUsers.query'
 
 @ApiTags('User')
@@ -121,7 +121,7 @@ export class UserController implements OnModuleInit {
 		}
 	}
 
-	@Get(':userId/' + RouteNames.USERS.USER_ID(0).POSTS.value)
+	/*@Get(':userId/' + RouteNames.USERS.USER_ID(0).POSTS.value)
 	@RouteDecorators(usersRoutesConfig.posts.getUserPosts)
 	async getUserPosts(
 		@Param('userId') userId: number,
@@ -138,7 +138,7 @@ export class UserController implements OnModuleInit {
 			console.log(err)
 			createFailResp(postsRoutesConfig.getPost, err)
 		}
-	}
+	}*/
 
 	@ApiConsumes('multipart/form-data')
 	@ApiBody({

@@ -1,5 +1,31 @@
 import { ApiProperty } from '@nestjs/swagger'
 
+export class SWUploadPostPhotoRouteOut {
+	@ApiProperty({ default: 'success' })
+	status: string
+
+	@ApiProperty()
+	code: number
+
+	@ApiProperty({
+		type: 'object',
+		properties: {
+			photoId: {
+				type: 'string',
+				default: 'fgie5wwcn78',
+			},
+			photoUrl: {
+				type: 'string',
+				default:
+					'https://storage.yandexcloud.net/sociable-people/users/100/posts/photo.png',
+			},
+		},
+	})
+	data: {
+		photoId: string
+		photoUrl: string
+	}
+}
 export class SWAddPostRouteOut {
 	@ApiProperty({ default: 'success' })
 	status: string
@@ -33,6 +59,10 @@ export class SWAddPostRouteOut {
 				items: {
 					type: 'object',
 					properties: {
+						id: {
+							type: 'string',
+							default: 'reh768975df',
+						},
 						url: {
 							type: 'string',
 							default:
@@ -49,12 +79,13 @@ export class SWAddPostRouteOut {
 		location: null | string
 		userId: number
 		photos: {
+			id: string
 			url: string
 		}[]
 	}
 }
 
-export class SWGetPostRouteOut {
+/*export class SWGetPostRouteOut {
 	@ApiProperty({ default: 'success' })
 	status: string
 
@@ -107,9 +138,9 @@ export class SWGetPostRouteOut {
 			url: string
 		}[]
 	}
-}
+}*/
 
-export class SWUpdatePostRouteOut {
+/*export class SWUpdatePostRouteOut {
 	@ApiProperty({ default: 'success' })
 	status: string
 
@@ -162,9 +193,9 @@ export class SWUpdatePostRouteOut {
 			url: string
 		}[]
 	}
-}
+}*/
 
-export class SWGetRecentPostRouteOut {
+/*export class SWGetRecentPostRouteOut {
 	@ApiProperty({ default: 'success' })
 	status: string
 
@@ -227,4 +258,4 @@ export class SWGetRecentPostRouteOut {
 		user: { id: number; name: string; avatar: null | string }
 		photos: { url: string }[]
 	}[]
-}
+}*/

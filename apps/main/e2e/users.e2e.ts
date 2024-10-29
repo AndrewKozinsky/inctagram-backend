@@ -24,7 +24,6 @@ import { userUtils } from './utils/userUtils'
 import {
 	FileMS_DeleteUserAvatarOutContract,
 	FileMS_GetUserAvatarOutContract,
-	FileMS_SavePostImagesOutContract,
 	FileMS_SaveUserAvatarOutContract,
 } from '@app/shared'
 import { GitHubService } from '../src/routes/auth/gitHubService'
@@ -458,7 +457,7 @@ describe('Users (e2e)', () => {
 		})
 	})
 
-	describe('Get user posts', () => {
+	/*describe('Get user posts', () => {
 		it('should return an empty array if there is not posts', async () => {
 			const user = await userUtils.createUserWithConfirmedEmail({
 				mainApp,
@@ -534,7 +533,7 @@ describe('Users (e2e)', () => {
 			checkSuccessResponse(getUserPostRes.body, 200, expectedRes)
 		})
 
-		/*it('should return 5 posts of the user', async () => {
+		it('should return 5 posts of the user', async () => {
 			const [accessToken, refreshTokenStr, user] = await userUtils.createUserAndLogin({
 				mainApp,
 				filesMicroservice,
@@ -566,6 +565,6 @@ describe('Users (e2e)', () => {
 			expect(getUserPost.data.pageSize).toBe(5)
 			expect(getUserPost.data.totalCount).toBe(12)
 			expect(getUserPost.data.items.length).toBe(5)
-		})*/
-	})
+		})
+	})*/
 })

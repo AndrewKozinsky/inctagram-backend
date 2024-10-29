@@ -6,27 +6,28 @@ import { JwtAdapterService } from '@app/jwt-adapter'
 import { MainConfigService } from '@app/config'
 import { PrismaService } from '../../db/prisma.service'
 import { PostController } from './post.controller'
-import { AddPostHandler } from '../../features/posts/AddPost.command'
 import { PostRepository } from '../../repositories/post.repository'
 import { DevicesRepository } from '../../repositories/devices.repository'
 import { PostQueryRepository } from '../../repositories/post.queryRepository'
-import { GetPostHandler } from '../../features/posts/GetPost.query'
-import { UpdatePostHandler } from '../../features/posts/UpdatePost.command'
-import { DeletePostHandler } from '../../features/posts/DeletePost.command'
-import { GetRecentPostsHandler } from '../../features/posts/GetRecentPosts.query'
+// import { AddPostHandler } from '../../features/posts/AddPost.command'
+// import { GetPostHandler } from '../../features/posts/GetPost.query'
+// import { UpdatePostHandler } from '../../features/posts/UpdatePost.command'
+// import { DeletePostHandler } from '../../features/posts/DeletePost.command'
+// import { GetRecentPostsHandler } from '../../features/posts/GetRecentPosts.query'
 import { FilesMSEmitService } from '../../repositories/filesMSEmit.service'
 
 const services = [PrismaService, FilesMSEmitService, BrowserServiceService, JwtAdapterService]
 
 const repositories = [DevicesRepository, PostRepository, PostQueryRepository]
 
-const commandHandlers = [
+/*const commandHandlers = [
 	AddPostHandler,
 	GetPostHandler,
 	UpdatePostHandler,
 	DeletePostHandler,
 	GetRecentPostsHandler,
-]
+]*/
+const commandHandlers: any[] = []
 
 @Module({
 	imports: [CqrsModule],

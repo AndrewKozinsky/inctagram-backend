@@ -12,7 +12,7 @@ export class PostQueryRepository {
 		private postBaseRepository: FilesMSEmitService,
 	) {}
 
-	async getRecentPosts() {
+	/*async getRecentPosts() {
 		type RawPost = {
 			id: number
 			text: string // 'Post description',
@@ -71,9 +71,9 @@ export class PostQueryRepository {
 		})
 
 		return userPosts
-	}
+	}*/
 
-	async getPostById(postId: number) {
+	/*async getPostById(postId: number) {
 		const post = await this.prisma.post.findUnique({
 			where: { id: postId },
 		})
@@ -85,9 +85,9 @@ export class PostQueryRepository {
 		const postPhotos = await this.postBaseRepository.getPostPhotos(postId)
 
 		return this.mapDbPostToServicePost(post, postPhotos.imagesUrls)
-	}
+	}*/
 
-	async getUserPosts(userId: number, query: GetUserPostsQueries) {
+	/*async getUserPosts(userId: number, query: GetUserPostsQueries) {
 		const pageNumber = query.pageNumber ? +query.pageNumber : 1
 		const pageSize = query.pageSize ? +query.pageSize : 10
 
@@ -123,9 +123,9 @@ export class PostQueryRepository {
 				return this.mapDbPostToServicePost(post, imagesUrls)
 			}),
 		}
-	}
+	}*/
 
-	mapDbPostToServicePost(dbPost: Post, postImages: string[]): PostOutModel {
+	/*mapDbPostToServicePost(dbPost: Post, postImages: string[]): PostOutModel {
 		return {
 			id: dbPost.id,
 			text: dbPost.text,
@@ -137,5 +137,5 @@ export class PostQueryRepository {
 				}
 			}),
 		}
-	}
+	}*/
 }

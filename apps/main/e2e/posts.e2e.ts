@@ -21,7 +21,7 @@ import { clearAllDB } from './utils/db'
 import { EmailAdapterService } from '@app/email-adapter'
 import { UserRepository } from '../src/repositories/user.repository'
 import { userUtils } from './utils/userUtils'
-import { FileMS_SavePostImagesOutContract, parseCookieStringToObj } from '@app/shared'
+import { parseCookieStringToObj } from '@app/shared'
 import { GitHubService } from '../src/routes/auth/gitHubService'
 import { GoogleService } from '../src/routes/auth/googleService'
 import { DevicesRepository } from '../src/repositories/devices.repository'
@@ -83,7 +83,7 @@ describe('Posts (e2e)', () => {
 		jest.clearAllMocks()
 	})
 
-	describe('Add a new post', () => {
+	/*describe('Add a new post', () => {
 		it('should return 400 if the accessToken inside cookie is valid, but request body is not send', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
@@ -163,9 +163,9 @@ describe('Posts (e2e)', () => {
 
 			checkSuccessResponse(addPostRes.body, 201, expectedRes)
 		})
-	})
+	})*/
 
-	describe('Get a post', () => {
+	/*describe('Get a post', () => {
 		it('should return 404 if there is not post with passed post id', async () => {
 			await getRequest(mainApp, RouteNames.POSTS.POST(99).full).expect(
 				HTTP_STATUSES.NOT_FOUNT_404,
@@ -214,9 +214,9 @@ describe('Posts (e2e)', () => {
 
 			checkSuccessResponse(getPostRes.body, 200, expectedRes)
 		})
-	})
+	})*/
 
-	describe('Update post', () => {
+	/*describe('Update post', () => {
 		it('should return 404 if the auth data is valid, but there is not a post with passed id', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
@@ -363,9 +363,9 @@ describe('Posts (e2e)', () => {
 			const getPostRes = await getRequest(mainApp, RouteNames.POSTS.POST(postId).full)
 			checkSuccessResponse(getPostRes.body, 200, expectedRes)
 		})
-	})
+	})*/
 
-	describe('Update post', () => {
+	/*describe('Update post', () => {
 		it('should return 404 if the auth data is valid, but there is not a post with passed id', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
@@ -460,9 +460,9 @@ describe('Posts (e2e)', () => {
 			const getPostRes = await getRequest(mainApp, RouteNames.POSTS.POST(postId).full)
 			checkErrorResponse(getPostRes.body, 404, 'Post not found')
 		})
-	})
+	})*/
 
-	describe('Get recent posts', () => {
+	/*describe('Get recent posts', () => {
 		it('should return an array with 4 posts', async () => {
 			// Create a user which will created 3 posts
 			const [accessToken1, refreshTokenStr1] = await userUtils.createUserAndLogin({
@@ -523,5 +523,5 @@ describe('Posts (e2e)', () => {
 				{ id: 11, url: 'url 1' },
 			])
 		})
-	})
+	})*/
 })

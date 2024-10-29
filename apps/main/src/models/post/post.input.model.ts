@@ -12,6 +12,9 @@ export class CreatePostDtoModel {
 
 	@DtoFieldDecorators('location', bdConfig.Post.dbFields.location)
 	location: string
+
+	@DtoFieldDecorators('location', bdConfig.Post.dbFields.location)
+	photosIds: string[]
 }
 
 export class UpdatePostDtoModel {

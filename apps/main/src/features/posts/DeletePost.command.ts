@@ -1,18 +1,18 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
-import { ErrorMessage, FileMS_DeletePostImagesInContract, FileMS_EventNames } from '@app/shared'
-import { lastValueFrom } from 'rxjs'
-import { Inject } from '@nestjs/common'
-import { ClientProxy } from '@nestjs/microservices'
-import { PostRepository } from '../../repositories/post.repository'
+// import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
+// import { ErrorMessage, FileMS_DeletePostImagesInContract, FileMS_EventNames } from '@app/shared'
+// import { lastValueFrom } from 'rxjs'
+// import { Inject } from '@nestjs/common'
+// import { ClientProxy } from '@nestjs/microservices'
+// import { PostRepository } from '../../repositories/post.repository'
 
-export class DeletePostCommand {
+/*export class DeletePostCommand {
 	constructor(
 		public postId: number,
 		public userId: number,
 	) {}
-}
+}*/
 
-@CommandHandler(DeletePostCommand)
+/*@CommandHandler(DeletePostCommand)
 export class DeletePostHandler implements ICommandHandler<DeletePostCommand> {
 	constructor(
 		@Inject('FILES_MICROSERVICE') private filesMicroClient: ClientProxy,
@@ -41,4 +41,4 @@ export class DeletePostHandler implements ICommandHandler<DeletePostCommand> {
 
 		await this.postRepository.deletePost(postId)
 	}
-}
+}*/

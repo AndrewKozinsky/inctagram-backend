@@ -3,10 +3,11 @@ export enum FileMS_EventNames {
 	GetUsersAvatars = 'getUsersAvatars',
 	GetUserAvatar = 'getUserAvatar',
 	DeleteUserAvatar = 'deleteUserAvatar',
-	SavePostImages = 'savePostImages',
-	GetPostImages = 'getPostImages',
-	GetPostsImages = 'getPostsImages',
-	DeletePostImages = 'deletePostImages',
+
+	SavePostPhoto = 'savePostPhoto',
+	// GetPostImages = 'getPostImages',
+	// GetPostsImages = 'getPostsImages',
+	// DeletePostImages = 'deletePostImages',
 
 	EraseDatabase = 'eraseDatabase',
 }
@@ -43,31 +44,30 @@ export type FileMS_DeleteUserAvatarOutContract = null
 
 // === POST IMAGES ===
 
-export type FileMS_SavePostImagesInContract = {
-	postId: number
-	photoFiles: Express.Multer.File[]
+export type FileMS_SavePostPhotoInContract = {
+	postPhotoFile: Express.Multer.File
 }
-export type FileMS_SavePostImagesOutContract = {
-	images: string[]
+export type FileMS_SavePostPhotoOutContract = {
+	imageId: string
 }
 
-export type FileMS_GetPostsImagesInContract = {
+/*export type FileMS_GetPostsImagesInContract = {
 	postsIds: number[]
-}
-export type FileMS_GetPostsImagesOutContract = {
+}*/
+/*export type FileMS_GetPostsImagesOutContract = {
 	postId: number
 	imagesUrls: string[]
-}[]
+}[]*/
 
-export type FileMS_GetPostImagesInContract = {
+/*export type FileMS_GetPostImagesInContract = {
 	postId: number
-}
-export type FileMS_GetPostImagesOutContract = {
+}*/
+/*export type FileMS_GetPostImagesOutContract = {
 	postId: number
 	imagesUrls: string[]
-}
+}*/
 
-export type FileMS_DeletePostImagesInContract = {
+/*export type FileMS_DeletePostImagesInContract = {
 	postId: number
-}
-export type FileMS_DeletePostImagesOutContract = null
+}*/
+// export type FileMS_DeletePostImagesOutContract = null

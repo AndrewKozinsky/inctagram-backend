@@ -23,26 +23,26 @@ import { RouteDecorators } from '../routesConfig/routesDecorators'
 import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
 import { CheckAccessTokenGuard } from '../../infrastructure/guards/checkAccessToken.guard'
 import { postsRoutesConfig } from './postsRoutesConfig'
-import {
-	SWAddPostRouteOut,
-	SWGetPostRouteOut,
-	SWGetRecentPostRouteOut,
-	SWUpdatePostRouteOut,
-} from './swaggerTypes'
-import { AddPostCommand, AddPostHandler } from '../../features/posts/AddPost.command'
+import { SWAddPostRouteOut, SWUploadPostPhotoRouteOut } from './swaggerTypes'
+// import { AddPostCommand, AddPostHandler } from '../../features/posts/AddPost.command'
 import {
 	CreatePostDtoModel,
 	UpdatePostDtoModel,
 	UploadPostImagesPipe,
 } from '../../models/post/post.input.model'
-import { GetPostQuery, GetPostHandler } from '../../features/posts/GetPost.query'
-import { UpdatePostCommand, UpdatePostHandler } from '../../features/posts/UpdatePost.command'
+// import { GetPostQuery, GetPostHandler } from '../../features/posts/GetPost.query'
+// import { UpdatePostCommand, UpdatePostHandler } from '../../features/posts/UpdatePost.command'
 import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
-import { DeletePostCommand, DeletePostHandler } from '../../features/posts/DeletePost.command'
 import {
+	UploadPostPhotoCommand,
+	UploadPostPhotoHandler,
+} from '../../features/posts/UploadPostPhoto.command'
+import { AddPostCommand, AddPostHandler } from '../../features/posts/AddPost.command'
+// import { DeletePostCommand, DeletePostHandler } from '../../features/posts/DeletePost.command'
+/*import {
 	GetRecentPostsQuery,
 	GetRecentPostsHandler,
-} from '../../features/posts/GetRecentPosts.query'
+} from '../../features/posts/GetRecentPosts.query'*/
 
 @ApiTags('Post')
 @Controller(RouteNames.POSTS.value)
@@ -57,7 +57,7 @@ export class PostController implements OnModuleInit {
 		await this.filesMicroClient.connect()
 	}
 
-	@Get(RouteNames.POSTS.RECENT.value)
+	/*@Get(RouteNames.POSTS.RECENT.value)
 	@RouteDecorators(postsRoutesConfig.getRecentPosts)
 	async getRecentPost(): Promise<SWGetRecentPostRouteOut | undefined> {
 		try {
@@ -70,7 +70,7 @@ export class PostController implements OnModuleInit {
 		} catch (err: any) {
 			createFailResp(postsRoutesConfig.getRecentPosts, err)
 		}
-	}
+	}*/
 
 	@ApiConsumes('multipart/form-data')
 	@ApiBody({
@@ -79,11 +79,8 @@ export class PostController implements OnModuleInit {
 		schema: {
 			type: 'object',
 			properties: {
-				photoFiles: {
-					type: 'array',
-					items: {
-						format: 'binary',
-					},
+				photoFile: {
+					format: 'binary',
 				},
 			},
 		},
@@ -92,19 +89,38 @@ export class PostController implements OnModuleInit {
 	@ApiBearerAuth('access-token')
 	@UseGuards(CheckAccessTokenGuard)
 	@Post()
+	@RouteDecorators(postsRoutesConfig.uploadPostPhoto)
+	@UseInterceptors(FilesInterceptor('postPhotoFile'))
+	async uploadPostPhoto(
+		@UploadedFiles(new UploadPostImagesPipe())
+		postPhotoFile: Express.Multer.File,
+	): Promise<SWUploadPostPhotoRouteOut | undefined> {
+		try {
+			const commandRes = await this.commandBus.execute<
+				any,
+				ReturnType<typeof UploadPostPhotoHandler.prototype.execute>
+			>(new UploadPostPhotoCommand(postPhotoFile))
+
+			return createSuccessResp(postsRoutesConfig.uploadPostPhoto, commandRes)
+		} catch (err: any) {
+			createFailResp(postsRoutesConfig.uploadPostPhoto, err)
+		}
+	}
+
+	@ApiCookieAuth()
+	@ApiBearerAuth('access-token')
+	@UseGuards(CheckAccessTokenGuard)
+	@Post()
 	@RouteDecorators(postsRoutesConfig.createPost)
-	@UseInterceptors(FilesInterceptor('photoFiles'))
 	async createPost(
 		@Body() body: CreatePostDtoModel,
-		@UploadedFiles(new UploadPostImagesPipe())
-		photoFiles: Express.Multer.File[],
 		@Req() req: Request,
 	): Promise<SWAddPostRouteOut | undefined> {
 		try {
 			const commandRes = await this.commandBus.execute<
 				any,
 				ReturnType<typeof AddPostHandler.prototype.execute>
-			>(new AddPostCommand(req.user.id, body, photoFiles))
+			>(new AddPostCommand(req.user.id, body))
 
 			return createSuccessResp(postsRoutesConfig.createPost, commandRes)
 		} catch (err: any) {
@@ -112,7 +128,7 @@ export class PostController implements OnModuleInit {
 		}
 	}
 
-	@Get(':postId')
+	/*@Get(':postId')
 	@RouteDecorators(postsRoutesConfig.getPost)
 	async getPost(@Param('postId') postId: number): Promise<SWGetPostRouteOut | undefined> {
 		try {
@@ -125,9 +141,9 @@ export class PostController implements OnModuleInit {
 		} catch (err: any) {
 			createFailResp(postsRoutesConfig.getPost, err)
 		}
-	}
+	}*/
 
-	@ApiCookieAuth()
+	/*@ApiCookieAuth()
 	@ApiBearerAuth('access-token')
 	@UseGuards(CheckAccessTokenGuard)
 	@Patch(':postId')
@@ -147,9 +163,9 @@ export class PostController implements OnModuleInit {
 		} catch (err: any) {
 			createFailResp(postsRoutesConfig.updatePost, err)
 		}
-	}
+	}*/
 
-	@ApiCookieAuth()
+	/*@ApiCookieAuth()
 	@ApiBearerAuth('access-token')
 	@UseGuards(CheckAccessTokenGuard)
 	@Delete(':postId')
@@ -168,5 +184,5 @@ export class PostController implements OnModuleInit {
 		} catch (err: any) {
 			createFailResp(postsRoutesConfig.deletePost, err)
 		}
-	}
+	}*/
 }

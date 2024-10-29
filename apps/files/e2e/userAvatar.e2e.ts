@@ -1,12 +1,12 @@
 import { INestMicroservice } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
+import { Connection } from 'mongoose'
 import { createFilesApp } from './utils/createFilesApp'
 import { createEmitApp } from './utils/createEmitApp'
 import { AvatarService } from '../src/avatarService'
 import { PostPhotoService } from '../src/postPhotoService'
 import { CommonService } from '../src/commonService'
 import { avatarUtils } from './utils/avatarUtils'
-import { Connection } from 'mongoose'
 
 it.only('123', async () => {
 	expect(2).toBe(2)

@@ -49,7 +49,7 @@ describe('Post photos (e2e)', () => {
 		await mongoConnection.close()
 	})
 
-	describe('Create post photos', () => {
+	/*describe('Create post photos', () => {
 		it('Create post photos', async () => {
 			commonService.s3Client.send = jest.fn().mockResolvedValueOnce('mockResponse')
 
@@ -79,9 +79,9 @@ describe('Post photos (e2e)', () => {
 			expect(getPostPhotosResp[0]).toBe(postPhotosFromDB[0].url)
 			expect(getPostPhotosResp[1]).toBe(postPhotosFromDB[1].url)
 		})
-	})
+	})*/
 
-	describe('Get posts photos', () => {
+	/*describe('Get posts photos', () => {
 		it('Get posts photos', async () => {
 			await postPhotosUtils.createFivePostsPhotos(emitApp)
 
@@ -102,9 +102,9 @@ describe('Post photos (e2e)', () => {
 			expect(getPostPhotos[2].imagesUrls.length).toBe(1)
 			expect(getPostPhotos[2].imagesUrls[0].startsWith('posts/4/')).toBeTruthy()
 		})
-	})
+	})*/
 
-	describe('Get post photos', () => {
+	/*describe('Get post photos', () => {
 		it('Get post photos', async () => {
 			const postId = 2
 			const addPostPhotosResp = await postPhotosUtils.createPostPhotos(emitApp, postId)
@@ -115,9 +115,9 @@ describe('Post photos (e2e)', () => {
 			expect(getPostPhotosResp[0]).toBe(addPostPhotosResp[0])
 			expect(getPostPhotosResp[1]).toBe(addPostPhotosResp[1])
 		})
-	})
+	})*/
 
-	describe('Delete post photos', () => {
+	/*describe('Delete post photos', () => {
 		it('Get post photos', async () => {
 			const postId = 2
 			await postPhotosUtils.createPostPhotos(emitApp, postId)
@@ -135,5 +135,5 @@ describe('Post photos (e2e)', () => {
 			// Check post photos details from database
 			expect(postPhotosFromDB.length).toBe(0)
 		})
-	})
+	})*/
 })

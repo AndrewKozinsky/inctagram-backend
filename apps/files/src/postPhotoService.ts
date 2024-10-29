@@ -3,15 +3,9 @@ import { Model } from 'mongoose'
 import { InjectModel } from '@nestjs/mongoose'
 import {
 	ErrorMessage,
-	FileMS_DeletePostImagesInContract,
-	FileMS_DeletePostImagesOutContract,
-	FileMS_GetPostImagesInContract,
-	FileMS_GetPostImagesOutContract,
-	FileMS_GetPostsImagesInContract,
-	FileMS_GetPostsImagesOutContract,
-	FileMS_SavePostImagesOutContract,
+	FileMS_SavePostPhotoInContract,
+	FileMS_SavePostPhotoOutContract,
 } from '@app/shared'
-import { FileMS_SavePostImagesInContract } from '@app/shared/contracts/fileMS.contracts'
 import { createUniqString } from '@app/shared'
 import { CommonService, SaveFileDetails } from './commonService'
 import { PostPhoto } from './schemas/postPhoto.schema'
@@ -23,42 +17,39 @@ export class PostPhotoService {
 		@InjectModel(PostPhoto.name) private postPhotoModel: Model<PostPhoto>,
 	) {}
 
-	async savePostImages(
-		savePostImagesInContract: FileMS_SavePostImagesInContract,
-	): Promise<FileMS_SavePostImagesOutContract> {
-		const { postId, photoFiles } = savePostImagesInContract
-
-		const imagesUrls: string[] = []
+	async savePostPhoto(
+		savePostPhotoInContract: FileMS_SavePostPhotoInContract,
+	): Promise<FileMS_SavePostPhotoOutContract> {
+		const { postPhotoFile } = savePostPhotoInContract
 
 		// Create images
-		for (const imageFile of photoFiles) {
-			const fileExtension = this.commonService.getFileExtension(imageFile)
-			const imageUrl = `posts/${postId}/${createUniqString()}.${fileExtension}`
+		const fileExtension = this.commonService.getFileExtension(postPhotoFile)
+		const imageUrl = `posts/${createUniqString()}.${fileExtension}`
 
-			const setUserAvatarContract: SaveFileDetails = {
-				mimetype: imageFile.mimetype,
-				filePath: imageUrl,
-				fileBuffer: imageFile.buffer,
-				fileSize: imageFile.size,
-			}
-
-			try {
-				await this.commonService.saveFile(setUserAvatarContract)
-				imagesUrls.push(imageUrl)
-			} catch (error: any) {
-				throw new Error(ErrorMessage.CannotSaveFile)
-			}
-
-			await this.postPhotoModel.create<PostPhoto>({
-				url: imageUrl,
-				postId,
-			})
+		const setPhotoContract: SaveFileDetails = {
+			mimetype: postPhotoFile.mimetype,
+			filePath: imageUrl,
+			fileBuffer: postPhotoFile.buffer,
+			fileSize: postPhotoFile.size,
 		}
 
-		return { images: imagesUrls }
+		try {
+			await this.commonService.saveFile(setPhotoContract)
+		} catch (error: any) {
+			throw new Error(ErrorMessage.CannotSaveFile)
+		}
+
+		const postPhotoInDb = await this.postPhotoModel.create<PostPhoto>({
+			url: imageUrl,
+			createdAt: new Date().toISOString(),
+		})
+
+		return {
+			imageId: postPhotoInDb._id.toString(),
+		}
 	}
 
-	async getPostsImages(
+	/*async getPostsImages(
 		getPostsImagesInContract: FileMS_GetPostsImagesInContract,
 	): Promise<FileMS_GetPostsImagesOutContract> {
 		const { postsIds } = getPostsImagesInContract
@@ -86,9 +77,9 @@ export class PostPhotoService {
 		) {
 			return preparedPosts.find((thisPost) => thisPost.postId === postId)
 		}
-	}
+	}*/
 
-	async getPostImages(
+	/*async getPostImages(
 		getPostImagesInContract: FileMS_GetPostImagesInContract,
 	): Promise<FileMS_GetPostImagesOutContract> {
 		const { postId } = getPostImagesInContract
@@ -101,9 +92,9 @@ export class PostPhotoService {
 				return postPhoto.url
 			}),
 		}
-	}
+	}*/
 
-	async deletePostImages(
+	/*async deletePostImages(
 		deletePostImagesInContract: FileMS_DeletePostImagesInContract,
 	): Promise<FileMS_DeletePostImagesOutContract> {
 		const { postId } = deletePostImagesInContract
@@ -119,5 +110,5 @@ export class PostPhotoService {
 		await this.postPhotoModel.deleteMany({ postId })
 
 		return null
-	}
+	}*/
 }

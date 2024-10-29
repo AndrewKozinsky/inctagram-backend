@@ -192,7 +192,11 @@ export const bdConfig = {
 		},
 	},
 	Post: {
-		dtoProps: {},
+		dtoProps: {
+			photosIds: {
+				type: 'stringsArray',
+			},
+		},
 		dbFields: {
 			id: {
 				type: 'index',
@@ -214,6 +218,28 @@ export const bdConfig = {
 				type: 'manyToOne',
 				thisField: 'user_id',
 				foreignTable: 'User',
+				foreignField: 'id',
+			},
+			PostPhoto: {
+				type: 'oneToMany',
+			},
+		},
+	},
+	PostPhoto: {
+		dtoProps: {},
+		dbFields: {
+			id: {
+				type: 'index',
+			},
+			post_photo_id: {
+				type: 'string',
+				description: 'Post photo id in database of files microservice',
+				required: true,
+			},
+			post_id: {
+				type: 'manyToOne',
+				thisField: 'post_id',
+				foreignTable: 'Post',
 				foreignField: 'id',
 			},
 		},

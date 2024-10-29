@@ -111,7 +111,8 @@ function createColumnAttrs(columnConfig: BdConfig.Field) {
 		columnConfig.type !== 'index' &&
 		columnConfig.type !== 'manyToOne' &&
 		columnConfig.type !== 'oneToMany' &&
-		columnConfig.type !== 'createdAt'
+		columnConfig.type !== 'createdAt' &&
+		columnConfig.type !== 'stringsArray'
 	) {
 		if (!columnConfig.required) {
 			attrStrings.push('?')
