@@ -117,7 +117,7 @@ export class PostController implements OnModuleInit {
 		@Req() req: Request,
 	): Promise<SWAddPostRouteOut | undefined> {
 		try {
-			const commandRes = await this.commandBus.execute<
+			const commandRes: any = await this.commandBus.execute<
 				any,
 				ReturnType<typeof AddPostHandler.prototype.execute>
 			>(new AddPostCommand(req.user.id, body))
