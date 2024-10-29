@@ -83,6 +83,10 @@ describe('Posts (e2e)', () => {
 		jest.clearAllMocks()
 	})
 
+	it('123', async () => {
+		expect(2).toBe(2)
+	})
+
 	/*describe('Add a new post', () => {
 		it('should return 400 if the accessToken inside cookie is valid, but request body is not send', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
