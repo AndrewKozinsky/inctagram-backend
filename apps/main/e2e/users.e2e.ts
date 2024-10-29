@@ -25,9 +25,7 @@ import {
 	FileMS_DeleteUserAvatarOutContract,
 	FileMS_GetUserAvatarOutContract,
 	FileMS_SavePostImagesOutContract,
-	FileMS_SaveUserAvatarInContract,
 	FileMS_SaveUserAvatarOutContract,
-	parseCookieStringToObj,
 } from '@app/shared'
 import { GitHubService } from '../src/routes/auth/gitHubService'
 import { GoogleService } from '../src/routes/auth/googleService'
@@ -37,7 +35,7 @@ import { createMainApp } from './utils/createMainApp'
 import { ClientProxy } from '@nestjs/microservices'
 import { postUtils } from './utils/postUtils'
 
-it('123', async () => {
+it.only('123', async () => {
 	expect(2).toBe(2)
 })
 
@@ -477,7 +475,7 @@ describe('Users (e2e)', () => {
 			checkSuccessResponse(getUserPostRes.body, 200, expectedData)
 		})
 
-		it.only('should return 2 posts of the user', async () => {
+		it('should return 2 posts of the user', async () => {
 			const [accessToken, refreshTokenStr, user] = await userUtils.createUserAndLogin({
 				mainApp,
 				filesMicroservice,

@@ -3,13 +3,13 @@ import { Post } from '@prisma/client'
 import { PrismaService } from '../db/prisma.service'
 import { CreatePostDtoModel, UpdatePostDtoModel } from '../models/post/post.input.model'
 import { PostServiceModel } from '../models/post/post.service.model'
-import { PostBaseRepository } from './post.baseRepository'
+import { FilesMSEmitService } from './filesMSEmit.service'
 
 @Injectable()
 export class PostRepository {
 	constructor(
 		private prisma: PrismaService,
-		private postBaseRepository: PostBaseRepository,
+		private postBaseRepository: FilesMSEmitService,
 	) {}
 
 	async createPost(userId: number, dto: CreatePostDtoModel) {

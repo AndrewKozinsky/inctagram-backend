@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common'
 import {
 	ErrorMessage,
 	FileMS_DeleteUserAvatarOutContract,
-	FileMS_GetPostsImagesOutContract,
 	FileMS_GetUserAvatarInContract,
 	FileMS_GetUserAvatarOutContract,
 	FileMS_GetUsersAvatarsInContract,
@@ -72,7 +71,7 @@ export class AvatarService {
 	): Promise<FileMS_GetUsersAvatarsOutContract> {
 		const { usersIds } = getUsersAvatarsInContract
 
-		const usersAvatars = await this.userAvatarModel.find({ postId: { $in: usersIds } })
+		const usersAvatars = await this.userAvatarModel.find({ userId: { $in: usersIds } })
 
 		const preparedUsersAvatars: FileMS_GetUsersAvatarsOutContract = []
 

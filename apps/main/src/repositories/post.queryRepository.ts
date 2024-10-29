@@ -3,13 +3,13 @@ import { Post } from '@prisma/client'
 import { PrismaService } from '../db/prisma.service'
 import { PostOutModel } from '../models/post/post.out.model'
 import { GetUserPostsQueries } from '../models/user/user.input.model'
-import { PostBaseRepository } from './post.baseRepository'
+import { FilesMSEmitService } from './filesMSEmit.service'
 
 @Injectable()
 export class PostQueryRepository {
 	constructor(
 		private prisma: PrismaService,
-		private postBaseRepository: PostBaseRepository,
+		private postBaseRepository: FilesMSEmitService,
 	) {}
 
 	async getRecentPosts() {

@@ -17,6 +17,7 @@ import { PostPhoto, PostPhotoSchema } from './schemas/postPhoto.schema'
 			useFactory: async (configService: MainConfigService) => {
 				return {
 					uri: configService.get().mongoDb.host,
+					dbName: 'files',
 				}
 			},
 			inject: [MainConfigService],

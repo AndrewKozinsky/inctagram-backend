@@ -8,7 +8,7 @@ import { CommonService } from '../src/commonService'
 import { postPhotosUtils } from './utils/postPhotosUtils'
 import { Connection } from 'mongoose'
 
-it('123', async () => {
+it.only('123', async () => {
 	expect(2).toBe(2)
 })
 
@@ -82,7 +82,7 @@ describe('Post photos (e2e)', () => {
 	})
 
 	describe('Get posts photos', () => {
-		it.only('Get posts photos', async () => {
+		it('Get posts photos', async () => {
 			await postPhotosUtils.createFivePostsPhotos(emitApp)
 
 			// Try to get created post photos by additional request

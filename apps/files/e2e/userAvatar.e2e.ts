@@ -70,6 +70,25 @@ describe('User avatar (e2e)', () => {
 		})
 	})
 
+	describe('Get users avatars', () => {
+		it('Get users avatars', async () => {
+			await avatarUtils.createFiveUsersAvatars(emitApp)
+
+			// Try to get created users avatars by additional request
+			const getPostPhotos = await avatarUtils.getUsersAvatars(emitApp, [2, 3, 4])
+			expect(getPostPhotos.length).toBe(3)
+
+			expect(getPostPhotos[0].userId).toBe(2)
+			expect(getPostPhotos[0].avatarUrl.startsWith('users/2/')).toBeTruthy()
+
+			expect(getPostPhotos[1].userId).toBe(3)
+			expect(getPostPhotos[1].avatarUrl.startsWith('users/3/')).toBeTruthy()
+
+			expect(getPostPhotos[2].userId).toBe(4)
+			expect(getPostPhotos[2].avatarUrl.startsWith('users/4/')).toBeTruthy()
+		})
+	})
+
 	describe('Get user avatar', () => {
 		it('Get not exist user avatar', async () => {
 			// Try to get created avatar

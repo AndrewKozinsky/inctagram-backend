@@ -14,11 +14,11 @@ import { GetPostHandler } from '../../features/posts/GetPost.query'
 import { UpdatePostHandler } from '../../features/posts/UpdatePost.command'
 import { DeletePostHandler } from '../../features/posts/DeletePost.command'
 import { GetRecentPostsHandler } from '../../features/posts/GetRecentPosts.query'
-import { PostBaseRepository } from '../../repositories/post.baseRepository'
+import { FilesMSEmitService } from '../../repositories/filesMSEmit.service'
 
-const services = [PrismaService, BrowserServiceService, JwtAdapterService]
+const services = [PrismaService, FilesMSEmitService, BrowserServiceService, JwtAdapterService]
 
-const repositories = [DevicesRepository, PostBaseRepository, PostRepository, PostQueryRepository]
+const repositories = [DevicesRepository, PostRepository, PostQueryRepository]
 
 const commandHandlers = [
 	AddPostHandler,

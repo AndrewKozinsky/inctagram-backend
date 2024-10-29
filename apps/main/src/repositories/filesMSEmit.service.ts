@@ -14,7 +14,7 @@ import { lastValueFrom } from 'rxjs'
 import { ClientProxy } from '@nestjs/microservices'
 
 @Injectable()
-export class PostBaseRepository {
+export class FilesMSEmitService {
 	constructor(@Inject('FILES_MICROSERVICE') private filesMicroClient: ClientProxy) {}
 
 	async getUsersAvatars(usersIds: number[]): Promise<FileMS_GetUsersAvatarsOutContract> {
