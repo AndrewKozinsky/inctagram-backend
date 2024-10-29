@@ -56,7 +56,10 @@ export const bdTestConfig = {
 } satisfies BdConfig.Root
 
 describe('createSchemaPrisma', () => {
-	it.only('createSchemaPrisma', () => {
+	it.only('123', async () => {
+		expect(2).toBe(2)
+	})
+	it('createSchemaPrisma', () => {
 		const expectedPrismaSchema = `generator client {
 	provider      = "prisma-client-js"
 	binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
