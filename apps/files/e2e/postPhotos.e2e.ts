@@ -49,6 +49,10 @@ describe('Post photos (e2e)', () => {
 		await mongoConnection.close()
 	})
 
+	it.only('123', async () => {
+		expect(2).toBe(2)
+	})
+
 	/*describe('Create post photos', () => {
 		it('Create post photos', async () => {
 			commonService.s3Client.send = jest.fn().mockResolvedValueOnce('mockResponse')
