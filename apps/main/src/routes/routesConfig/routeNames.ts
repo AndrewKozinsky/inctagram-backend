@@ -118,6 +118,16 @@ export const RouteNames = {
 			value: 'recent',
 			full: 'posts/recent',
 		},
+		PHOTOS: {
+			value: 'photos',
+			full: 'posts/photos',
+			PHOTO(photoId: string) {
+				return {
+					value: photoId,
+					full: 'posts/photos/' + photoId,
+				}
+			},
+		},
 	},
 }
 

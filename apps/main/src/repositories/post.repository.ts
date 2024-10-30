@@ -23,7 +23,9 @@ export class PostRepository {
 
 		await this.createPostPhotosFromPhotoIds(post.id, dto.photosIds)
 
-		// return this.mapDbPostToServicePost(post, [])
+		const photos = await this.postBaseRepository.getPostPhotos(dto.photosIds)
+
+		return this.mapDbPostToServicePost(post, photos)
 	}
 
 	async createPostPhotosFromPhotoIds(postId: number, photosIds: string[]) {
@@ -33,7 +35,7 @@ export class PostRepository {
 			const request = this.prisma.postPhoto.create({
 				data: {
 					post_id: postId,
-					post_photo_id: photoId,
+					files_ms_post_photo_id: photoId,
 				},
 			})
 
@@ -80,17 +82,27 @@ export class PostRepository {
 		})
 	}*/
 
-	/*mapDbPostToServicePost(dbPost: Post, postImages: string[]): PostServiceModel {
+	async deletePostPhoto(photoId: string) {
+		await this.postBaseRepository.deletePostPhoto(photoId)
+
+		await this.prisma.postPhoto.deleteMany({
+			where: { files_ms_post_photo_id: photoId },
+		})
+	}
+
+	mapDbPostToServicePost(
+		dbPost: Post,
+		postPhotos: {
+			id: string
+			url: string
+		}[],
+	): PostServiceModel {
 		return {
 			id: dbPost.id,
 			text: dbPost.text,
 			location: dbPost.location,
 			userId: dbPost.user_id,
-			photos: postImages.map((imageUrl) => {
-				return {
-					url: imageUrl,
-				}
-			}),
+			photos: postPhotos,
 		}
-	}*/
+	}
 }

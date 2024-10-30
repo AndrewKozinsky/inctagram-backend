@@ -26,7 +26,7 @@ export class AddPostHandler implements ICommandHandler<AddPostCommand> {
 		// Create a post
 		const createdPost = await this.postRepository.createPost(userId, dto)
 
-		// const post = await this.postQueryRepository.getPostById(createdPost.id)
-		// return post!
+		const post = await this.postQueryRepository.getPostById(createdPost.id)
+		return post!
 	}
 }

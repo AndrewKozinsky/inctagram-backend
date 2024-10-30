@@ -7,6 +7,8 @@ import { PostPhotoService } from '../src/postPhotoService'
 import { CommonService } from '../src/commonService'
 import { postPhotosUtils } from './utils/postPhotosUtils'
 import { Connection } from 'mongoose'
+import path from 'path'
+import { ObjectId } from 'mongodb'
 
 it.only('123', async () => {
 	expect(2).toBe(2)
@@ -49,41 +51,50 @@ describe('Post photos (e2e)', () => {
 		await mongoConnection.close()
 	})
 
-	it.only('123', async () => {
-		expect(2).toBe(2)
-	})
-
-	/*describe('Create post photos', () => {
-		it('Create post photos', async () => {
+	describe('Create post photo', () => {
+		it('Create post photo', async () => {
 			commonService.s3Client.send = jest.fn().mockResolvedValueOnce('mockResponse')
 
-			const postId = 2
-			const addPostPhotosResp = await postPhotosUtils.createPostPhotos(emitApp, postId)
+			const addPostPhoto = await postPhotosUtils.createPostPhoto(emitApp) // { imageId: '6720e8d0e08e0deb98875b92' }
 
 			// Check response
-			expect(addPostPhotosResp.length).toBe(2)
-			expect(addPostPhotosResp[0].startsWith('posts/2/')).toBeTruthy()
-			expect(addPostPhotosResp[1].startsWith('posts/2/')).toBeTruthy()
+			expect(typeof addPostPhoto.photoId).toBe('string')
+		})
+	})
 
-			// Check if s3Client.send was run for 1 time.
-			expect(commonService.s3Client.send).toBeCalledTimes(2)
+	describe('Get post photos', () => {
+		it('Get post photos', async () => {
+			const postPhoto1Path = path.join(__dirname, 'utils/files/post-photo-1.jpeg')
+			const addPostPhoto1 = await postPhotosUtils.createPostPhoto(emitApp, postPhoto1Path)
 
-			// Try to get created post photos details in database
-			const postPhotosCollection = mongoConnection.collection('postphotos')
-			const postPhotosFromDB = await postPhotosCollection.find({ postId }).toArray()
-
-			// Check post photos details from database
-			expect(postPhotosFromDB.length).toBe(2)
-			expect(postPhotosFromDB[0].postId).toBe(2)
-			expect(postPhotosFromDB[0].url.startsWith('posts/2/')).toBeTruthy()
+			const postPhoto2Path = path.join(__dirname, 'utils/files/post-photo-2.png')
+			const addPostPhoto2 = await postPhotosUtils.createPostPhoto(emitApp, postPhoto2Path)
 
 			// Try to get created post photos by additional request
-			const getPostPhotosResp = await postPhotosUtils.getPostPhotos(emitApp, postId)
-			expect(getPostPhotosResp.length).toBe(2)
-			expect(getPostPhotosResp[0]).toBe(postPhotosFromDB[0].url)
-			expect(getPostPhotosResp[1]).toBe(postPhotosFromDB[1].url)
+			const getPostPhotos = await postPhotosUtils.getPostPhotos(emitApp, [
+				addPostPhoto1.photoId,
+				addPostPhoto2.photoId,
+			])
+			/*[
+				{
+					id: '6720f5423e64f0e5b06dd530',
+					url: 'posts/0e58c10b-aaed-401b-a797-35b2a4128f08.jpeg',
+				},
+				{
+					id: '6720f5423e64f0e5b06dd532',
+					url: 'posts/13d38ff0-b9f5-4517-925f-47aa4ff29e4d.png',
+				},
+			]*/
+
+			expect(getPostPhotos.length).toBe(2)
+
+			expect(getPostPhotos[0].id).toBe(addPostPhoto1.photoId)
+			expect(getPostPhotos[0].url.startsWith('postPhotos/')).toBeTruthy()
+
+			expect(getPostPhotos[1].id).toBe(addPostPhoto2.photoId)
+			expect(getPostPhotos[1].url.startsWith('postPhotos/')).toBeTruthy()
 		})
-	})*/
+	})
 
 	/*describe('Get posts photos', () => {
 		it('Get posts photos', async () => {
@@ -108,36 +119,25 @@ describe('Post photos (e2e)', () => {
 		})
 	})*/
 
-	/*describe('Get post photos', () => {
-		it('Get post photos', async () => {
-			const postId = 2
-			const addPostPhotosResp = await postPhotosUtils.createPostPhotos(emitApp, postId)
+	describe('Delete post photo', () => {
+		it('Get post photo', async () => {
+			const addPostPhoto = await postPhotosUtils.createPostPhoto(emitApp)
 
-			// Try to get created post photos by additional request
-			const getPostPhotosResp = await postPhotosUtils.getPostPhotos(emitApp, postId)
-			expect(getPostPhotosResp.length).toBe(2)
-			expect(getPostPhotosResp[0]).toBe(addPostPhotosResp[0])
-			expect(getPostPhotosResp[1]).toBe(addPostPhotosResp[1])
-		})
-	})*/
+			await postPhotosUtils.deletePostPhoto(emitApp, addPostPhoto.photoId)
 
-	/*describe('Delete post photos', () => {
-		it('Get post photos', async () => {
-			const postId = 2
-			await postPhotosUtils.createPostPhotos(emitApp, postId)
-
-			await postPhotosUtils.deletePostPhotos(emitApp, postId)
-
-			// Try to get deleted post photos by additional request
-			const getPostPhotosResp = await postPhotosUtils.getPostPhotos(emitApp, postId)
-			expect(getPostPhotosResp.length).toBe(0)
+			const getPostPhotos = await postPhotosUtils.getPostPhotos(emitApp, [
+				addPostPhoto.photoId,
+			])
+			expect(getPostPhotos.length).toBe(0)
 
 			// Try to get created post photos details in database
 			const postPhotosCollection = mongoConnection.collection('postphotos')
-			const postPhotosFromDB = await postPhotosCollection.find({ postId }).toArray()
 
-			// Check post photos details from database
+			// Check post photos from database
+			const postPhotosFromDB = await postPhotosCollection
+				.find({ _id: new ObjectId(addPostPhoto.photoId) })
+				.toArray()
 			expect(postPhotosFromDB.length).toBe(0)
 		})
-	})*/
+	})
 })

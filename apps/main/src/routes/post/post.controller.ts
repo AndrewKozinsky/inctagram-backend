@@ -38,6 +38,10 @@ import {
 	UploadPostPhotoHandler,
 } from '../../features/posts/UploadPostPhoto.command'
 import { AddPostCommand, AddPostHandler } from '../../features/posts/AddPost.command'
+import {
+	DeletePostPhotoCommand,
+	DeletePostPhotoHandler,
+} from '../../features/posts/DeletePostPhoto.command'
 // import { DeletePostCommand, DeletePostHandler } from '../../features/posts/DeletePost.command'
 /*import {
 	GetRecentPostsQuery,
@@ -57,21 +61,6 @@ export class PostController implements OnModuleInit {
 		await this.filesMicroClient.connect()
 	}
 
-	/*@Get(RouteNames.POSTS.RECENT.value)
-	@RouteDecorators(postsRoutesConfig.getRecentPosts)
-	async getRecentPost(): Promise<SWGetRecentPostRouteOut | undefined> {
-		try {
-			const commandRes = await this.queryBus.execute<
-				any,
-				ReturnType<typeof GetRecentPostsHandler.prototype.execute>
-			>(new GetRecentPostsQuery())
-
-			return createSuccessResp(postsRoutesConfig.getRecentPosts, commandRes)
-		} catch (err: any) {
-			createFailResp(postsRoutesConfig.getRecentPosts, err)
-		}
-	}*/
-
 	@ApiConsumes('multipart/form-data')
 	@ApiBody({
 		description: 'Images must be loaded to the photoFiles property',
@@ -88,7 +77,7 @@ export class PostController implements OnModuleInit {
 	@ApiCookieAuth()
 	@ApiBearerAuth('access-token')
 	@UseGuards(CheckAccessTokenGuard)
-	@Post()
+	@Post(RouteNames.POSTS.PHOTOS.value)
 	@RouteDecorators(postsRoutesConfig.uploadPostPhoto)
 	@UseInterceptors(FilesInterceptor('postPhotoFile'))
 	async uploadPostPhoto(
@@ -106,6 +95,41 @@ export class PostController implements OnModuleInit {
 			createFailResp(postsRoutesConfig.uploadPostPhoto, err)
 		}
 	}
+
+	@ApiCookieAuth()
+	@ApiBearerAuth('access-token')
+	@UseGuards(CheckAccessTokenGuard)
+	@Delete(RouteNames.POSTS.PHOTOS.value + '/:postPhotoId')
+	@RouteDecorators(postsRoutesConfig.deletePostPhoto)
+	async deletePostPhoto(
+		@Param('postPhotoId') postPhotoId: string,
+	): Promise<SWEmptyRouteOut | undefined> {
+		try {
+			await this.commandBus.execute<
+				any,
+				ReturnType<typeof DeletePostPhotoHandler.prototype.execute>
+			>(new DeletePostPhotoCommand(postPhotoId))
+
+			return createSuccessResp(postsRoutesConfig.deletePostPhoto, null)
+		} catch (err: any) {
+			createFailResp(postsRoutesConfig.deletePostPhoto, err)
+		}
+	}
+
+	/*@Get(RouteNames.POSTS.RECENT.value)
+	@RouteDecorators(postsRoutesConfig.getRecentPosts)
+	async getRecentPost(): Promise<SWGetRecentPostRouteOut | undefined> {
+		try {
+			const commandRes = await this.queryBus.execute<
+				any,
+				ReturnType<typeof GetRecentPostsHandler.prototype.execute>
+			>(new GetRecentPostsQuery())
+
+			return createSuccessResp(postsRoutesConfig.getRecentPosts, commandRes)
+		} catch (err: any) {
+			createFailResp(postsRoutesConfig.getRecentPosts, err)
+		}
+	}*/
 
 	@ApiCookieAuth()
 	@ApiBearerAuth('access-token')

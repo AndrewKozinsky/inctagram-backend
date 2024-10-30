@@ -30,7 +30,7 @@ import { createMainApp } from './utils/createMainApp'
 import { ClientProxy } from '@nestjs/microservices'
 import { postUtils } from './utils/postUtils'
 
-it.only('123', async () => {
+it('123', async () => {
 	expect(2).toBe(2)
 })
 
@@ -83,8 +83,84 @@ describe('Posts (e2e)', () => {
 		jest.clearAllMocks()
 	})
 
-	it('123', async () => {
-		expect(2).toBe(2)
+	describe('Add a post photo', () => {
+		it.only('should return 400 if request body is not send', async () => {
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
+				mainApp,
+				filesMicroservice,
+				userRepository,
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
+
+			const addPostRes = await postRequest(mainApp, RouteNames.POSTS.value)
+				.set('authorization', 'Bearer ' + accessToken)
+				.expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+			/*checkErrorResponse(addPostRes.body, 400, 'Files not found')*/
+		})
+		/*it('should return 400 if the JWT refreshToken inside cookie is valid, but send wrong files', async () => {
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
+				mainApp,
+				filesMicroservice,
+				userRepository,
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
+
+			// Send large file and in invalid format
+			const textFilePath = path.join(__dirname, 'utils/files/text.txt')
+			const bigFilePath = path.join(__dirname, 'utils/files/big-avatar.png')
+
+			const addPostRes = await postRequest(mainApp, RouteNames.POSTS.value)
+				.set('authorization', 'Bearer ' + accessToken)
+				.set('Content-Type', 'multipart/form-data')
+				.attach('photoFiles', textFilePath)
+				.attach('photoFiles', bigFilePath)
+				.expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+			checkErrorResponse(addPostRes.body, 400, 'One of files is too large')
+		})*/
+		/*it('should return 200 if send correct data', async () => {
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
+				mainApp,
+				filesMicroservice,
+				userRepository,
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
+
+			mockFilesServiceSendMethod(filesMicroservice, {
+				images: ['url 1', 'url 2'],
+			} satisfies FileMS_SavePostImagesOutContract)
+
+			const avatarFilePath = path.join(__dirname, 'utils/files/avatar.png')
+
+			const addPostRes = await postRequest(mainApp, RouteNames.POSTS.value)
+				.set('authorization', 'Bearer ' + accessToken)
+				.set('Content-Type', 'multipart/form-data')
+				.attach('photoFiles', avatarFilePath)
+				.attach('photoFiles', avatarFilePath)
+				.field('text', 'Post description')
+				.field('location', 'Photo location')
+				.expect(HTTP_STATUSES.CREATED_201)
+
+			const expectedRes = {
+				id: 1,
+				text: 'Post description',
+				location: 'Photo location',
+				userId: 1,
+				photos: [
+					{ id: 1, url: 'url 1' },
+					{ id: 2, url: 'url 2' },
+				],
+			}
+
+			checkSuccessResponse(addPostRes.body, 201, expectedRes)
+		})*/
 	})
 
 	/*describe('Add a new post', () => {

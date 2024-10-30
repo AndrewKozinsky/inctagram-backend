@@ -14,6 +14,15 @@ export const postsRoutesConfig = {
 			},
 		],
 	},
+	deletePostPhoto: {
+		response: [
+			{
+				code: SuccessCode.Ok,
+				description: 'Delete post photo',
+				dataClass: SWEmptyRouteOut,
+			},
+		],
+	},
 	createPost: {
 		response: [
 			{

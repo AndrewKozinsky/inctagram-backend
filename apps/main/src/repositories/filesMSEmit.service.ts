@@ -1,6 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common'
 import {
+	FileMS_DeletePostPhotoInContract,
+	FileMS_DeletePostPhotoOutContract,
 	FileMS_EventNames,
+	FileMS_GetPostPhotosInContract,
+	FileMS_GetPostPhotosOutContract,
 	FileMS_GetUsersAvatarsInContract,
 	FileMS_GetUsersAvatarsOutContract,
 } from '@app/shared'
@@ -25,17 +29,17 @@ export class FilesMSEmitService {
 		)
 	}*/
 
-	/*async getPostPhotos(postId: number): Promise<FileMS_GetPostImagesOutContract> {
-		const sendingDataContract: FileMS_GetPostImagesInContract = { postId }
+	async getPostPhotos(photosIds: string[]): Promise<FileMS_GetPostPhotosOutContract> {
+		const sendingDataContract: FileMS_GetPostPhotosInContract = { photosIds }
 		return lastValueFrom(
-			this.filesMicroClient.send(FileMS_EventNames.GetPostImages, sendingDataContract),
+			this.filesMicroClient.send(FileMS_EventNames.GetPostPhotos, sendingDataContract),
 		)
-	}*/
+	}
 
-	/*async deletePostPhotos(postId: number): Promise<FileMS_DeletePostImagesOutContract> {
-		const sendingDataContract: FileMS_DeletePostImagesInContract = { postId }
+	async deletePostPhoto(photoId: string): Promise<FileMS_DeletePostPhotoOutContract> {
+		const sendingDataContract: FileMS_DeletePostPhotoInContract = { photoId }
 		return lastValueFrom(
-			this.filesMicroClient.send(FileMS_EventNames.DeletePostImages, sendingDataContract),
+			this.filesMicroClient.send(FileMS_EventNames.DeletePostPhoto, sendingDataContract),
 		)
-	}*/
+	}
 }

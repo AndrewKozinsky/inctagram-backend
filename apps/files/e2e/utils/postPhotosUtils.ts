@@ -1,4 +1,11 @@
-import { FileMS_EventNames } from '@app/shared'
+import {
+	FileMS_DeletePostPhotoInContract,
+	FileMS_DeletePostPhotoOutContract,
+	FileMS_EventNames,
+	FileMS_GetPostPhotosInContract,
+	FileMS_SavePostPhotoInContract,
+	FileMS_SavePostPhotoOutContract,
+} from '@app/shared'
 import { ClientProxy } from '@nestjs/microservices'
 import path from 'path'
 import { readFileAsMulterFile } from './readFileAsMulterFile'
@@ -45,6 +52,25 @@ export const postPhotosUtils = {
 		// Send a request to the microservice
 		return await emitApp.send(eventName, payload).toPromise()
 	},*/
+	async createPostPhoto(
+		emitApp: ClientProxy,
+		imageUrl?: string,
+	): Promise<FileMS_SavePostPhotoOutContract> {
+		const postPhotoPath = imageUrl
+			? imageUrl
+			: path.join(__dirname, '../utils/files/post-photo-1.jpg')
+
+		const postPhotoFile = await readFileAsMulterFile(postPhotoPath)
+
+		// Prepare a payload for the microservice
+		const eventName = FileMS_EventNames.SavePostPhoto
+		const payload: FileMS_SavePostPhotoInContract = {
+			postPhotoFile,
+		}
+
+		// Send a request to the microservice
+		return await emitApp.send(eventName, payload).toPromise()
+	},
 	/*async getPostsPhotos(emitApp: ClientProxy, postsIds: number[]) {
 		// Prepare a payload for the microservice
 		const eventName = FileMS_EventNames.GetPostsImages
@@ -55,24 +81,27 @@ export const postPhotosUtils = {
 		// Send a request to the microservice
 		return await emitApp.send(eventName, payload).toPromise()
 	},*/
-	/*async getPostPhotos(emitApp: ClientProxy, postId: number) {
+	async getPostPhotos(emitApp: ClientProxy, photosIds: string[]) {
 		// Prepare a payload for the microservice
-		const eventName = FileMS_EventNames.GetPostImages
-		const payload: FileMS_GetPostImagesInContract = {
-			postId,
+		const eventName = FileMS_EventNames.GetPostPhotos
+		const payload: FileMS_GetPostPhotosInContract = {
+			photosIds,
 		}
 
 		// Send a request to the microservice
 		return await emitApp.send(eventName, payload).toPromise()
-	},*/
-	/*async deletePostPhotos(emitApp: ClientProxy, postId: number) {
+	},
+	async deletePostPhoto(
+		emitApp: ClientProxy,
+		photoId: string,
+	): Promise<FileMS_DeletePostPhotoOutContract> {
 		// Prepare a payload for the microservice
-		const eventName = FileMS_EventNames.DeletePostImages
-		const payload: FileMS_DeletePostImagesInContract = {
-			postId,
+		const eventName = FileMS_EventNames.DeletePostPhoto
+		const payload: FileMS_DeletePostPhotoInContract = {
+			photoId,
 		}
 
 		// Send a request to the microservice
 		return await emitApp.send(eventName, payload).toPromise()
-	},*/
+	},
 }

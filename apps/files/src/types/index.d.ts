@@ -10,7 +10,8 @@ declare global {
 	}
 }
 
-declare global {
+// DELETE
+/*declare global {
 	namespace NodeJS {
 		interface ProcessEnv {
 			MODE: 'TEST'
@@ -23,4 +24,4 @@ declare global {
 			RECAPTCHA_SERVER_KEY: string
 		}
 	}
-}
+}*/

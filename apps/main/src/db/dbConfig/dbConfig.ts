@@ -231,7 +231,7 @@ export const bdConfig = {
 			id: {
 				type: 'index',
 			},
-			post_photo_id: {
+			files_ms_post_photo_id: {
 				type: 'string',
 				description: 'Post photo id in database of files microservice',
 				required: true,

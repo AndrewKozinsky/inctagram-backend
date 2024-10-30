@@ -5,9 +5,9 @@ export enum FileMS_EventNames {
 	DeleteUserAvatar = 'deleteUserAvatar',
 
 	SavePostPhoto = 'savePostPhoto',
-	// GetPostImages = 'getPostImages',
+	GetPostPhotos = 'getPhotosByIds',
 	// GetPostsImages = 'getPostsImages',
-	// DeletePostImages = 'deletePostImages',
+	DeletePostPhoto = 'deletePostPhoto',
 
 	EraseDatabase = 'eraseDatabase',
 }
@@ -48,7 +48,7 @@ export type FileMS_SavePostPhotoInContract = {
 	postPhotoFile: Express.Multer.File
 }
 export type FileMS_SavePostPhotoOutContract = {
-	imageId: string
+	photoId: string
 }
 
 /*export type FileMS_GetPostsImagesInContract = {
@@ -56,18 +56,18 @@ export type FileMS_SavePostPhotoOutContract = {
 }*/
 /*export type FileMS_GetPostsImagesOutContract = {
 	postId: number
-	imagesUrls: string[]
+	photosUrls: string[]
 }[]*/
 
-/*export type FileMS_GetPostImagesInContract = {
-	postId: number
-}*/
-/*export type FileMS_GetPostImagesOutContract = {
-	postId: number
-	imagesUrls: string[]
-}*/
+export type FileMS_GetPostPhotosInContract = {
+	photosIds: string[]
+}
+export type FileMS_GetPostPhotosOutContract = {
+	id: string
+	url: string
+}[]
 
-/*export type FileMS_DeletePostImagesInContract = {
-	postId: number
-}*/
-// export type FileMS_DeletePostImagesOutContract = null
+export type FileMS_DeletePostPhotoInContract = {
+	photoId: string
+}
+export type FileMS_DeletePostPhotoOutContract = null

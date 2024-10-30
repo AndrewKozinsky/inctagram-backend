@@ -21,6 +21,7 @@ import { DevicesRepository } from '../../src/repositories/devices.repository'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { MainConfigService } from '@app/config'
 import { ClientProxy } from '@nestjs/microservices'
+import { FileMS_GetUserAvatarOutContract } from '@app/shared'
 
 export const userUtils = {
 	async createUserWithUnconfirmedEmail(props: {
@@ -111,7 +112,9 @@ export const userUtils = {
 		password: string
 	}) {
 		// TODO
-		mockFilesServiceSendMethod(props.filesMicroservice, '')
+		mockFilesServiceSendMethod(props.filesMicroservice, {
+			avatarUrl: null,
+		} as FileMS_GetUserAvatarOutContract)
 
 		const loginRes = await postRequest(props.mainApp, RouteNames.AUTH.LOGIN.full)
 			.send({ password: props.password, email: props.email })

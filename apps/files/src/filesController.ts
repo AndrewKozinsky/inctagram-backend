@@ -2,7 +2,9 @@ import { Controller } from '@nestjs/common'
 import { MessagePattern } from '@nestjs/microservices'
 import { AvatarService } from './avatarService'
 import {
+	FileMS_DeletePostPhotoInContract,
 	FileMS_EventNames,
+	FileMS_GetPostPhotosInContract,
 	FileMS_GetUserAvatarInContract,
 	FileMS_GetUsersAvatarsInContract,
 	FileMS_SavePostPhotoInContract,
@@ -41,24 +43,24 @@ export class FilesController {
 	}
 
 	@MessagePattern(FileMS_EventNames.SavePostPhoto)
-	async savePostImages(savePostPhotoInContract: FileMS_SavePostPhotoInContract) {
+	async savePostPhoto(savePostPhotoInContract: FileMS_SavePostPhotoInContract) {
 		return await this.postService.savePostPhoto(savePostPhotoInContract)
 	}
 
-	/*@MessagePattern(FileMS_EventNames.GetPostsImages)
-	async getPostsImages(getPostsImagesInContract: FileMS_GetPostsImagesInContract) {
-		return await this.postService.getPostsImages(getPostsImagesInContract)
+	/*@MessagePattern(FileMS_EventNames.GetPostsPhotos)
+	async getPostsPhotos(getPostsPhotosInContract: FileMS_GetPostsPhotosInContract) {
+		return await this.postService.getPostsPhotos(getPostsPhotosInContract)
 	}*/
 
-	/*@MessagePattern(FileMS_EventNames.GetPostImages)
-	async getPostImages(getPostImagesInContract: FileMS_GetPostImagesInContract) {
-		return await this.postService.getPostImages(getPostImagesInContract)
-	}*/
+	@MessagePattern(FileMS_EventNames.GetPostPhotos)
+	async getPostPhotos(getPostPhotosByIdsInContract: FileMS_GetPostPhotosInContract) {
+		return await this.postService.getPostPhotos(getPostPhotosByIdsInContract)
+	}
 
-	/*@MessagePattern(FileMS_EventNames.DeletePostImages)
-	async deletePostImages(deletePostImagesInContract: FileMS_DeletePostImagesInContract) {
-		return await this.postService.deletePostImages(deletePostImagesInContract)
-	}*/
+	@MessagePattern(FileMS_EventNames.DeletePostPhoto)
+	async deletePostPhoto(deletePostPhotoInContract: FileMS_DeletePostPhotoInContract) {
+		return await this.postService.deletePostPhoto(deletePostPhotoInContract)
+	}
 
 	@MessagePattern(FileMS_EventNames.EraseDatabase)
 	async eraseDatabase() {

@@ -73,19 +73,22 @@ export class PostQueryRepository {
 		return userPosts
 	}*/
 
-	/*async getPostById(postId: number) {
+	async getPostById(postId: number) {
 		const post = await this.prisma.post.findUnique({
 			where: { id: postId },
+			include: {
+				PostPhoto: true,
+			},
 		})
 
 		if (!post) {
 			return null
 		}
 
-		const postPhotos = await this.postBaseRepository.getPostPhotos(postId)
+		// const photos = await this.postBaseRepository.getPostPhotos(post.PostPhoto)
 
-		return this.mapDbPostToServicePost(post, postPhotos.imagesUrls)
-	}*/
+		/*return this.mapDbPostToServicePost(post, postPhotos.imagesUrls)*/
+	}
 
 	/*async getUserPosts(userId: number, query: GetUserPostsQueries) {
 		const pageNumber = query.pageNumber ? +query.pageNumber : 1
