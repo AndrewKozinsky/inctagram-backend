@@ -13,7 +13,7 @@ export class CreatePostDtoModel {
 	@DtoFieldDecorators('location', bdConfig.Post.dbFields.location)
 	location: string
 
-	@DtoFieldDecorators('location', bdConfig.Post.dbFields.location)
+	@DtoFieldDecorators('location', bdConfig.Post.dtoProps.photosIds)
 	photosIds: string[]
 }
 
@@ -26,31 +26,29 @@ export class UpdatePostDtoModel {
 }
 
 @Injectable()
-export class UploadPostImagesPipe implements PipeTransform {
-	transform(files: Express.Multer.File[], metadata: ArgumentMetadata) {
+export class UploadPostPhotoPipe implements PipeTransform {
+	transform(file: Express.Multer.File, metadata: ArgumentMetadata) {
 		const errStatusCode = HTTP_STATUSES.BAD_REQUEST_400.toString()
 		let errMessage = ''
 
-		if (!files || !files.length) {
-			throw CustomException(errStatusCode, ErrorMessage.FilesNotFound)
+		if (!file) {
+			throw CustomException(errStatusCode, ErrorMessage.FileNotFound)
 		}
 
-		files.forEach((file) => {
-			const maxFileSize = 10 * 1024 * 1024
-			const allowedMimeTypes = ['image/png', 'image/jpg', 'image/jpeg']
+		const maxFileSize = 10 * 1024 * 1024
+		const allowedMimeTypes = ['image/png', 'image/jpg', 'image/jpeg']
 
-			if (!allowedMimeTypes.includes(file.mimetype)) {
-				errMessage = ErrorMessage.OneOfFilesHasWrongMimeType
-			} else if (file.size > maxFileSize) {
-				errMessage = ErrorMessage.OneOfFilesIsTooLarge
-			}
-		})
+		if (!allowedMimeTypes.includes(file.mimetype)) {
+			errMessage = ErrorMessage.OneOfFilesHasWrongMimeType
+		} else if (file.size > maxFileSize) {
+			errMessage = ErrorMessage.OneOfFilesIsTooLarge
+		}
 
 		if (errMessage) {
 			throw CustomException(errStatusCode, errMessage)
 		}
 
-		return files
+		return file
 	}
 }
 

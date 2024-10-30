@@ -64,6 +64,12 @@ export namespace BdConfig {
 
 	export type StringsArrayField = {
 		type: 'stringsArray'
+		// Is the field required? True by default
+		required: boolean
+		// Field description
+		description?: string
+		// Field example value
+		example?: string | number | boolean
 	}
 
 	export type CreatedAtField = {

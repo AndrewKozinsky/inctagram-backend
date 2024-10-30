@@ -21,7 +21,7 @@ import { clearAllDB } from './utils/db'
 import { EmailAdapterService } from '@app/email-adapter'
 import { UserRepository } from '../src/repositories/user.repository'
 import { userUtils } from './utils/userUtils'
-import { parseCookieStringToObj } from '@app/shared'
+import { FileMS_GetUserAvatarOutContract, parseCookieStringToObj } from '@app/shared'
 import { GitHubService } from '../src/routes/auth/gitHubService'
 import { GoogleService } from '../src/routes/auth/googleService'
 import { DevicesRepository } from '../src/repositories/devices.repository'
@@ -84,23 +84,7 @@ describe('Posts (e2e)', () => {
 	})
 
 	describe('Add a post photo', () => {
-		it.only('should return 400 if request body is not send', async () => {
-			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
-				mainApp,
-				filesMicroservice,
-				userRepository,
-				userName: defUserName,
-				email: defUserEmail,
-				password: defUserPassword,
-			})
-
-			const addPostRes = await postRequest(mainApp, RouteNames.POSTS.value)
-				.set('authorization', 'Bearer ' + accessToken)
-				.expect(HTTP_STATUSES.BAD_REQUEST_400)
-
-			/*checkErrorResponse(addPostRes.body, 400, 'Files not found')*/
-		})
-		/*it('should return 400 if the JWT refreshToken inside cookie is valid, but send wrong files', async () => {
+		it.only('should return 400 if wrong files were send', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
 				filesMicroservice,
@@ -114,6 +98,10 @@ describe('Posts (e2e)', () => {
 			const textFilePath = path.join(__dirname, 'utils/files/text.txt')
 			const bigFilePath = path.join(__dirname, 'utils/files/big-avatar.png')
 
+			mockFilesServiceSendMethod(filesMicroservice, {
+				avatarUrl: null,
+			} as FileMS_GetUserAvatarOutContract)
+
 			const addPostRes = await postRequest(mainApp, RouteNames.POSTS.value)
 				.set('authorization', 'Bearer ' + accessToken)
 				.set('Content-Type', 'multipart/form-data')
@@ -122,7 +110,8 @@ describe('Posts (e2e)', () => {
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
 
 			checkErrorResponse(addPostRes.body, 400, 'One of files is too large')
-		})*/
+		})
+
 		/*it('should return 200 if send correct data', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,

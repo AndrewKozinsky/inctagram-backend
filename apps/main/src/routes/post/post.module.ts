@@ -9,7 +9,7 @@ import { PostController } from './post.controller'
 import { PostRepository } from '../../repositories/post.repository'
 import { DevicesRepository } from '../../repositories/devices.repository'
 import { PostQueryRepository } from '../../repositories/post.queryRepository'
-// import { AddPostHandler } from '../../features/posts/AddPost.command'
+import { AddPostHandler } from '../../features/posts/AddPost.command'
 // import { GetPostHandler } from '../../features/posts/GetPost.query'
 // import { UpdatePostHandler } from '../../features/posts/UpdatePost.command'
 // import { DeletePostHandler } from '../../features/posts/DeletePost.command'
@@ -20,14 +20,13 @@ const services = [PrismaService, FilesMSEmitService, BrowserServiceService, JwtA
 
 const repositories = [DevicesRepository, PostRepository, PostQueryRepository]
 
-/*const commandHandlers = [
+const commandHandlers = [
 	AddPostHandler,
-	GetPostHandler,
-	UpdatePostHandler,
-	DeletePostHandler,
-	GetRecentPostsHandler,
-]*/
-const commandHandlers: any[] = []
+	// GetPostHandler,
+	// UpdatePostHandler,
+	// DeletePostHandler,
+	// GetRecentPostsHandler,
+]
 
 @Module({
 	imports: [CqrsModule],

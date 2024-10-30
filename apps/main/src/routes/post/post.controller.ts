@@ -9,6 +9,7 @@ import {
 	Patch,
 	Post,
 	Req,
+	UploadedFile,
 	UploadedFiles,
 	UseGuards,
 	UseInterceptors,
@@ -16,7 +17,7 @@ import {
 import { Request } from 'express'
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCookieAuth, ApiTags } from '@nestjs/swagger'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
-import { FilesInterceptor } from '@nestjs/platform-express'
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express'
 import { ClientProxy } from '@nestjs/microservices'
 import RouteNames from '../routesConfig/routeNames'
 import { RouteDecorators } from '../routesConfig/routesDecorators'
@@ -28,7 +29,7 @@ import { SWAddPostRouteOut, SWUploadPostPhotoRouteOut } from './swaggerTypes'
 import {
 	CreatePostDtoModel,
 	UpdatePostDtoModel,
-	UploadPostImagesPipe,
+	UploadPostPhotoPipe,
 } from '../../models/post/post.input.model'
 // import { GetPostQuery, GetPostHandler } from '../../features/posts/GetPost.query'
 // import { UpdatePostCommand, UpdatePostHandler } from '../../features/posts/UpdatePost.command'
@@ -79,9 +80,9 @@ export class PostController implements OnModuleInit {
 	@UseGuards(CheckAccessTokenGuard)
 	@Post(RouteNames.POSTS.PHOTOS.value)
 	@RouteDecorators(postsRoutesConfig.uploadPostPhoto)
-	@UseInterceptors(FilesInterceptor('postPhotoFile'))
+	@UseInterceptors(FileInterceptor('postPhotoFile'))
 	async uploadPostPhoto(
-		@UploadedFiles(new UploadPostImagesPipe())
+		@UploadedFile(new UploadPostPhotoPipe())
 		postPhotoFile: Express.Multer.File,
 	): Promise<SWUploadPostPhotoRouteOut | undefined> {
 		try {
@@ -94,6 +95,7 @@ export class PostController implements OnModuleInit {
 		} catch (err: any) {
 			createFailResp(postsRoutesConfig.uploadPostPhoto, err)
 		}
+		// return undefined
 	}
 
 	@ApiCookieAuth()
@@ -148,6 +150,7 @@ export class PostController implements OnModuleInit {
 
 			return createSuccessResp(postsRoutesConfig.createPost, commandRes)
 		} catch (err: any) {
+			console.log(err)
 			createFailResp(postsRoutesConfig.createPost, err)
 		}
 	}

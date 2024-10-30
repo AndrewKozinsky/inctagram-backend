@@ -111,7 +111,6 @@ export const userUtils = {
 		email: string
 		password: string
 	}) {
-		// TODO
 		mockFilesServiceSendMethod(props.filesMicroservice, {
 			avatarUrl: null,
 		} as FileMS_GetUserAvatarOutContract)

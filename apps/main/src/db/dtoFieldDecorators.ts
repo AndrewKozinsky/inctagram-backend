@@ -1,5 +1,6 @@
 import { applyDecorators } from '@nestjs/common'
 import {
+	IsArray,
 	IsDateString,
 	IsEmail,
 	IsNumber,
@@ -121,6 +122,12 @@ export function DtoFieldDecorators(
 		}
 	} else if (updatedFieldConf.type === 'boolean') {
 		decorators.push(Type(() => Boolean))
+		if (!updatedFieldConf.required) {
+			decorators.push(IsOptional())
+		}
+	} else if (updatedFieldConf.type === 'stringsArray') {
+		decorators.push(IsArray)
+		decorators.push(Type(() => IsString({ each: true })))
 		if (!updatedFieldConf.required) {
 			decorators.push(IsOptional())
 		}
