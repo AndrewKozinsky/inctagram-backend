@@ -12,13 +12,14 @@ export class PostQueryRepository {
 		private postBaseRepository: FilesMSEmitService,
 	) {}
 
-	/*async getRecentPosts() {
+	async getRecentPosts() {
 		type RawPost = {
 			id: number
 			text: string // 'Post description',
 			created_at: string //  2024-10-16T08:50:01.499Z,
 			user_id: number // 1,
 			user_name: string // 'myUserName',
+			photo_id: string // 'sfsdg5wd'
 		}
 
 		const rowPosts: RawPost[] = await this.prisma.$queryRaw`SELECT
@@ -27,51 +28,71 @@ export class PostQueryRepository {
 			p.created_at,
 			(SELECT id as "user_id" FROM "User" WHERE id = p.user_id),
 			(SELECT user_name FROM "User" WHERE id=p.user_id),
+			pp.files_ms_post_photo_id AS photo_id
 			FROM "Post" p
+			LEFT JOIN "PostPhoto" pp ON p.id = pp.post_id
 			ORDER BY p.created_at DESC
-			LIMIT 4`
+			LIMIT 100`
 
-		type UserPost = {
+		type CompiledPost = {
 			id: number
 			text: string
 			createdAt: string
 			user: { id: number; name: string; avatar: null | string }
-			photos: { url: string }[]
+			photos: { id: string; url: string }[]
 		}
 
-		const postsPhotos = await this.postBaseRepository.getPostsPhotos(
-			rowPosts.map((post) => post.id),
-		)
+		const usersIds = new Set()
+		rowPosts.forEach((post) => {
+			usersIds.add(post.user_id)
+		})
 		const usersAvatars = await this.postBaseRepository.getUsersAvatars(
-			rowPosts.map((post) => post.user_id),
+			Array.from(usersIds) as number[],
 		)
 
-		const userPosts: UserPost[] = []
+		const postPhotosIds = rowPosts.map((post) => {
+			return post.photo_id
+		})
+		const postsPhotos = await this.postBaseRepository.getPostPhotos(postPhotosIds)
+
+		const compiledPosts: CompiledPost[] = []
 
 		rowPosts.forEach((rawPost) => {
-			const postPhotos = postsPhotos.find((postPhotos) => postPhotos.postId === rawPost.id)
-			const imagesUrls = postPhotos ? postPhotos.imagesUrls : []
+			let compiledPost = compiledPosts.find((post) => post.id === rawPost.id)
 
-			const userAvatarDetails = usersAvatars.find((user) => user.userId === rawPost.user_id)
-			const userAvatar = userAvatarDetails ? userAvatarDetails.avatarUrl : null
+			// If post not exists
+			if (!compiledPost) {
+				const userAvatarDetails = usersAvatars.find(
+					(avatar) => avatar.userId === rawPost.user_id,
+				)
+				const userAvatar = userAvatarDetails ? userAvatarDetails.avatarUrl : null
 
-			userPosts.push({
-				id: rawPost.id,
-				text: rawPost.text,
-				createdAt: rawPost.created_at,
-				user: {
-					id: rawPost.user_id,
-					name: rawPost.user_name,
-					avatar: userAvatar,
-				},
-				photos: imagesUrls.map((imageUrl) => {
-					return { url: imageUrl }
-				}),
+				compiledPosts.push({
+					id: rawPost.id,
+					text: rawPost.text,
+					createdAt: rawPost.created_at,
+					user: {
+						id: rawPost.user_id,
+						name: rawPost.user_name,
+						avatar: userAvatar,
+					},
+					photos: [],
+				})
+			}
+
+			compiledPost = compiledPosts.find((post) => post.id === rawPost.id)
+
+			const postPhoto = postsPhotos.find((pPhoto) => {
+				return pPhoto.id == rawPost.photo_id
 			})
+
+			if (postPhoto) {
+				compiledPost!.photos.push(postPhoto)
+			}
 		})
 
-		return userPosts
-	}*/
+		return compiledPosts
+	}
 
 	async getPostById(postId: number) {
 		const post = await this.prisma.post.findUnique({
@@ -85,12 +106,15 @@ export class PostQueryRepository {
 			return null
 		}
 
-		// const photos = await this.postBaseRepository.getPostPhotos(post.PostPhoto)
+		const postPhotos = await this.prisma.postPhoto.findMany({ where: { post_id: postId } })
+		const photosIds = postPhotos.map((postPhoto) => postPhoto.files_ms_post_photo_id)
 
-		/*return this.mapDbPostToServicePost(post, postPhotos.imagesUrls)*/
+		const photos = await this.postBaseRepository.getPostPhotos(photosIds)
+
+		return this.mapDbPostToServicePost(post, photos)
 	}
 
-	/*async getUserPosts(userId: number, query: GetUserPostsQueries) {
+	async getUserPosts(userId: number, query: GetUserPostsQueries) {
 		const pageNumber = query.pageNumber ? +query.pageNumber : 1
 		const pageSize = query.pageSize ? +query.pageSize : 10
 
@@ -103,6 +127,9 @@ export class PostQueryRepository {
 
 		const userPosts = await this.prisma.post.findMany({
 			where: { user_id: userId },
+			include: {
+				PostPhoto: true,
+			},
 			skip: (pageNumber - 1) * pageSize,
 			take: pageSize,
 			orderBy: {
@@ -110,9 +137,14 @@ export class PostQueryRepository {
 			},
 		})
 
-		const postsPhotos = await this.postBaseRepository.getPostsPhotos(
-			userPosts.map((post) => post.id),
-		)
+		const allPostsPhotosIds: string[] = []
+		userPosts.forEach((post) => {
+			for (const photo of post.PostPhoto) {
+				allPostsPhotosIds.push(photo.files_ms_post_photo_id)
+			}
+		})
+
+		const allPostsPhotos = await this.postBaseRepository.getPostPhotos(allPostsPhotosIds)
 
 		return {
 			pagesCount,
@@ -120,25 +152,39 @@ export class PostQueryRepository {
 			pageSize,
 			totalCount: +totalUserPostsCount,
 			items: userPosts.map((post) => {
-				const postPhotos = postsPhotos.find((postPhotos) => postPhotos.postId === post.id)
-				const imagesUrls = postPhotos ? postPhotos.imagesUrls : []
+				// Get photos of this post by enumerating photos of all posts
+				const thisPostPhotos = post.PostPhoto.reduce(
+					(acc, thisPostPhotoItem) => {
+						const thisPostPhoto = allPostsPhotos.find(
+							(postsPhotosItem) =>
+								postsPhotosItem.id === thisPostPhotoItem.files_ms_post_photo_id,
+						)
 
-				return this.mapDbPostToServicePost(post, imagesUrls)
+						if (thisPostPhoto) acc.push(thisPostPhoto)
+
+						return acc
+					},
+					[] as { id: string; url: string }[],
+				)
+
+				return this.mapDbPostToServicePost(post, thisPostPhotos)
 			}),
 		}
-	}*/
+	}
 
-	/*mapDbPostToServicePost(dbPost: Post, postImages: string[]): PostOutModel {
+	mapDbPostToServicePost(
+		dbPost: Post,
+		postPhotos: {
+			id: string
+			url: string
+		}[],
+	): PostOutModel {
 		return {
 			id: dbPost.id,
 			text: dbPost.text,
 			location: dbPost.location,
 			userId: dbPost.user_id,
-			photos: postImages.map((imageUrl) => {
-				return {
-					url: imageUrl,
-				}
-			}),
+			photos: postPhotos,
 		}
-	}*/
+	}
 }

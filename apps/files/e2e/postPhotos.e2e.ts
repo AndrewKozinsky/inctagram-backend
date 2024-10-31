@@ -96,29 +96,6 @@ describe('Post photos (e2e)', () => {
 		})
 	})
 
-	/*describe('Get posts photos', () => {
-		it('Get posts photos', async () => {
-			await postPhotosUtils.createFivePostsPhotos(emitApp)
-
-			// Try to get created post photos by additional request
-			const getPostPhotos = await postPhotosUtils.getPostsPhotos(emitApp, [2, 3, 4])
-
-			expect(getPostPhotos.length).toBe(3)
-
-			expect(getPostPhotos[0].postId).toBe(2)
-			expect(getPostPhotos[0].imagesUrls.length).toBe(1)
-			expect(getPostPhotos[0].imagesUrls[0].startsWith('posts/2/')).toBeTruthy()
-
-			expect(getPostPhotos[1].postId).toBe(3)
-			expect(getPostPhotos[1].imagesUrls.length).toBe(1)
-			expect(getPostPhotos[1].imagesUrls[0].startsWith('posts/3/')).toBeTruthy()
-
-			expect(getPostPhotos[2].postId).toBe(4)
-			expect(getPostPhotos[2].imagesUrls.length).toBe(1)
-			expect(getPostPhotos[2].imagesUrls[0].startsWith('posts/4/')).toBeTruthy()
-		})
-	})*/
-
 	describe('Delete post photo', () => {
 		it('Get post photo', async () => {
 			const addPostPhoto = await postPhotosUtils.createPostPhoto(emitApp)

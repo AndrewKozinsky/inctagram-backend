@@ -10,29 +10,33 @@ import {
 	Post,
 	Req,
 	UploadedFile,
-	UploadedFiles,
 	UseGuards,
 	UseInterceptors,
 } from '@nestjs/common'
 import { Request } from 'express'
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCookieAuth, ApiTags } from '@nestjs/swagger'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express'
+import { FileInterceptor } from '@nestjs/platform-express'
 import { ClientProxy } from '@nestjs/microservices'
 import RouteNames from '../routesConfig/routeNames'
 import { RouteDecorators } from '../routesConfig/routesDecorators'
 import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
 import { CheckAccessTokenGuard } from '../../infrastructure/guards/checkAccessToken.guard'
 import { postsRoutesConfig } from './postsRoutesConfig'
-import { SWAddPostRouteOut, SWUploadPostPhotoRouteOut } from './swaggerTypes'
-// import { AddPostCommand, AddPostHandler } from '../../features/posts/AddPost.command'
+import {
+	SWAddPostRouteOut,
+	SWGetPostRouteOut,
+	SWGetRecentPostRouteOut,
+	SWUpdatePostRouteOut,
+	SWUploadPostPhotoRouteOut,
+} from './swaggerTypes'
 import {
 	CreatePostDtoModel,
 	UpdatePostDtoModel,
 	UploadPostPhotoPipe,
 } from '../../models/post/post.input.model'
-// import { GetPostQuery, GetPostHandler } from '../../features/posts/GetPost.query'
-// import { UpdatePostCommand, UpdatePostHandler } from '../../features/posts/UpdatePost.command'
+import { GetPostQuery, GetPostHandler } from '../../features/posts/GetPost.query'
+import { UpdatePostCommand, UpdatePostHandler } from '../../features/posts/UpdatePost.command'
 import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
 import {
 	UploadPostPhotoCommand,
@@ -43,11 +47,11 @@ import {
 	DeletePostPhotoCommand,
 	DeletePostPhotoHandler,
 } from '../../features/posts/DeletePostPhoto.command'
-// import { DeletePostCommand, DeletePostHandler } from '../../features/posts/DeletePost.command'
-/*import {
+import { DeletePostCommand, DeletePostHandler } from '../../features/posts/DeletePost.command'
+import {
 	GetRecentPostsQuery,
 	GetRecentPostsHandler,
-} from '../../features/posts/GetRecentPosts.query'*/
+} from '../../features/posts/GetRecentPosts.query'
 
 @ApiTags('Post')
 @Controller(RouteNames.POSTS.value)
@@ -93,9 +97,9 @@ export class PostController implements OnModuleInit {
 
 			return createSuccessResp(postsRoutesConfig.uploadPostPhoto, commandRes)
 		} catch (err: any) {
+			console.log({ err })
 			createFailResp(postsRoutesConfig.uploadPostPhoto, err)
 		}
-		// return undefined
 	}
 
 	@ApiCookieAuth()
@@ -118,9 +122,9 @@ export class PostController implements OnModuleInit {
 		}
 	}
 
-	/*@Get(RouteNames.POSTS.RECENT.value)
+	@Get(RouteNames.POSTS.RECENT.value)
 	@RouteDecorators(postsRoutesConfig.getRecentPosts)
-	async getRecentPost(): Promise<SWGetRecentPostRouteOut | undefined> {
+	async getRecentPosts(): Promise<SWGetRecentPostRouteOut | undefined> {
 		try {
 			const commandRes = await this.queryBus.execute<
 				any,
@@ -129,9 +133,10 @@ export class PostController implements OnModuleInit {
 
 			return createSuccessResp(postsRoutesConfig.getRecentPosts, commandRes)
 		} catch (err: any) {
+			console.log({ err })
 			createFailResp(postsRoutesConfig.getRecentPosts, err)
 		}
-	}*/
+	}
 
 	@ApiCookieAuth()
 	@ApiBearerAuth('access-token')
@@ -155,7 +160,7 @@ export class PostController implements OnModuleInit {
 		}
 	}
 
-	/*@Get(':postId')
+	@Get(':postId')
 	@RouteDecorators(postsRoutesConfig.getPost)
 	async getPost(@Param('postId') postId: number): Promise<SWGetPostRouteOut | undefined> {
 		try {
@@ -168,9 +173,9 @@ export class PostController implements OnModuleInit {
 		} catch (err: any) {
 			createFailResp(postsRoutesConfig.getPost, err)
 		}
-	}*/
+	}
 
-	/*@ApiCookieAuth()
+	@ApiCookieAuth()
 	@ApiBearerAuth('access-token')
 	@UseGuards(CheckAccessTokenGuard)
 	@Patch(':postId')
@@ -190,9 +195,9 @@ export class PostController implements OnModuleInit {
 		} catch (err: any) {
 			createFailResp(postsRoutesConfig.updatePost, err)
 		}
-	}*/
+	}
 
-	/*@ApiCookieAuth()
+	@ApiCookieAuth()
 	@ApiBearerAuth('access-token')
 	@UseGuards(CheckAccessTokenGuard)
 	@Delete(':postId')
@@ -211,5 +216,5 @@ export class PostController implements OnModuleInit {
 		} catch (err: any) {
 			createFailResp(postsRoutesConfig.deletePost, err)
 		}
-	}*/
+	}
 }

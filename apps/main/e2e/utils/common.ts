@@ -78,6 +78,11 @@ export function mockFilesServiceSendMethod(filesMicroservice: ClientProxy, retur
 		return of(returnValue)
 	})
 }
+export function mockFilesServiceSendMethodOnce(filesMicroservice: ClientProxy, returnValue: any) {
+	;(filesMicroservice.send as jest.Mock).mockImplementationOnce(() => {
+		return of(returnValue)
+	})
+}
 
 export function resetMockFilesServiceSendMethod(filesMicroservice: ClientProxy) {
 	;(filesMicroservice.send as jest.Mock).mockReset()

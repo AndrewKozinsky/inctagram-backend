@@ -1,6 +1,6 @@
 import { DtoFieldDecorators } from '../../db/dtoFieldDecorators'
 import { bdConfig } from '../../db/dbConfig/dbConfig'
-import { IsIn, IsOptional, IsString } from 'class-validator'
+import { IsArray, IsIn, IsOptional, IsString } from 'class-validator'
 import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common'
 import { CustomException } from '../../infrastructure/exceptionFilters/customException'
 import { HTTP_STATUSES } from '../../utils/httpStatuses'
@@ -13,7 +13,7 @@ export class CreatePostDtoModel {
 	@DtoFieldDecorators('location', bdConfig.Post.dbFields.location)
 	location: string
 
-	@DtoFieldDecorators('location', bdConfig.Post.dtoProps.photosIds)
+	@DtoFieldDecorators('photosIds', bdConfig.Post.dtoProps.photosIds)
 	photosIds: string[]
 }
 
@@ -39,9 +39,9 @@ export class UploadPostPhotoPipe implements PipeTransform {
 		const allowedMimeTypes = ['image/png', 'image/jpg', 'image/jpeg']
 
 		if (!allowedMimeTypes.includes(file.mimetype)) {
-			errMessage = ErrorMessage.OneOfFilesHasWrongMimeType
+			errMessage = ErrorMessage.FileHasWrongMimeType
 		} else if (file.size > maxFileSize) {
-			errMessage = ErrorMessage.OneOfFilesIsTooLarge
+			errMessage = ErrorMessage.FileIsTooLarge
 		}
 
 		if (errMessage) {

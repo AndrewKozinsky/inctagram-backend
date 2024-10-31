@@ -1,9 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { JwtAdapterService } from '@app/jwt-adapter'
+import { ErrorMessage } from '@app/shared'
 import { UserRepository } from '../../repositories/user.repository'
 import { DeviceTokenOutModel } from '../../models/auth/auth.output.model'
 import { DevicesRepository } from '../../repositories/devices.repository'
-import { ErrorMessage } from '@app/shared'
 
 export class GenerateAccessAndRefreshTokensCommand {
 	constructor(public readonly deviceRefreshToken: DeviceTokenOutModel) {}

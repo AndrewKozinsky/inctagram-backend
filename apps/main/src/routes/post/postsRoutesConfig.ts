@@ -1,8 +1,14 @@
+import { ErrorMessage } from '@app/shared'
 import { ErrorCode, SuccessCode } from '../../infrastructure/exceptionFilters/layerResult'
 import { RoutesConfig } from '../routesConfig/routesConfigTypes'
-import { ErrorMessage } from '@app/shared'
 import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
-import { SWAddPostRouteOut, SWUploadPostPhotoRouteOut } from './swaggerTypes'
+import {
+	SWAddPostRouteOut,
+	SWGetPostRouteOut,
+	SWGetRecentPostRouteOut,
+	SWUpdatePostRouteOut,
+	SWUploadPostPhotoRouteOut,
+} from './swaggerTypes'
 
 export const postsRoutesConfig = {
 	uploadPostPhoto: {
@@ -32,7 +38,7 @@ export const postsRoutesConfig = {
 			},
 		],
 	},
-	/*getPost: {
+	getPost: {
 		response: [
 			{
 				code: SuccessCode.Ok,
@@ -44,8 +50,8 @@ export const postsRoutesConfig = {
 				errors: [ErrorMessage.PostNotFound],
 			},
 		],
-	},*/
-	/*updatePost: {
+	},
+	updatePost: {
 		response: [
 			{
 				code: SuccessCode.Ok,
@@ -61,8 +67,8 @@ export const postsRoutesConfig = {
 				errors: [ErrorMessage.PostNotBelongToUser],
 			},
 		],
-	},*/
-	/*deletePost: {
+	},
+	deletePost: {
 		response: [
 			{
 				code: SuccessCode.Ok,
@@ -78,8 +84,8 @@ export const postsRoutesConfig = {
 				errors: [ErrorMessage.PostNotBelongToUser],
 			},
 		],
-	},*/
-	/*getRecentPosts: {
+	},
+	getRecentPosts: {
 		response: [
 			{
 				code: SuccessCode.Ok,
@@ -87,5 +93,5 @@ export const postsRoutesConfig = {
 				dataClass: SWGetRecentPostRouteOut,
 			},
 		],
-	},*/
+	},
 } satisfies RoutesConfig.Root

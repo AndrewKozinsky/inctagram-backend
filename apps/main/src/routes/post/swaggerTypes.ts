@@ -85,7 +85,7 @@ export class SWAddPostRouteOut {
 	}
 }
 
-/*export class SWGetPostRouteOut {
+export class SWGetPostRouteOut {
 	@ApiProperty({ default: 'success' })
 	status: string
 
@@ -119,6 +119,10 @@ export class SWAddPostRouteOut {
 				items: {
 					type: 'object',
 					properties: {
+						id: {
+							type: 'string',
+							default: 'reh768975df',
+						},
 						url: {
 							type: 'string',
 							default:
@@ -135,12 +139,13 @@ export class SWAddPostRouteOut {
 		location: null | string
 		userId: number
 		photos: {
+			id: string
 			url: string
 		}[]
 	}
-}*/
+}
 
-/*export class SWUpdatePostRouteOut {
+export class SWUpdatePostRouteOut {
 	@ApiProperty({ default: 'success' })
 	status: string
 
@@ -190,12 +195,13 @@ export class SWAddPostRouteOut {
 		location: null | string
 		userId: number
 		photos: {
+			id: string
 			url: string
 		}[]
 	}
-}*/
+}
 
-/*export class SWGetRecentPostRouteOut {
+export class SWGetRecentPostRouteOut {
 	@ApiProperty({ default: 'success' })
 	status: string
 
@@ -230,7 +236,7 @@ export class SWAddPostRouteOut {
 						avatar: {
 							type: 'string',
 							example:
-								'https://sociable-people.storage.yandexcloud.net/users/1/avatar.png',
+								'https://sociable-people.storage.yandexcloud.net/users/11/avatar.png',
 							nullable: true,
 						},
 					},
@@ -240,6 +246,10 @@ export class SWAddPostRouteOut {
 					items: {
 						type: 'object',
 						properties: {
+							id: {
+								type: 'string',
+								default: 'reh768975df',
+							},
 							url: {
 								type: 'string',
 								default:
@@ -256,6 +266,9 @@ export class SWAddPostRouteOut {
 		text: string
 		createdAt: string
 		user: { id: number; name: string; avatar: null | string }
-		photos: { url: string }[]
+		photos: {
+			id: string
+			url: string
+		}[]
 	}[]
-}*/
+}

@@ -21,35 +21,42 @@ import { MainConfigService } from '@app/config'
 import path from 'node:path'
 
 export const postUtils = {
+	async createPostPhoto(params: { mainApp: INestApplication; accessToken: string }) {
+		const { mainApp, accessToken } = params
+
+		const photoFilePath = path.join(__dirname, 'utils/files/avatar.png')
+
+		return await postRequest(mainApp, RouteNames.POSTS.PHOTOS.full)
+			.set('authorization', 'Bearer ' + accessToken)
+			.set('Content-Type', 'multipart/form-data')
+			.attach('postPhotoFile', photoFilePath)
+			.expect(HTTP_STATUSES.CREATED_201)
+	},
 	async createPost(params: {
-		app: INestApplication
+		mainApp: INestApplication
 		accessToken: string
-		mainConfig: MainConfigService
 		postText?: string
 		postLocation?: string
 	}) {
 		const {
-			app,
+			mainApp,
 			accessToken,
-			mainConfig,
 			postText = 'Post description',
 			postLocation = 'Photo location',
 		} = params
 
-		const avatarFilePath = path.join(__dirname, 'files/avatar.png')
-
-		const addPostRes = await postRequest(app, RouteNames.POSTS.value)
+		const addPostRes = await postRequest(mainApp, RouteNames.POSTS.value)
 			.set('authorization', 'Bearer ' + accessToken)
-			.set('Content-Type', 'multipart/form-data')
-			.attach('photoFiles', avatarFilePath)
-			.attach('photoFiles', avatarFilePath)
-			.field('text', postText)
-			.field('location', postLocation)
+			.send({
+				text: postText,
+				location: postLocation,
+				photosIds: ['1', '2'],
+			})
 			.expect(HTTP_STATUSES.CREATED_201)
 
 		return addPostRes.body
 	},
-	async createPosts(params: {
+	/*async createPosts(params: {
 		app: INestApplication
 		accessToken: string
 		mainConfig: MainConfigService
@@ -76,5 +83,5 @@ export const postUtils = {
 		}
 
 		return posts
-	},
+	},*/
 }

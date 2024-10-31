@@ -194,7 +194,9 @@ export const bdConfig = {
 	Post: {
 		dtoProps: {
 			photosIds: {
-				type: 'stringsArray',
+				type: 'array',
+				arrayItemType: 'string',
+				required: true,
 			},
 		},
 		dbFields: {

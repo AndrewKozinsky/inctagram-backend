@@ -47,11 +47,6 @@ export class FilesController {
 		return await this.postService.savePostPhoto(savePostPhotoInContract)
 	}
 
-	/*@MessagePattern(FileMS_EventNames.GetPostsPhotos)
-	async getPostsPhotos(getPostsPhotosInContract: FileMS_GetPostsPhotosInContract) {
-		return await this.postService.getPostsPhotos(getPostsPhotosInContract)
-	}*/
-
 	@MessagePattern(FileMS_EventNames.GetPostPhotos)
 	async getPostPhotos(getPostPhotosByIdsInContract: FileMS_GetPostPhotosInContract) {
 		return await this.postService.getPostPhotos(getPostPhotosByIdsInContract)

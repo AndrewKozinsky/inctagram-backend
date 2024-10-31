@@ -16,11 +16,13 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { UserAvatar } from './schemas/userAvatar.schema'
 import { CommonService, SaveFileDetails } from './commonService'
+import { MainConfigService } from '@app/config'
 
 @Injectable()
 export class AvatarService {
 	constructor(
 		private commonService: CommonService,
+		private mainConfig: MainConfigService,
 		@InjectModel(UserAvatar.name) private userAvatarModel: Model<UserAvatar>,
 	) {}
 
@@ -86,7 +88,8 @@ export class AvatarService {
 			}
 
 			postInPreparedPosts = findPostInPreparedPosts(preparedUsersAvatars, userAvatar.userId)
-			postInPreparedPosts!.avatarUrl = userAvatar.url
+			postInPreparedPosts!.avatarUrl =
+				this.mainConfig.get().s3.filesRootUrl + '/' + userAvatar.url
 		})
 
 		return preparedUsersAvatars
@@ -108,7 +111,7 @@ export class AvatarService {
 
 		if (avatarDetails) {
 			return {
-				avatarUrl: avatarDetails.url,
+				avatarUrl: this.mainConfig.get().s3.filesRootUrl + '/' + avatarDetails.url,
 			}
 		}
 

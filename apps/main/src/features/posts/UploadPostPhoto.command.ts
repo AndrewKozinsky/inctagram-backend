@@ -3,6 +3,8 @@ import { lastValueFrom } from 'rxjs'
 import { Inject } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
 import { ErrorMessage, FileMS_EventNames, FileMS_SavePostPhotoInContract } from '@app/shared'
+import { PostRepository } from '../../repositories/post.repository'
+import { PostPhotoRepository } from '../../repositories/postPhoto.repository'
 
 export class UploadPostPhotoCommand {
 	constructor(public postPhotoFile: Express.Multer.File) {}
@@ -21,9 +23,11 @@ export class UploadPostPhotoHandler implements ICommandHandler<UploadPostPhotoCo
 				postPhotoFile,
 			}
 
-			return await lastValueFrom(
+			const createPhotoRes = await lastValueFrom(
 				this.filesMicroClient.send(FileMS_EventNames.SavePostPhoto, sendingDataContract),
 			)
+
+			return createPhotoRes
 		} catch (err: any) {
 			console.log(err)
 			throw new Error(ErrorMessage.CannotSaveFile)

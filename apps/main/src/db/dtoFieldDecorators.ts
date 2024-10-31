@@ -18,7 +18,6 @@ import { ApiProperty, ApiPropertyOptions } from '@nestjs/swagger'
 
 // @IsIn(['desc', 'asc'])
 // @IsEnum(LikeStatuses)
-// @IsArray({ message: 'CorrectAnswers must be an array of strings' })
 // @ArrayMinSize(1)
 
 /**
@@ -125,9 +124,14 @@ export function DtoFieldDecorators(
 		if (!updatedFieldConf.required) {
 			decorators.push(IsOptional())
 		}
-	} else if (updatedFieldConf.type === 'stringsArray') {
-		decorators.push(IsArray)
-		decorators.push(Type(() => IsString({ each: true })))
+	} else if (updatedFieldConf.type === 'array') {
+		let errorMessage = name + ' must be an array.'
+		if (updatedFieldConf.arrayItemType === 'string') {
+			errorMessage = name + ' must be an array of strings.'
+		}
+
+		decorators.push(IsArray({ message: errorMessage }))
+
 		if (!updatedFieldConf.required) {
 			decorators.push(IsOptional())
 		}

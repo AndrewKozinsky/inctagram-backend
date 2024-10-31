@@ -13,11 +13,13 @@ import {
 import { createUniqString } from '@app/shared'
 import { CommonService, SaveFileDetails } from './commonService'
 import { PostPhoto } from './schemas/postPhoto.schema'
+import { MainConfigService } from '@app/config'
 
 @Injectable()
 export class PostPhotoService {
 	constructor(
 		private commonService: CommonService,
+		private mainConfig: MainConfigService,
 		@InjectModel(PostPhoto.name) private postPhotoModel: Model<PostPhoto>,
 	) {}
 
@@ -53,36 +55,6 @@ export class PostPhotoService {
 		}
 	}
 
-	/*async getPostsPhotos(
-		getPostsPhotosInContract: FileMS_GetPostsPhotosInContract,
-	): Promise<FileMS_GetPostsPhotosOutContract> {
-		const { postsIds } = getPostsPhotosInContract
-
-		const posts = await this.postPhotoModel.find({ postId: { $in: postsIds } })
-
-		const preparedPosts: FileMS_GetPostsPhotosOutContract = []
-
-		posts.forEach((post) => {
-			let postInPreparedPosts = findPostInPreparedPosts(preparedPosts, post.postId)
-
-			if (!postInPreparedPosts) {
-				preparedPosts.push({ postId: post.postId, imagesUrls: [] })
-			}
-
-			postInPreparedPosts = findPostInPreparedPosts(preparedPosts, post.postId)
-			postInPreparedPosts!.imagesUrls.push(post.url)
-		})
-
-		return preparedPosts
-
-		function findPostInPreparedPosts(
-			preparedPosts: FileMS_GetPostsPhotosOutContract,
-			postId: number,
-		) {
-			return preparedPosts.find((thisPost) => thisPost.postId === postId)
-		}
-	}*/
-
 	async getPostPhotos(
 		getPostPhotosInContract: FileMS_GetPostPhotosInContract,
 	): Promise<FileMS_GetPostPhotosOutContract> {
@@ -93,7 +65,7 @@ export class PostPhotoService {
 		return postPhotos.map((postPhoto) => {
 			return {
 				id: postPhoto._id.toString(),
-				url: postPhoto.url,
+				url: this.mainConfig.get().s3.filesRootUrl + '/' + postPhoto.url,
 			}
 		})
 	}
@@ -103,10 +75,9 @@ export class PostPhotoService {
 	): Promise<FileMS_DeletePostPhotoOutContract> {
 		const { photoId } = deletePostPhotosInContract
 
-		const postPhoto = await this.postPhotoModel.find({ _id: photoId })
+		const postPhoto = await this.postPhotoModel.findOne({ _id: photoId })
 
 		if (postPhoto) {
-			// @ts-ignore
 			await this.commonService.deleteFile(postPhoto.url)
 			await this.postPhotoModel.deleteOne({ _id: photoId })
 		}

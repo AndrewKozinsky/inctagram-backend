@@ -10,11 +10,13 @@ import { PostRepository } from '../../repositories/post.repository'
 import { DevicesRepository } from '../../repositories/devices.repository'
 import { PostQueryRepository } from '../../repositories/post.queryRepository'
 import { AddPostHandler } from '../../features/posts/AddPost.command'
-// import { GetPostHandler } from '../../features/posts/GetPost.query'
-// import { UpdatePostHandler } from '../../features/posts/UpdatePost.command'
-// import { DeletePostHandler } from '../../features/posts/DeletePost.command'
-// import { GetRecentPostsHandler } from '../../features/posts/GetRecentPosts.query'
+import { GetPostHandler } from '../../features/posts/GetPost.query'
+import { UpdatePostHandler } from '../../features/posts/UpdatePost.command'
+import { DeletePostHandler } from '../../features/posts/DeletePost.command'
+import { GetRecentPostsHandler } from '../../features/posts/GetRecentPosts.query'
 import { FilesMSEmitService } from '../../repositories/filesMSEmit.service'
+import { UploadPostPhotoHandler } from '../../features/posts/UploadPostPhoto.command'
+import { DeletePostPhotoHandler } from '../../features/posts/DeletePostPhoto.command'
 
 const services = [PrismaService, FilesMSEmitService, BrowserServiceService, JwtAdapterService]
 
@@ -22,10 +24,12 @@ const repositories = [DevicesRepository, PostRepository, PostQueryRepository]
 
 const commandHandlers = [
 	AddPostHandler,
-	// GetPostHandler,
-	// UpdatePostHandler,
-	// DeletePostHandler,
-	// GetRecentPostsHandler,
+	UploadPostPhotoHandler,
+	DeletePostPhotoHandler,
+	GetPostHandler,
+	UpdatePostHandler,
+	DeletePostHandler,
+	GetRecentPostsHandler,
 ]
 
 @Module({

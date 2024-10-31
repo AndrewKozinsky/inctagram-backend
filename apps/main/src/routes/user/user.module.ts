@@ -14,7 +14,7 @@ import { DeleteUserAvatarHandler } from '../../features/user/DeleteUserAvatar.co
 import { GetMyProfileHandler } from '../../features/user/GetMyProfile.query'
 import { EditMyProfileHandler } from '../../features/user/EditMyProfile.command'
 import { UserQueryRepository } from '../../repositories/user.queryRepository'
-// import { GetUserPostsHandler } from '../../features/posts/GetUserPosts.query'
+import { GetUserPostsHandler } from '../../features/posts/GetUserPosts.query'
 import { PostQueryRepository } from '../../repositories/post.queryRepository'
 import { FilesMSEmitService } from '../../repositories/filesMSEmit.service'
 
@@ -28,7 +28,7 @@ const commandHandlers = [
 	DeleteUserAvatarHandler,
 	EditMyProfileHandler,
 	GetMyProfileHandler,
-	// GetUserPostsHandler,
+	GetUserPostsHandler,
 ]
 
 @Module({

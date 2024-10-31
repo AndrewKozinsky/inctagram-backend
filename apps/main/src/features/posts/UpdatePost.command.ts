@@ -1,18 +1,18 @@
-// import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
-// import { ErrorMessage } from '@app/shared'
-// import { PostRepository } from '../../repositories/post.repository'
-// import { UpdatePostDtoModel } from '../../models/post/post.input.model'
-// import { PostQueryRepository } from '../../repositories/post.queryRepository'
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
+import { ErrorMessage } from '@app/shared'
+import { PostRepository } from '../../repositories/post.repository'
+import { UpdatePostDtoModel } from '../../models/post/post.input.model'
+import { PostQueryRepository } from '../../repositories/post.queryRepository'
 
-/*export class UpdatePostCommand {
+export class UpdatePostCommand {
 	constructor(
 		public postId: number,
 		public userId: number,
 		public dto: UpdatePostDtoModel,
 	) {}
-}*/
+}
 
-/*@CommandHandler(UpdatePostCommand)
+@CommandHandler(UpdatePostCommand)
 export class UpdatePostHandler implements ICommandHandler<UpdatePostCommand> {
 	constructor(
 		private postQueryRepository: PostQueryRepository,
@@ -36,4 +36,4 @@ export class UpdatePostHandler implements ICommandHandler<UpdatePostCommand> {
 		const updatedPost = await this.postQueryRepository.getPostById(postId)
 		return updatedPost!
 	}
-}*/
+}

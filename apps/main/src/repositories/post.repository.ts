@@ -45,21 +45,27 @@ export class PostRepository {
 		await Promise.all(requests)
 	}
 
-	/*async getPostById(postId: number) {
+	async getPostById(postId: number) {
 		const post = await this.prisma.post.findFirst({
 			where: { id: postId },
+			include: {
+				PostPhoto: true,
+			},
 		})
 
 		if (!post) {
 			return null
 		}
 
-		const photos = await this.postBaseRepository.getPostPhotos(postId)
+		const postPhotos = await this.prisma.postPhoto.findMany({ where: { post_id: postId } })
+		const photosIds = postPhotos.map((postPhoto) => postPhoto.files_ms_post_photo_id)
 
-		return this.mapDbPostToServicePost(post, photos.imagesUrls)
-	}*/
+		const photos = await this.postBaseRepository.getPostPhotos(photosIds)
 
-	/*async updatePost(postId: number, dto: UpdatePostDtoModel) {
+		return this.mapDbPostToServicePost(post, photos)
+	}
+
+	async updatePost(postId: number, dto: UpdatePostDtoModel) {
 		const newPostData: Record<string, string> = {}
 		if (dto.text || dto.text == '') {
 			newPostData.text = dto.text
@@ -72,18 +78,34 @@ export class PostRepository {
 			where: { id: postId },
 			data: newPostData,
 		})
-	}*/
+	}
 
-	/*async deletePost(postId: number) {
-		await this.postBaseRepository.deletePostPhotos(postId)
+	async deletePost(postId: number) {
+		const post = await this.getPostById(postId)
+
+		if (!post) {
+			return
+		}
+
+		for (const photo of post.photos) {
+			await this.postBaseRepository.deletePostPhoto(photo.id)
+		}
+
+		await this.prisma.postPhoto.deleteMany({
+			where: { post_id: postId },
+		})
 
 		await this.prisma.post.delete({
 			where: { id: postId },
 		})
-	}*/
+	}
 
 	async deletePostPhoto(photoId: string) {
 		await this.postBaseRepository.deletePostPhoto(photoId)
+
+		await this.prisma.postPhoto.findFirst({
+			where: { files_ms_post_photo_id: photoId },
+		})
 
 		await this.prisma.postPhoto.deleteMany({
 			where: { files_ms_post_photo_id: photoId },

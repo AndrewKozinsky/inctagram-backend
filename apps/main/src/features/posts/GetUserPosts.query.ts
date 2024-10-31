@@ -1,15 +1,15 @@
-// import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
-// import { PostQueryRepository } from '../../repositories/post.queryRepository'
-// import { GetUserPostsQueries } from '../../models/user/user.input.model'
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
+import { PostQueryRepository } from '../../repositories/post.queryRepository'
+import { GetUserPostsQueries } from '../../models/user/user.input.model'
 
-/*export class GetUserPostsQuery {
+export class GetUserPostsQuery {
 	constructor(
 		public userId: number,
 		public query: GetUserPostsQueries,
 	) {}
-}*/
+}
 
-/*@QueryHandler(GetUserPostsQuery)
+@QueryHandler(GetUserPostsQuery)
 export class GetUserPostsHandler implements IQueryHandler<GetUserPostsQuery> {
 	constructor(private postQueryRepository: PostQueryRepository) {}
 
@@ -18,4 +18,4 @@ export class GetUserPostsHandler implements IQueryHandler<GetUserPostsQuery> {
 
 		return await this.postQueryRepository.getUserPosts(userId, query)
 	}
-}*/
+}

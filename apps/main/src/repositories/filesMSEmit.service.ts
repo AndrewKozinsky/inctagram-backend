@@ -15,19 +15,12 @@ import { ClientProxy } from '@nestjs/microservices'
 export class FilesMSEmitService {
 	constructor(@Inject('FILES_MICROSERVICE') private filesMicroClient: ClientProxy) {}
 
-	/*async getUsersAvatars(usersIds: number[]): Promise<FileMS_GetUsersAvatarsOutContract> {
+	async getUsersAvatars(usersIds: number[]): Promise<FileMS_GetUsersAvatarsOutContract> {
 		const sendingDataContract: FileMS_GetUsersAvatarsInContract = { usersIds }
 		return lastValueFrom(
 			this.filesMicroClient.send(FileMS_EventNames.GetUsersAvatars, sendingDataContract),
 		)
-	}*/
-
-	/*async getPostsPhotos(postsIds: number[]): Promise<FileMS_GetPostsImagesOutContract> {
-		const sendingDataContract: FileMS_GetPostsImagesInContract = { postsIds }
-		return lastValueFrom(
-			this.filesMicroClient.send(FileMS_EventNames.GetPostsImages, sendingDataContract),
-		)
-	}*/
+	}
 
 	async getPostPhotos(photosIds: string[]): Promise<FileMS_GetPostPhotosOutContract> {
 		const sendingDataContract: FileMS_GetPostPhotosInContract = { photosIds }

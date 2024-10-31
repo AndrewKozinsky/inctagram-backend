@@ -14,6 +14,7 @@ import {
 	patchRequest,
 	mockFilesServiceSendMethod,
 	resetMockFilesServiceSendMethod,
+	mockFilesServiceSendMethodOnce,
 } from './utils/common'
 import RouteNames from '../src/routes/routesConfig/routeNames'
 import { HTTP_STATUSES } from '../src/utils/httpStatuses'
@@ -21,7 +22,13 @@ import { clearAllDB } from './utils/db'
 import { EmailAdapterService } from '@app/email-adapter'
 import { UserRepository } from '../src/repositories/user.repository'
 import { userUtils } from './utils/userUtils'
-import { FileMS_GetUserAvatarOutContract, parseCookieStringToObj } from '@app/shared'
+import {
+	FileMS_GetPostPhotosOutContract,
+	FileMS_GetUserAvatarOutContract,
+	FileMS_GetUsersAvatarsOutContract,
+	FileMS_SavePostPhotoOutContract,
+	parseCookieStringToObj,
+} from '@app/shared'
 import { GitHubService } from '../src/routes/auth/gitHubService'
 import { GoogleService } from '../src/routes/auth/googleService'
 import { DevicesRepository } from '../src/repositories/devices.repository'
@@ -29,6 +36,7 @@ import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 import { createMainApp } from './utils/createMainApp'
 import { ClientProxy } from '@nestjs/microservices'
 import { postUtils } from './utils/postUtils'
+import { of } from 'rxjs'
 
 it('123', async () => {
 	expect(2).toBe(2)
@@ -84,7 +92,7 @@ describe('Posts (e2e)', () => {
 	})
 
 	describe('Add a post photo', () => {
-		it.only('should return 400 if wrong files were send', async () => {
+		it('should return 400 if wrong files were send', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
 				filesMicroservice,
@@ -93,26 +101,35 @@ describe('Posts (e2e)', () => {
 				email: defUserEmail,
 				password: defUserPassword,
 			})
-
-			// Send large file and in invalid format
-			const textFilePath = path.join(__dirname, 'utils/files/text.txt')
-			const bigFilePath = path.join(__dirname, 'utils/files/big-avatar.png')
 
 			mockFilesServiceSendMethod(filesMicroservice, {
 				avatarUrl: null,
 			} as FileMS_GetUserAvatarOutContract)
 
-			const addPostRes = await postRequest(mainApp, RouteNames.POSTS.value)
+			// Send large file
+			const bigFilePath = path.join(__dirname, 'utils/files/big-avatar.png')
+
+			const addPostPhotoRes1 = await postRequest(mainApp, RouteNames.POSTS.PHOTOS.full)
 				.set('authorization', 'Bearer ' + accessToken)
 				.set('Content-Type', 'multipart/form-data')
-				.attach('photoFiles', textFilePath)
-				.attach('photoFiles', bigFilePath)
+				.attach('postPhotoFile', bigFilePath)
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
 
-			checkErrorResponse(addPostRes.body, 400, 'One of files is too large')
+			checkErrorResponse(addPostPhotoRes1.body, 400, 'File is too large')
+
+			// Send file in invalid format
+			const textFilePath = path.join(__dirname, 'utils/files/text.txt')
+
+			const addPostPhotoRes2 = await postRequest(mainApp, RouteNames.POSTS.PHOTOS.full)
+				.set('authorization', 'Bearer ' + accessToken)
+				.set('Content-Type', 'multipart/form-data')
+				.attach('postPhotoFile', textFilePath)
+				.expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+			checkErrorResponse(addPostPhotoRes2.body, 400, 'File has wrong mime type')
 		})
 
-		/*it('should return 200 if send correct data', async () => {
+		it('should return 200 if send correct file', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
 				filesMicroservice,
@@ -123,36 +140,65 @@ describe('Posts (e2e)', () => {
 			})
 
 			mockFilesServiceSendMethod(filesMicroservice, {
-				images: ['url 1', 'url 2'],
-			} satisfies FileMS_SavePostImagesOutContract)
+				photoId: 'somePostPhotoId',
+			} satisfies FileMS_SavePostPhotoOutContract)
 
-			const avatarFilePath = path.join(__dirname, 'utils/files/avatar.png')
+			const photoFilePath = path.join(__dirname, 'utils/files/avatar.png')
 
-			const addPostRes = await postRequest(mainApp, RouteNames.POSTS.value)
+			const addPostPhotoRes = await postRequest(mainApp, RouteNames.POSTS.PHOTOS.full)
 				.set('authorization', 'Bearer ' + accessToken)
 				.set('Content-Type', 'multipart/form-data')
-				.attach('photoFiles', avatarFilePath)
-				.attach('photoFiles', avatarFilePath)
-				.field('text', 'Post description')
-				.field('location', 'Photo location')
+				.attach('postPhotoFile', photoFilePath)
 				.expect(HTTP_STATUSES.CREATED_201)
 
-			const expectedRes = {
-				id: 1,
-				text: 'Post description',
-				location: 'Photo location',
-				userId: 1,
-				photos: [
-					{ id: 1, url: 'url 1' },
-					{ id: 2, url: 'url 2' },
-				],
-			}
+			// { status: 'success', code: 201, data: { photoId: 'somePostPhotoId' } }
+			const addPostPhoto = addPostPhotoRes.body
 
-			checkSuccessResponse(addPostRes.body, 201, expectedRes)
-		})*/
+			checkSuccessResponse(addPostPhoto, 201, { photoId: 'somePostPhotoId' })
+		})
 	})
 
-	/*describe('Add a new post', () => {
+	describe('Add a post photo', () => {
+		it('should return 200 if post photo is exists and was deleted', async () => {
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
+				mainApp,
+				filesMicroservice,
+				userRepository,
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
+
+			;(filesMicroservice.send as jest.Mock)
+				.mockImplementation(() => {
+					return of({
+						avatarUrl: null,
+					} as FileMS_GetUserAvatarOutContract)
+				})
+				.mockImplementation(() => {
+					return of({
+						photoId: 'somePostPhotoId',
+					} satisfies FileMS_SavePostPhotoOutContract)
+				})
+
+			const photoFilePath = path.join(__dirname, 'utils/files/avatar.png')
+
+			const addPostPhotoRes = await postRequest(mainApp, RouteNames.POSTS.PHOTOS.full)
+				.set('authorization', 'Bearer ' + accessToken)
+				.set('Content-Type', 'multipart/form-data')
+				.attach('postPhotoFile', photoFilePath)
+				.expect(HTTP_STATUSES.CREATED_201)
+
+			// { status: 'success', code: 201, data: { photoId: 'somePostPhotoId' } }
+			const addPostPhoto = addPostPhotoRes.body
+
+			await deleteRequest(mainApp, RouteNames.POSTS.PHOTOS.PHOTO(addPostPhoto.photoId).full)
+				.set('authorization', 'Bearer ' + accessToken)
+				.expect(HTTP_STATUSES.OK_200)
+		})
+	})
+
+	describe('Add a new post', () => {
 		it('should return 400 if the accessToken inside cookie is valid, but request body is not send', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
@@ -163,35 +209,17 @@ describe('Posts (e2e)', () => {
 				password: defUserPassword,
 			})
 
+			mockFilesServiceSendMethod(filesMicroservice, {
+				avatarUrl: null,
+			} as FileMS_GetUserAvatarOutContract)
+
 			const addPostRes = await postRequest(mainApp, RouteNames.POSTS.value)
 				.set('authorization', 'Bearer ' + accessToken)
 				.expect(HTTP_STATUSES.BAD_REQUEST_400)
 
-			checkErrorResponse(addPostRes.body, 400, 'Files not found')
-		})
+			const addPost = addPostRes.body
 
-		it('should return 400 if the JWT refreshToken inside cookie is valid, but send wrong files', async () => {
-			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
-				mainApp,
-				filesMicroservice,
-				userRepository,
-				userName: defUserName,
-				email: defUserEmail,
-				password: defUserPassword,
-			})
-
-			// Send large file and in invalid format
-			const textFilePath = path.join(__dirname, 'utils/files/text.txt')
-			const bigFilePath = path.join(__dirname, 'utils/files/big-avatar.png')
-
-			const addPostRes = await postRequest(mainApp, RouteNames.POSTS.value)
-				.set('authorization', 'Bearer ' + accessToken)
-				.set('Content-Type', 'multipart/form-data')
-				.attach('photoFiles', textFilePath)
-				.attach('photoFiles', bigFilePath)
-				.expect(HTTP_STATUSES.BAD_REQUEST_400)
-
-			checkErrorResponse(addPostRes.body, 400, 'One of files is too large')
+			checkErrorResponse(addPost, 400, 'Wrong body')
 		})
 
 		it('should return 200 if send correct data', async () => {
@@ -204,19 +232,32 @@ describe('Posts (e2e)', () => {
 				password: defUserPassword,
 			})
 
-			mockFilesServiceSendMethod(filesMicroservice, {
-				images: ['url 1', 'url 2'],
-			} satisfies FileMS_SavePostImagesOutContract)
-
-			const avatarFilePath = path.join(__dirname, 'utils/files/avatar.png')
+			;(filesMicroservice.send as jest.Mock)
+				.mockImplementation(() => {
+					return of({
+						avatarUrl: null,
+					} as FileMS_GetUserAvatarOutContract)
+				})
+				.mockImplementation(() => {
+					return of([
+						{
+							id: '1',
+							url: 'url-1',
+						},
+						{
+							id: '2',
+							url: 'url-2',
+						},
+					] satisfies FileMS_GetPostPhotosOutContract)
+				})
 
 			const addPostRes = await postRequest(mainApp, RouteNames.POSTS.value)
 				.set('authorization', 'Bearer ' + accessToken)
-				.set('Content-Type', 'multipart/form-data')
-				.attach('photoFiles', avatarFilePath)
-				.attach('photoFiles', avatarFilePath)
-				.field('text', 'Post description')
-				.field('location', 'Photo location')
+				.send({
+					text: 'Post description',
+					location: 'Photo location',
+					photosIds: ['1', '2'],
+				})
 				.expect(HTTP_STATUSES.CREATED_201)
 
 			const expectedRes = {
@@ -225,22 +266,16 @@ describe('Posts (e2e)', () => {
 				location: 'Photo location',
 				userId: 1,
 				photos: [
-					{ id: 1, url: 'url 1' },
-					{ id: 2, url: 'url 2' },
+					{ id: '1', url: 'url-1' },
+					{ id: '2', url: 'url-2' },
 				],
 			}
 
 			checkSuccessResponse(addPostRes.body, 201, expectedRes)
 		})
-	})*/
+	})
 
-	/*describe('Get a post', () => {
-		it('should return 404 if there is not post with passed post id', async () => {
-			await getRequest(mainApp, RouteNames.POSTS.POST(99).full).expect(
-				HTTP_STATUSES.NOT_FOUNT_404,
-			)
-		})
-
+	describe('Get a post', () => {
 		it('should return 200 if send correct data', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
@@ -252,23 +287,38 @@ describe('Posts (e2e)', () => {
 			})
 
 			let secondPostId = 0
-			for (let i = 0; i < 2; i++) {
-				mockFilesServiceSendMethod(filesMicroservice, {
-					images: ['url 1', 'url 2'],
-				} satisfies FileMS_SavePostImagesOutContract)
+			for (let i = 1; i < 3; i++) {
+				;(filesMicroservice.send as jest.Mock)
+					.mockImplementation(() => {
+						return of({
+							avatarUrl: null,
+						} as FileMS_GetUserAvatarOutContract)
+					})
+					.mockImplementation(() => {
+						return of([
+							{
+								id: '1',
+								url: 'url-1',
+							},
+							{
+								id: '2',
+								url: 'url-2',
+							},
+						] satisfies FileMS_GetPostPhotosOutContract)
+					})
 
 				const addPost = await postUtils.createPost({
-					app: mainApp,
+					mainApp,
 					accessToken,
-					mainConfig,
 				})
 
-				if (i === 1) {
+				if (i === 2) {
 					secondPostId = addPost.data.id
 				}
 			}
 
 			const getPostRes = await getRequest(mainApp, RouteNames.POSTS.POST(secondPostId).full)
+			const getPost = getPostRes.body
 
 			const expectedRes = {
 				id: 2,
@@ -276,16 +326,22 @@ describe('Posts (e2e)', () => {
 				location: 'Photo location',
 				userId: 1,
 				photos: [
-					{ id: 3, url: 'url 1' },
-					{ id: 4, url: 'url 2' },
+					{
+						id: '1',
+						url: 'url-1',
+					},
+					{
+						id: '2',
+						url: 'url-2',
+					},
 				],
 			}
 
-			checkSuccessResponse(getPostRes.body, 200, expectedRes)
+			checkSuccessResponse(getPost, 200, expectedRes)
 		})
-	})*/
+	})
 
-	/*describe('Update post', () => {
+	describe('Update post', () => {
 		it('should return 404 if the auth data is valid, but there is not a post with passed id', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
@@ -295,6 +351,10 @@ describe('Posts (e2e)', () => {
 				email: defUserEmail,
 				password: defUserPassword,
 			})
+
+			mockFilesServiceSendMethod(filesMicroservice, {
+				avatarUrl: null,
+			} as FileMS_GetUserAvatarOutContract)
 
 			const updatePostRes = await patchRequest(mainApp, RouteNames.POSTS.POST(999).full)
 				.set('authorization', 'Bearer ' + accessToken)
@@ -313,14 +373,28 @@ describe('Posts (e2e)', () => {
 				password: defUserPassword,
 			})
 
-			mockFilesServiceSendMethod(filesMicroservice, {
-				images: ['url 1', 'url 2'],
-			} satisfies FileMS_SavePostImagesOutContract)
+			;(filesMicroservice.send as jest.Mock)
+				.mockImplementation(() => {
+					return of({
+						avatarUrl: null,
+					} as FileMS_GetUserAvatarOutContract)
+				})
+				.mockImplementation(() => {
+					return of([
+						{
+							id: '1',
+							url: 'url-1',
+						},
+						{
+							id: '2',
+							url: 'url-2',
+						},
+					] satisfies FileMS_GetPostPhotosOutContract)
+				})
 
 			const addPost = await postUtils.createPost({
-				app: mainApp,
+				mainApp,
 				accessToken,
-				mainConfig,
 			})
 			const postId = addPost.data.id
 
@@ -350,14 +424,28 @@ describe('Posts (e2e)', () => {
 				password: defUserPassword,
 			})
 
-			mockFilesServiceSendMethod(filesMicroservice, {
-				images: ['url 1', 'url 2'],
-			} satisfies FileMS_SavePostImagesOutContract)
+			;(filesMicroservice.send as jest.Mock)
+				.mockImplementationOnce(() => {
+					return of({
+						avatarUrl: null,
+					} as FileMS_GetUserAvatarOutContract)
+				})
+				.mockImplementation(() => {
+					return of([
+						{
+							id: '1',
+							url: 'url-1',
+						},
+						{
+							id: '2',
+							url: 'url-2',
+						},
+					] satisfies FileMS_GetPostPhotosOutContract)
+				})
 
 			const addPost = await postUtils.createPost({
-				app: mainApp,
+				mainApp,
 				accessToken: accessToken1,
-				mainConfig,
 			})
 			const postId = addPost.data.id
 
@@ -371,11 +459,27 @@ describe('Posts (e2e)', () => {
 				password: 'secondPassword',
 			})
 
-			const refreshTokenValue2 = parseCookieStringToObj(refreshTokenStr1).cookieValue
+			;(filesMicroservice.send as jest.Mock)
+				.mockImplementationOnce(() => {
+					return of({
+						avatarUrl: null,
+					} as FileMS_GetUserAvatarOutContract)
+				})
+				.mockImplementation(() => {
+					return of([
+						{
+							id: '1',
+							url: 'url-1',
+						},
+						{
+							id: '2',
+							url: 'url-2',
+						},
+					] satisfies FileMS_GetPostPhotosOutContract)
+				})
 
 			const updatePostRes = await patchRequest(mainApp, RouteNames.POSTS.POST(postId).full)
 				.set('authorization', 'Bearer ' + accessToken2)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue2)
 				.send({
 					text: 'My new post text',
 					location: 'My new location',
@@ -396,14 +500,28 @@ describe('Posts (e2e)', () => {
 				password: defUserPassword,
 			})
 
-			mockFilesServiceSendMethod(filesMicroservice, {
-				images: ['url 1', 'url 2'],
-			} satisfies FileMS_SavePostImagesOutContract)
+			;(filesMicroservice.send as jest.Mock)
+				.mockImplementationOnce(() => {
+					return of({
+						avatarUrl: null,
+					} as FileMS_GetUserAvatarOutContract)
+				})
+				.mockImplementation(() => {
+					return of([
+						{
+							id: '1',
+							url: 'url-1',
+						},
+						{
+							id: '2',
+							url: 'url-2',
+						},
+					] satisfies FileMS_GetPostPhotosOutContract)
+				})
 
 			const addPost = await postUtils.createPost({
-				app: mainApp,
+				mainApp,
 				accessToken,
-				mainConfig,
 			})
 			const postId = addPost.data.id
 
@@ -422,8 +540,8 @@ describe('Posts (e2e)', () => {
 				location: 'My new location',
 				userId: 1,
 				photos: [
-					{ id: 1, url: 'url 1' },
-					{ id: 2, url: 'url 2' },
+					{ id: '1', url: 'url-1' },
+					{ id: '2', url: 'url-2' },
 				],
 			}
 
@@ -432,9 +550,9 @@ describe('Posts (e2e)', () => {
 			const getPostRes = await getRequest(mainApp, RouteNames.POSTS.POST(postId).full)
 			checkSuccessResponse(getPostRes.body, 200, expectedRes)
 		})
-	})*/
+	})
 
-	/*describe('Update post', () => {
+	describe('Delete post', () => {
 		it('should return 404 if the auth data is valid, but there is not a post with passed id', async () => {
 			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
 				mainApp,
@@ -444,6 +562,10 @@ describe('Posts (e2e)', () => {
 				email: defUserEmail,
 				password: defUserPassword,
 			})
+
+			mockFilesServiceSendMethod(filesMicroservice, {
+				avatarUrl: null,
+			} as FileMS_GetUserAvatarOutContract)
 
 			const deletePostRes = await deleteRequest(mainApp, RouteNames.POSTS.POST(999).full)
 				.set('authorization', 'Bearer ' + accessToken)
@@ -463,14 +585,28 @@ describe('Posts (e2e)', () => {
 				password: defUserPassword,
 			})
 
-			mockFilesServiceSendMethod(filesMicroservice, {
-				images: ['url 1', 'url 2'],
-			} satisfies FileMS_SavePostImagesOutContract)
+			;(filesMicroservice.send as jest.Mock)
+				.mockImplementationOnce(() => {
+					return of({
+						avatarUrl: null,
+					} as FileMS_GetUserAvatarOutContract)
+				})
+				.mockImplementation(() => {
+					return of([
+						{
+							id: '1',
+							url: 'url-1',
+						},
+						{
+							id: '2',
+							url: 'url-2',
+						},
+					] satisfies FileMS_GetPostPhotosOutContract)
+				})
 
 			const addPost = await postUtils.createPost({
-				app: mainApp,
+				mainApp,
 				accessToken: accessToken1,
-				mainConfig,
 			})
 			const postId = addPost.data.id
 
@@ -483,6 +619,25 @@ describe('Posts (e2e)', () => {
 				email: 'second@mail.com',
 				password: 'secondPassword',
 			})
+
+			;(filesMicroservice.send as jest.Mock)
+				.mockImplementationOnce(() => {
+					return of({
+						avatarUrl: null,
+					} as FileMS_GetUserAvatarOutContract)
+				})
+				.mockImplementation(() => {
+					return of([
+						{
+							id: '1',
+							url: 'url-1',
+						},
+						{
+							id: '2',
+							url: 'url-2',
+						},
+					] satisfies FileMS_GetPostPhotosOutContract)
+				})
 
 			const deletePostRes = await deleteRequest(mainApp, RouteNames.POSTS.POST(postId).full)
 				.set('authorization', 'Bearer ' + accessToken2)
@@ -502,95 +657,56 @@ describe('Posts (e2e)', () => {
 				password: defUserPassword,
 			})
 
-			mockFilesServiceSendMethod(filesMicroservice, {
-				images: ['url 1', 'url 2'],
-			} satisfies FileMS_SavePostImagesOutContract)
+			;(filesMicroservice.send as jest.Mock)
+				.mockImplementationOnce(() => {
+					return of({
+						avatarUrl: null,
+					} as FileMS_GetUserAvatarOutContract)
+				})
+				.mockImplementation(() => {
+					return of([
+						{
+							id: '1',
+							url: 'url-1',
+						},
+						{
+							id: '2',
+							url: 'url-2',
+						},
+					] satisfies FileMS_GetPostPhotosOutContract)
+				})
 
 			const addPost = await postUtils.createPost({
-				app: mainApp,
+				mainApp,
 				accessToken,
-				mainConfig,
 			})
 			const postId = addPost.data.id
 
-			resetMockFilesServiceSendMethod(filesMicroservice)
-			// TODO
-			mockFilesServiceSendMethod(filesMicroservice, [])
+			;(filesMicroservice.send as jest.Mock)
+				.mockImplementationOnce(() => {
+					return of({
+						avatarUrl: null,
+					} as FileMS_GetUserAvatarOutContract)
+				})
+				.mockImplementation(() => {
+					return of([
+						{
+							id: '1',
+							url: 'url-1',
+						},
+						{
+							id: '2',
+							url: 'url-2',
+						},
+					] satisfies FileMS_GetPostPhotosOutContract)
+				})
 
 			const deletePostRes = await deleteRequest(mainApp, RouteNames.POSTS.POST(postId).full)
 				.set('authorization', 'Bearer ' + accessToken)
 				.expect(HTTP_STATUSES.OK_200)
 
-			expect(filesMicroservice.send).toBeCalledTimes(2)
-
 			const deletePost = deletePostRes.body
 			checkSuccessResponse(deletePost, 200, null)
-
-			const getPostRes = await getRequest(mainApp, RouteNames.POSTS.POST(postId).full)
-			checkErrorResponse(getPostRes.body, 404, 'Post not found')
 		})
-	})*/
-
-	/*describe('Get recent posts', () => {
-		it('should return an array with 4 posts', async () => {
-			// Create a user which will created 3 posts
-			const [accessToken1, refreshTokenStr1] = await userUtils.createUserAndLogin({
-				mainApp,
-				filesMicroservice,
-				userRepository,
-				userName: defUserName,
-				email: defUserEmail,
-				password: defUserPassword,
-			})
-
-			mockFilesServiceSendMethod(filesMicroservice, {
-				images: ['url 1', 'url 2'],
-			} satisfies FileMS_SavePostImagesOutContract)
-
-			for (let i = 0; i < 3; i++) {
-				await postUtils.createPost({
-					app: mainApp,
-					accessToken: accessToken1,
-					mainConfig,
-				})
-			}
-
-			// Create a user which will created 2 posts
-			const [accessToken2, refreshTokenStr2] = await userUtils.createUserAndLogin({
-				mainApp,
-				filesMicroservice,
-				userRepository,
-				userName: 'secondUserName',
-				email: 'second@mail.com',
-				password: 'secondPassword',
-			})
-
-			for (let i = 0; i < 3; i++) {
-				await postUtils.createPost({
-					app: mainApp,
-					accessToken: accessToken2,
-					mainConfig,
-				})
-			}
-
-			// Get recent posts
-			const getRecentPostsRes = await getRequest(mainApp, RouteNames.POSTS.RECENT.full)
-			const getRecentPosts = getRecentPostsRes.body
-
-			expect(getRecentPosts.data.length).toBe(4)
-			checkSuccessResponse(getRecentPosts, 200)
-
-			const firstPost = getRecentPosts.data[0]
-			expect(firstPost.id).toBe(6)
-			expect(firstPost.text).toBe('Post description')
-			expect(typeof firstPost.createdAt).toBe('string')
-			expect(firstPost.user.id).toBe(2)
-			expect(firstPost.user.name).toBe('secondUserName')
-			expect(firstPost.user.avatar).toBe(null)
-			expect(firstPost.photos).toEqual([
-				{ id: 12, url: 'url 2' },
-				{ id: 11, url: 'url 1' },
-			])
-		})
-	})*/
+	})
 })

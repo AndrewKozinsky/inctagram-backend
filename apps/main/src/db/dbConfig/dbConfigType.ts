@@ -19,7 +19,17 @@ export namespace BdConfig {
 		| ManyToOneField
 		| OneToManyField
 
-	type FieldCommonProps = {
+	export type IndexField = {
+		type: 'index'
+	}
+
+	export type StringField = {
+		type: 'string'
+		minLength?: number
+		maxLength?: number
+		match?: RegExp
+		matchErrorMessage?: string
+
 		// Default value
 		default?: string | number | boolean
 		// Is the field required? True by default
@@ -32,38 +42,71 @@ export namespace BdConfig {
 		example?: string | number | boolean
 	}
 
-	export type IndexField = {
-		type: 'index'
-	}
-
-	export type StringField = FieldCommonProps & {
-		type: 'string'
-		minLength?: number
-		maxLength?: number
-		match?: RegExp
-		matchErrorMessage?: string
-	}
-
-	export type DateStringField = FieldCommonProps & {
+	export type DateStringField = {
 		type: 'dateString'
+
+		// Default value
+		default?: string | number | boolean
+		// Is the field required? True by default
+		required: boolean
+		// Is the field value must be unique?
+		unique?: boolean
+		// Field description
+		description?: string
+		// Field example value
+		example?: string | number | boolean
 	}
 
-	export type BooleanField = FieldCommonProps & {
+	export type BooleanField = {
 		type: 'boolean'
+
+		// Default value
+		default?: string | number | boolean
+		// Is the field required? True by default
+		required: boolean
+		// Is the field value must be unique?
+		unique?: boolean
+		// Field description
+		description?: string
+		// Field example value
+		example?: string | number | boolean
 	}
 
-	export type EmailField = FieldCommonProps & {
+	export type EmailField = {
 		type: 'email'
+
+		// Default value
+		default?: string | number | boolean
+		// Is the field required? True by default
+		required: boolean
+		// Is the field value must be unique?
+		unique?: boolean
+		// Field description
+		description?: string
+		// Field example value
+		example?: string | number | boolean
 	}
 
-	export type NumberField = FieldCommonProps & {
+	export type NumberField = {
 		type: 'number'
 		min?: number
 		max?: number
+
+		// Default value
+		default?: string | number | boolean
+		// Is the field required? True by default
+		required: boolean
+		// Is the field value must be unique?
+		unique?: boolean
+		// Field description
+		description?: string
+		// Field example value
+		example?: string | number | boolean
 	}
 
 	export type StringsArrayField = {
-		type: 'stringsArray'
+		type: 'array'
+		arrayItemType: 'string'
 		// Is the field required? True by default
 		required: boolean
 		// Field description

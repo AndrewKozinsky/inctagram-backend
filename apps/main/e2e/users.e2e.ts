@@ -457,8 +457,8 @@ describe('Users (e2e)', () => {
 		})
 	})
 
-	/*describe('Get user posts', () => {
-		it('should return an empty array if there is not posts', async () => {
+	describe('Get user posts', () => {
+		/*it('should return an empty array if there is not posts', async () => {
 			const user = await userUtils.createUserWithConfirmedEmail({
 				mainApp,
 				filesMicroservice,
@@ -472,9 +472,8 @@ describe('Users (e2e)', () => {
 
 			const expectedData = { page: 1, pageSize: 10, pagesCount: 0, totalCount: 0, items: [] }
 			checkSuccessResponse(getUserPostRes.body, 200, expectedData)
-		})
-
-		it('should return 2 posts of the user', async () => {
+		})*/
+		/*it('should return 2 posts of the user', async () => {
 			const [accessToken, refreshTokenStr, user] = await userUtils.createUserAndLogin({
 				mainApp,
 				filesMicroservice,
@@ -531,9 +530,8 @@ describe('Users (e2e)', () => {
 			}
 
 			checkSuccessResponse(getUserPostRes.body, 200, expectedRes)
-		})
-
-		it('should return 5 posts of the user', async () => {
+		})*/
+		/*it('should return 5 posts of the user', async () => {
 			const [accessToken, refreshTokenStr, user] = await userUtils.createUserAndLogin({
 				mainApp,
 				filesMicroservice,
@@ -565,6 +563,6 @@ describe('Users (e2e)', () => {
 			expect(getUserPost.data.pageSize).toBe(5)
 			expect(getUserPost.data.totalCount).toBe(12)
 			expect(getUserPost.data.items.length).toBe(5)
-		})
-	})*/
+		})*/
+	})
 })
