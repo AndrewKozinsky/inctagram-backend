@@ -38,7 +38,7 @@ import { ClientProxy } from '@nestjs/microservices'
 import { postUtils } from './utils/postUtils'
 import { of } from 'rxjs'
 
-it('123', async () => {
+it.only('123', async () => {
 	expect(2).toBe(2)
 })
 
