@@ -64,7 +64,7 @@ export class AvatarService {
 		}
 
 		return {
-			avatarUrl,
+			avatarUrl: this.mainConfig.get().s3.filesRootUrl + '/' + avatarUrl,
 		}
 	}
 
