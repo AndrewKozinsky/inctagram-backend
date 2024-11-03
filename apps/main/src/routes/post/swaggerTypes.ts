@@ -66,7 +66,7 @@ export class SWAddPostRouteOut {
 						url: {
 							type: 'string',
 							default:
-								'https://storage.yandexcloud.net/sociable-people/users/100/posts/photo.png',
+								'https://storage.yandexcloud.net/sociable-people/posts/photo.png',
 						},
 					},
 				},
@@ -126,7 +126,7 @@ export class SWGetPostRouteOut {
 						url: {
 							type: 'string',
 							default:
-								'https://storage.yandexcloud.net/sociable-people/users/100/posts/photo.png',
+								'https://storage.yandexcloud.net/sociable-people/posts/photo.png',
 						},
 					},
 				},
@@ -182,7 +182,7 @@ export class SWUpdatePostRouteOut {
 						url: {
 							type: 'string',
 							default:
-								'https://storage.yandexcloud.net/sociable-people/users/100/posts/photo.png',
+								'https://storage.yandexcloud.net/sociable-people/posts/photo.png',
 						},
 					},
 				},
@@ -236,7 +236,7 @@ export class SWGetRecentPostRouteOut {
 						avatar: {
 							type: 'string',
 							example:
-								'https://sociable-people.storage.yandexcloud.net/users/11/avatar.png',
+								'https://storage.yandexcloud.net/sociable-people/posts/photo.png',
 							nullable: true,
 						},
 					},
@@ -253,7 +253,7 @@ export class SWGetRecentPostRouteOut {
 							url: {
 								type: 'string',
 								default:
-									'https://storage.yandexcloud.net/sociable-people/users/100/posts/photo.png',
+									'https://storage.yandexcloud.net/sociable-people/posts/photo.png',
 							},
 						},
 					},

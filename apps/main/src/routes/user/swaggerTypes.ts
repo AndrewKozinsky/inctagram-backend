@@ -162,7 +162,7 @@ export class SWGetUserPostsRouteOut {
 									url: {
 										type: 'string',
 										default:
-											'https://storage.yandexcloud.net/sociable-people/users/100/posts/photo.png',
+											'https://storage.yandexcloud.net/sociable-people/posts/photo.png',
 									},
 								},
 							},

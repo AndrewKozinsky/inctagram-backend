@@ -40,12 +40,12 @@ export class CommonService {
 	}
 
 	async saveFile(fileData: SaveFileDetails) {
-		const { bucket } = this.mainConfig.get().s3
+		const { bucketName } = this.mainConfig.get().s3
 
 		await this.s3Client.send(
 			// Класс PutObjectCommand создаёт экземпляр класса создающего файл.
 			new PutObjectCommand({
-				Bucket: bucket,
+				Bucket: bucketName,
 				// Путь до файла
 				Key: fileData.filePath,
 				// Содержимое файла
@@ -59,13 +59,13 @@ export class CommonService {
 	async deleteFile(filePath: null | string) {
 		if (!filePath) return
 
-		const { bucket } = this.mainConfig.get().s3
+		const { bucketName } = this.mainConfig.get().s3
 
 		try {
 			await this.s3Client.send(
 				// DeleteObjectCommand creates an instance deleting a file.
 				new DeleteObjectCommand({
-					Bucket: bucket,
+					Bucket: bucketName,
 					Key: filePath,
 				}),
 			)

@@ -73,7 +73,7 @@ export class PostController implements OnModuleInit {
 		schema: {
 			type: 'object',
 			properties: {
-				photoFile: {
+				postPhotoFile: {
 					format: 'binary',
 				},
 			},
