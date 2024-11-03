@@ -150,8 +150,10 @@ export class PostQueryRepository {
 				allPostsPhotosIds.push(photo.files_ms_post_photo_id)
 			}
 		})
+		console.log({ allPostsPhotosIds })
 
 		const allPostsPhotos = await this.postBaseRepository.getPostPhotos(allPostsPhotosIds)
+		console.log({ allPostsPhotos })
 
 		return {
 			pagesCount,
