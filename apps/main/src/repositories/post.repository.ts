@@ -1,21 +1,16 @@
 import { Injectable } from '@nestjs/common'
-import { Post, PostPhoto, User } from '@prisma/client'
-import { add } from 'date-fns'
-import { HashAdapterService } from '@app/hash-adapter'
+import { Post } from '@prisma/client'
 import { PrismaService } from '../db/prisma.service'
-import { CreateUserDtoModel } from '../models/user/user.input.model'
-import { UserServiceModel } from '../models/user/user.service.model'
-import { JwtAdapterService } from '@app/jwt-adapter'
 import { CreatePostDtoModel, UpdatePostDtoModel } from '../models/post/post.input.model'
 import { PostServiceModel } from '../models/post/post.service.model'
-
-type DBPostWithPhotos = Post & {
-	PostPhoto: PostPhoto[]
-}
+import { FilesMSEmitService } from './filesMSEmit.service'
 
 @Injectable()
 export class PostRepository {
-	constructor(private prisma: PrismaService) {}
+	constructor(
+		private prisma: PrismaService,
+		private postBaseRepository: FilesMSEmitService,
+	) {}
 
 	async createPost(userId: number, dto: CreatePostDtoModel) {
 		const post = await this.prisma.post.create({
@@ -24,17 +19,35 @@ export class PostRepository {
 				location: dto.location,
 				user_id: userId,
 			},
-			include: {
-				PostPhoto: true,
-			},
 		})
 
-		return this.mapDbPostToServicePost(post)
+		await this.createPostPhotosFromPhotoIds(post.id, dto.photosIds)
+
+		const photos = await this.postBaseRepository.getPostPhotos(dto.photosIds)
+
+		return this.mapDbPostToServicePost(post, photos)
 	}
 
-	async getPostById(id: number) {
+	async createPostPhotosFromPhotoIds(postId: number, photosIds: string[]) {
+		const requests: Promise<any>[] = []
+
+		for (const photoId of photosIds) {
+			const request = this.prisma.postPhoto.create({
+				data: {
+					post_id: postId,
+					files_ms_post_photo_id: photoId,
+				},
+			})
+
+			requests.push(request)
+		}
+
+		await Promise.all(requests)
+	}
+
+	async getPostById(postId: number) {
 		const post = await this.prisma.post.findFirst({
-			where: { id },
+			where: { id: postId },
 			include: {
 				PostPhoto: true,
 			},
@@ -44,7 +57,12 @@ export class PostRepository {
 			return null
 		}
 
-		return this.mapDbPostToServicePost(post)
+		const postPhotos = await this.prisma.postPhoto.findMany({ where: { post_id: postId } })
+		const photosIds = postPhotos.map((postPhoto) => postPhoto.files_ms_post_photo_id)
+
+		const photos = await this.postBaseRepository.getPostPhotos(photosIds)
+
+		return this.mapDbPostToServicePost(post, photos)
 	}
 
 	async updatePost(postId: number, dto: UpdatePostDtoModel) {
@@ -63,23 +81,50 @@ export class PostRepository {
 	}
 
 	async deletePost(postId: number) {
+		const post = await this.getPostById(postId)
+
+		if (!post) {
+			return
+		}
+
+		for (const photo of post.photos) {
+			await this.postBaseRepository.deletePostPhoto(photo.id)
+		}
+
+		await this.prisma.postPhoto.deleteMany({
+			where: { post_id: postId },
+		})
+
 		await this.prisma.post.delete({
 			where: { id: postId },
 		})
 	}
 
-	mapDbPostToServicePost(dbPost: DBPostWithPhotos): PostServiceModel {
+	async deletePostPhoto(photoId: string) {
+		await this.postBaseRepository.deletePostPhoto(photoId)
+
+		await this.prisma.postPhoto.findFirst({
+			where: { files_ms_post_photo_id: photoId },
+		})
+
+		await this.prisma.postPhoto.deleteMany({
+			where: { files_ms_post_photo_id: photoId },
+		})
+	}
+
+	mapDbPostToServicePost(
+		dbPost: Post,
+		postPhotos: {
+			id: string
+			url: string
+		}[],
+	): PostServiceModel {
 		return {
 			id: dbPost.id,
 			text: dbPost.text,
 			location: dbPost.location,
 			userId: dbPost.user_id,
-			photos: dbPost.PostPhoto.map((photo) => {
-				return {
-					id: photo.id,
-					url: photo.url,
-				}
-			}),
+			photos: postPhotos,
 		}
 	}
 }

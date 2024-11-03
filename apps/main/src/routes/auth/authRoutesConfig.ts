@@ -4,7 +4,7 @@ import {
 	SWGetNewAccessAndRefreshTokenRouteOut,
 	SWLoginRouteOut,
 	SWRegistrationRouteOut,
-} from '../auth/swaggerTypes'
+} from './swaggerTypes'
 import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
 import { RoutesConfig } from '../routesConfig/routesConfigTypes'
 import { ErrorMessage } from '@app/shared'

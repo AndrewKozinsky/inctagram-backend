@@ -1,5 +1,6 @@
 import { applyDecorators } from '@nestjs/common'
 import {
+	IsArray,
 	IsDateString,
 	IsEmail,
 	IsNumber,
@@ -17,7 +18,6 @@ import { ApiProperty, ApiPropertyOptions } from '@nestjs/swagger'
 
 // @IsIn(['desc', 'asc'])
 // @IsEnum(LikeStatuses)
-// @IsArray({ message: 'CorrectAnswers must be an array of strings' })
 // @ArrayMinSize(1)
 
 /**
@@ -75,8 +75,7 @@ export function DtoFieldDecorators(
 		if (!updatedFieldConf.required) {
 			decorators.push(IsOptional())
 		}
-	}
-	if (updatedFieldConf.type === 'dateString') {
+	} else if (updatedFieldConf.type === 'dateString') {
 		decorators.push(
 			IsDateString(
 				{},
@@ -125,6 +124,17 @@ export function DtoFieldDecorators(
 		if (!updatedFieldConf.required) {
 			decorators.push(IsOptional())
 		}
+	} else if (updatedFieldConf.type === 'array') {
+		let errorMessage = name + ' must be an array.'
+		if (updatedFieldConf.arrayItemType === 'string') {
+			errorMessage = name + ' must be an array of strings.'
+		}
+
+		decorators.push(IsArray({ message: errorMessage }))
+
+		if (!updatedFieldConf.required) {
+			decorators.push(IsOptional())
+		}
 	}
 
 	decorators.push(ApiProperty(apiPropertyOptions))
@@ -140,7 +150,7 @@ function createApiPropertyOptions(fieldConf: BdConfig.Field) {
 	}
 
 	if ('required' in fieldConf) {
-		apiPropertyOptions.required = fieldConf.required === false ? false : true
+		apiPropertyOptions.required = !fieldConf.required
 	}
 
 	if ('default' in fieldConf) {

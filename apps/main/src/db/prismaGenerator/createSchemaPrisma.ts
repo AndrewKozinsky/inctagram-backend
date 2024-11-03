@@ -10,7 +10,7 @@ import { BdConfig } from '../dbConfig/dbConfigType'
  *
  * datasource db {
  *     provider = "postgresql"
- *     url      = env("DATABASE_URL")
+ *     url      = env("POSTGRES_DB_URL")
  * }
  *
  * model User {
@@ -44,7 +44,7 @@ function getTopPrismaSchema() {
 
 datasource db {
 	provider = "postgresql"
-	url      = env("DATABASE_URL")
+	url      = env("POSTGRES_DB_URL")
 }`
 }
 
@@ -82,6 +82,8 @@ model ${tableName} {
 			columnsArr.push(`\t${dbFieldName}	Boolean` + createColumnAttrs(field))
 		} else if (field.type === 'number') {
 			columnsArr.push(`\t${dbFieldName}	Int` + createColumnAttrs(field))
+		} else if (field.type === 'createdAt') {
+			columnsArr.push(`\t${dbFieldName}	DateTime	@default(now())`)
 		} else if (field.type === 'manyToOne') {
 			columnsArr.push(...createManyToOneColumn(field))
 		} else if (field.type === 'oneToMany') {
@@ -108,7 +110,9 @@ function createColumnAttrs(columnConfig: BdConfig.Field) {
 	if (
 		columnConfig.type !== 'index' &&
 		columnConfig.type !== 'manyToOne' &&
-		columnConfig.type !== 'oneToMany'
+		columnConfig.type !== 'oneToMany' &&
+		columnConfig.type !== 'createdAt' &&
+		columnConfig.type !== 'array'
 	) {
 		if (!columnConfig.required) {
 			attrStrings.push('?')

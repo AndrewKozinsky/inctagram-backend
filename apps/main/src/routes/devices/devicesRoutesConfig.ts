@@ -1,8 +1,8 @@
+import { ErrorMessage } from '@app/shared'
 import { ErrorCode, SuccessCode } from '../../infrastructure/exceptionFilters/layerResult'
-import { SWGetUserDevicesRouteOut } from '../devices/swaggerTypes'
+import { SWGetUserDevicesRouteOut } from './swaggerTypes'
 import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
 import { RoutesConfig } from '../routesConfig/routesConfigTypes'
-import { ErrorMessage } from '@app/shared'
 
 export const devicesRoutesConfig = {
 	getUserDevices: {

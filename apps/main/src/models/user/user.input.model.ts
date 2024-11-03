@@ -1,6 +1,6 @@
 import { DtoFieldDecorators } from '../../db/dtoFieldDecorators'
 import { bdConfig } from '../../db/dbConfig/dbConfig'
-import { IsIn, IsNumber, IsOptional, IsString } from 'class-validator'
+import { IsIn, IsNumber, IsOptional } from 'class-validator'
 import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common'
 import { CustomException } from '../../infrastructure/exceptionFilters/customException'
 import { HTTP_STATUSES } from '../../utils/httpStatuses'
@@ -80,4 +80,29 @@ export class EditMyProfileDtoModel {
 
 	@DtoFieldDecorators('aboutMe', bdConfig.User.dbFields.about_me)
 	aboutMe: null | string
+}
+
+export class GetUserPostsQueries {
+	@IsOptional()
+	@Type(() => Number)
+	@IsNumber()
+	// pageNumber is number of portions that should be returned. Default value is 1
+	pageNumber?: number
+
+	@IsOptional()
+	@Type(() => Number)
+	@IsNumber()
+	// pageSize is portions size that should be returned. Default value is 10
+	pageSize?: number
+}
+
+@Injectable()
+export class GetUserPostsQueriesPipe implements PipeTransform {
+	async transform(dto: GetUserPostsQueries, { metatype }: ArgumentMetadata) {
+		if (!metatype) {
+			return dto
+		}
+
+		return plainToInstance(metatype, dto)
+	}
 }

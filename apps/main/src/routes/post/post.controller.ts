@@ -9,19 +9,18 @@ import {
 	Patch,
 	Post,
 	Req,
-	UploadedFiles,
+	UploadedFile,
 	UseGuards,
 	UseInterceptors,
 } from '@nestjs/common'
 import { Request } from 'express'
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCookieAuth, ApiTags } from '@nestjs/swagger'
-import { CommandBus } from '@nestjs/cqrs'
-import { FilesInterceptor } from '@nestjs/platform-express'
+import { CommandBus, QueryBus } from '@nestjs/cqrs'
+import { FileInterceptor } from '@nestjs/platform-express'
 import { ClientProxy } from '@nestjs/microservices'
 import RouteNames from '../routesConfig/routeNames'
 import { RouteDecorators } from '../routesConfig/routesDecorators'
 import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
-import { CheckDeviceRefreshTokenGuard } from '../../infrastructure/guards/checkDeviceRefreshToken.guard'
 import { CheckAccessTokenGuard } from '../../infrastructure/guards/checkAccessToken.guard'
 import { postsRoutesConfig } from './postsRoutesConfig'
 import {
@@ -29,27 +28,37 @@ import {
 	SWGetPostRouteOut,
 	SWGetRecentPostRouteOut,
 	SWUpdatePostRouteOut,
+	SWUploadPostPhotoRouteOut,
 } from './swaggerTypes'
-import { AddPostCommand, AddPostHandler } from '../../features/posts/AddPost.command'
 import {
 	CreatePostDtoModel,
 	UpdatePostDtoModel,
-	UploadPostImagesPipe,
+	UploadPostPhotoPipe,
 } from '../../models/post/post.input.model'
-import { GetPostCommand, GetPostHandler } from '../../features/posts/GetPost.command'
+import { GetPostQuery, GetPostHandler } from '../../features/posts/GetPost.query'
 import { UpdatePostCommand, UpdatePostHandler } from '../../features/posts/UpdatePost.command'
 import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
+import {
+	UploadPostPhotoCommand,
+	UploadPostPhotoHandler,
+} from '../../features/posts/UploadPostPhoto.command'
+import { AddPostCommand, AddPostHandler } from '../../features/posts/AddPost.command'
+import {
+	DeletePostPhotoCommand,
+	DeletePostPhotoHandler,
+} from '../../features/posts/DeletePostPhoto.command'
 import { DeletePostCommand, DeletePostHandler } from '../../features/posts/DeletePost.command'
 import {
-	GetRecentPostsCommand,
+	GetRecentPostsQuery,
 	GetRecentPostsHandler,
-} from '../../features/posts/GetRecentPosts.command'
+} from '../../features/posts/GetRecentPosts.query'
 
 @ApiTags('Post')
 @Controller(RouteNames.POSTS.value)
 export class PostController implements OnModuleInit {
 	constructor(
 		private readonly commandBus: CommandBus,
+		private readonly queryBus: QueryBus,
 		@Inject('FILES_MICROSERVICE') private filesMicroClient: ClientProxy,
 	) {}
 
@@ -64,37 +73,89 @@ export class PostController implements OnModuleInit {
 		schema: {
 			type: 'object',
 			properties: {
-				photoFiles: {
-					type: 'array',
-					items: {
-						format: 'binary',
-					},
+				photoFile: {
+					format: 'binary',
 				},
 			},
 		},
 	})
 	@ApiCookieAuth()
 	@ApiBearerAuth('access-token')
-	@ApiBearerAuth('refresh-token')
 	@UseGuards(CheckAccessTokenGuard)
-	@UseGuards(CheckDeviceRefreshTokenGuard)
-	@Post()
-	@RouteDecorators(postsRoutesConfig.createPost)
-	@UseInterceptors(FilesInterceptor('photoFiles'))
-	async setPost(
-		@Body() body: CreatePostDtoModel,
-		@UploadedFiles(new UploadPostImagesPipe())
-		photoFiles: Express.Multer.File[],
-		@Req() req: Request,
-	): Promise<SWAddPostRouteOut | undefined> {
+	@Post(RouteNames.POSTS.PHOTOS.value)
+	@RouteDecorators(postsRoutesConfig.uploadPostPhoto)
+	@UseInterceptors(FileInterceptor('postPhotoFile'))
+	async uploadPostPhoto(
+		@UploadedFile(new UploadPostPhotoPipe())
+		postPhotoFile: Express.Multer.File,
+	): Promise<SWUploadPostPhotoRouteOut | undefined> {
 		try {
 			const commandRes = await this.commandBus.execute<
 				any,
+				ReturnType<typeof UploadPostPhotoHandler.prototype.execute>
+			>(new UploadPostPhotoCommand(postPhotoFile))
+
+			return createSuccessResp(postsRoutesConfig.uploadPostPhoto, commandRes)
+		} catch (err: any) {
+			console.log({ err })
+			createFailResp(postsRoutesConfig.uploadPostPhoto, err)
+		}
+	}
+
+	@ApiCookieAuth()
+	@ApiBearerAuth('access-token')
+	@UseGuards(CheckAccessTokenGuard)
+	@Delete(RouteNames.POSTS.PHOTOS.value + '/:postPhotoId')
+	@RouteDecorators(postsRoutesConfig.deletePostPhoto)
+	async deletePostPhoto(
+		@Param('postPhotoId') postPhotoId: string,
+	): Promise<SWEmptyRouteOut | undefined> {
+		try {
+			await this.commandBus.execute<
+				any,
+				ReturnType<typeof DeletePostPhotoHandler.prototype.execute>
+			>(new DeletePostPhotoCommand(postPhotoId))
+
+			return createSuccessResp(postsRoutesConfig.deletePostPhoto, null)
+		} catch (err: any) {
+			createFailResp(postsRoutesConfig.deletePostPhoto, err)
+		}
+	}
+
+	@Get(RouteNames.POSTS.RECENT.value)
+	@RouteDecorators(postsRoutesConfig.getRecentPosts)
+	async getRecentPosts(): Promise<SWGetRecentPostRouteOut | undefined> {
+		try {
+			const commandRes = await this.queryBus.execute<
+				any,
+				ReturnType<typeof GetRecentPostsHandler.prototype.execute>
+			>(new GetRecentPostsQuery())
+
+			return createSuccessResp(postsRoutesConfig.getRecentPosts, commandRes)
+		} catch (err: any) {
+			console.log({ err })
+			createFailResp(postsRoutesConfig.getRecentPosts, err)
+		}
+	}
+
+	@ApiCookieAuth()
+	@ApiBearerAuth('access-token')
+	@UseGuards(CheckAccessTokenGuard)
+	@Post()
+	@RouteDecorators(postsRoutesConfig.createPost)
+	async createPost(
+		@Body() body: CreatePostDtoModel,
+		@Req() req: Request,
+	): Promise<SWAddPostRouteOut | undefined> {
+		try {
+			const commandRes: any = await this.commandBus.execute<
+				any,
 				ReturnType<typeof AddPostHandler.prototype.execute>
-			>(new AddPostCommand(req.user.id, body, photoFiles))
+			>(new AddPostCommand(req.user.id, body))
 
 			return createSuccessResp(postsRoutesConfig.createPost, commandRes)
 		} catch (err: any) {
+			console.log(err)
 			createFailResp(postsRoutesConfig.createPost, err)
 		}
 	}
@@ -103,10 +164,10 @@ export class PostController implements OnModuleInit {
 	@RouteDecorators(postsRoutesConfig.getPost)
 	async getPost(@Param('postId') postId: number): Promise<SWGetPostRouteOut | undefined> {
 		try {
-			const commandRes = await this.commandBus.execute<
+			const commandRes = await this.queryBus.execute<
 				any,
 				ReturnType<typeof GetPostHandler.prototype.execute>
-			>(new GetPostCommand(postId))
+			>(new GetPostQuery(postId))
 
 			return createSuccessResp(postsRoutesConfig.getPost, commandRes)
 		} catch (err: any) {
@@ -116,9 +177,7 @@ export class PostController implements OnModuleInit {
 
 	@ApiCookieAuth()
 	@ApiBearerAuth('access-token')
-	@ApiBearerAuth('refresh-token')
 	@UseGuards(CheckAccessTokenGuard)
-	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Patch(':postId')
 	@RouteDecorators(postsRoutesConfig.getPost)
 	async updatePost(
@@ -134,15 +193,13 @@ export class PostController implements OnModuleInit {
 
 			return createSuccessResp(postsRoutesConfig.updatePost, commandRes)
 		} catch (err: any) {
-			createFailResp(postsRoutesConfig.getPost, err)
+			createFailResp(postsRoutesConfig.updatePost, err)
 		}
 	}
 
 	@ApiCookieAuth()
 	@ApiBearerAuth('access-token')
-	@ApiBearerAuth('refresh-token')
 	@UseGuards(CheckAccessTokenGuard)
-	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Delete(':postId')
 	@RouteDecorators(postsRoutesConfig.deletePost)
 	async deletePost(
@@ -158,21 +215,6 @@ export class PostController implements OnModuleInit {
 			return createSuccessResp(postsRoutesConfig.deletePost, null)
 		} catch (err: any) {
 			createFailResp(postsRoutesConfig.deletePost, err)
-		}
-	}
-
-	@Get(RouteNames.POSTS.RECENT.value)
-	@RouteDecorators(postsRoutesConfig.getPost)
-	async getRecentPost(): Promise<SWGetRecentPostRouteOut | undefined> {
-		try {
-			const commandRes = await this.commandBus.execute<
-				any,
-				ReturnType<typeof GetRecentPostsHandler.prototype.execute>
-			>(new GetRecentPostsCommand())
-
-			return createSuccessResp(postsRoutesConfig.getRecentPosts, commandRes)
-		} catch (err: any) {
-			createFailResp(postsRoutesConfig.getRecentPosts, err)
 		}
 	}
 }

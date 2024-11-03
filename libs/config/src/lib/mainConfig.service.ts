@@ -14,8 +14,11 @@ export class MainConfigService {
 				domainApiWithPostfix: 'main.sociable-people.com/api/v1',
 				domainRoot: 'sociable-people.com',
 			},
-			db: {
-				host: this.configService.get<string>('DATABASE_URL') || '',
+			postgresDb: {
+				host: this.configService.get<string>('POSTGRES_DB_URL') || '',
+			},
+			mongoDb: {
+				host: this.configService.get<string>('MONGO_DB_URL') || '',
 			},
 			mainMicroService: {
 				port: parseInt(this.configService.get<string>('MAIN_MICROSERVICE_PORT') || '0', 10),

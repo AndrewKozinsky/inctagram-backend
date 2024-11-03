@@ -6,17 +6,31 @@ import { JwtAdapterService } from '@app/jwt-adapter'
 import { MainConfigService } from '@app/config'
 import { PrismaService } from '../../db/prisma.service'
 import { PostController } from './post.controller'
-import { AddPostHandler } from '../../features/posts/AddPost.command'
 import { PostRepository } from '../../repositories/post.repository'
 import { DevicesRepository } from '../../repositories/devices.repository'
 import { PostQueryRepository } from '../../repositories/post.queryRepository'
-import { PostPhotoRepository } from '../../repositories/postPhoto.repository'
+import { AddPostHandler } from '../../features/posts/AddPost.command'
+import { GetPostHandler } from '../../features/posts/GetPost.query'
+import { UpdatePostHandler } from '../../features/posts/UpdatePost.command'
+import { DeletePostHandler } from '../../features/posts/DeletePost.command'
+import { GetRecentPostsHandler } from '../../features/posts/GetRecentPosts.query'
+import { FilesMSEmitService } from '../../repositories/filesMSEmit.service'
+import { UploadPostPhotoHandler } from '../../features/posts/UploadPostPhoto.command'
+import { DeletePostPhotoHandler } from '../../features/posts/DeletePostPhoto.command'
 
-const services = [PrismaService, BrowserServiceService, JwtAdapterService]
+const services = [PrismaService, FilesMSEmitService, BrowserServiceService, JwtAdapterService]
 
-const repositories = [DevicesRepository, PostRepository, PostQueryRepository, PostPhotoRepository]
+const repositories = [DevicesRepository, PostRepository, PostQueryRepository]
 
-const commandHandlers = [AddPostHandler]
+const commandHandlers = [
+	AddPostHandler,
+	UploadPostPhotoHandler,
+	DeletePostPhotoHandler,
+	GetPostHandler,
+	UpdatePostHandler,
+	DeletePostHandler,
+	GetRecentPostsHandler,
+]
 
 @Module({
 	imports: [CqrsModule],

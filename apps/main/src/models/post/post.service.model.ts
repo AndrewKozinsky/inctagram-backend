@@ -4,7 +4,7 @@ export type PostServiceModel = {
 	location: string | null
 	userId: number
 	photos: {
-		id: number
+		id: string
 		url: string
 	}[]
 }

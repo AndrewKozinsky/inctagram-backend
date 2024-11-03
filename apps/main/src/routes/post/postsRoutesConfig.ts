@@ -1,17 +1,31 @@
+import { ErrorMessage } from '@app/shared'
 import { ErrorCode, SuccessCode } from '../../infrastructure/exceptionFilters/layerResult'
 import { RoutesConfig } from '../routesConfig/routesConfigTypes'
-import { SWAddPostRouteOut, SWGetPostRouteOut, SWUpdatePostRouteOut } from './swaggerTypes'
-import { SWGetAllUsersRouteOut } from '../user/swaggerTypes'
-import { ErrorMessage } from '@app/shared'
 import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
+import {
+	SWAddPostRouteOut,
+	SWGetPostRouteOut,
+	SWGetRecentPostRouteOut,
+	SWUpdatePostRouteOut,
+	SWUploadPostPhotoRouteOut,
+} from './swaggerTypes'
 
 export const postsRoutesConfig = {
-	getRecentPosts: {
+	uploadPostPhoto: {
+		response: [
+			{
+				code: SuccessCode.Created_201,
+				description: 'Upload post photo',
+				dataClass: SWUploadPostPhotoRouteOut,
+			},
+		],
+	},
+	deletePostPhoto: {
 		response: [
 			{
 				code: SuccessCode.Ok,
-				description: 'Get recent posts',
-				dataClass: SWGetAllUsersRouteOut,
+				description: 'Delete post photo',
+				dataClass: SWEmptyRouteOut,
 			},
 		],
 	},
@@ -19,7 +33,7 @@ export const postsRoutesConfig = {
 		response: [
 			{
 				code: SuccessCode.Created_201,
-				description: 'Create post',
+				description: 'Create a post',
 				dataClass: SWAddPostRouteOut,
 			},
 		],
@@ -31,6 +45,10 @@ export const postsRoutesConfig = {
 				description: 'Get post',
 				dataClass: SWGetPostRouteOut,
 			},
+			{
+				code: ErrorCode.NotFound_404,
+				errors: [ErrorMessage.PostNotFound],
+			},
 		],
 	},
 	updatePost: {
@@ -41,8 +59,12 @@ export const postsRoutesConfig = {
 				dataClass: SWUpdatePostRouteOut,
 			},
 			{
+				code: ErrorCode.NotFound_404,
+				errors: [ErrorMessage.PostNotFound],
+			},
+			{
 				code: ErrorCode.BadRequest_400,
-				errors: [ErrorMessage.PostNotFound, ErrorMessage.PostNotBelongToUser],
+				errors: [ErrorMessage.PostNotBelongToUser],
 			},
 		],
 	},
@@ -54,8 +76,21 @@ export const postsRoutesConfig = {
 				dataClass: SWEmptyRouteOut,
 			},
 			{
+				code: ErrorCode.NotFound_404,
+				errors: [ErrorMessage.PostNotFound],
+			},
+			{
 				code: ErrorCode.BadRequest_400,
-				errors: [ErrorMessage.PostNotFound, ErrorMessage.PostNotBelongToUser],
+				errors: [ErrorMessage.PostNotBelongToUser],
+			},
+		],
+	},
+	getRecentPosts: {
+		response: [
+			{
+				code: SuccessCode.Ok,
+				description: 'Get recent posts',
+				dataClass: SWGetRecentPostRouteOut,
 			},
 		],
 	},

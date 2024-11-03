@@ -24,7 +24,7 @@ export class PostOutModel {
 		},
 	})
 	photos: {
-		id: number
+		id: string
 		url: string
 	}[]
 }

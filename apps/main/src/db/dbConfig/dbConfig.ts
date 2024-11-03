@@ -85,12 +85,6 @@ export const bdConfig = {
 				example: 'Kozinsky',
 				required: false,
 			},
-			avatar: {
-				type: 'string',
-				description: "User's avatar image",
-				example: 'https://sociable-people.storage.yandexcloud.net/users/1/avatar.png',
-				required: false,
-			},
 			date_of_birth: {
 				type: 'dateString',
 				description: "User's date of birth",
@@ -198,7 +192,13 @@ export const bdConfig = {
 		},
 	},
 	Post: {
-		dtoProps: {},
+		dtoProps: {
+			photosIds: {
+				type: 'array',
+				arrayItemType: 'string',
+				required: true,
+			},
+		},
 		dbFields: {
 			id: {
 				type: 'index',
@@ -213,13 +213,15 @@ export const bdConfig = {
 				description: 'Photos location',
 				required: false,
 			},
+			created_at: {
+				type: 'createdAt',
+			},
 			user_id: {
 				type: 'manyToOne',
 				thisField: 'user_id',
 				foreignTable: 'User',
 				foreignField: 'id',
 			},
-			// created_at: {},
 			PostPhoto: {
 				type: 'oneToMany',
 			},
@@ -231,9 +233,9 @@ export const bdConfig = {
 			id: {
 				type: 'index',
 			},
-			url: {
+			files_ms_post_photo_id: {
 				type: 'string',
-				description: 'Photo url',
+				description: 'Post photo id in database of files microservice',
 				required: true,
 			},
 			post_id: {

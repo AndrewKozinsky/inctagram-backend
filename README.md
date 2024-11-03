@@ -46,7 +46,7 @@ $ yarn run migrate:generate-types
 ```
 
 ## Run database migration in publish mode
-Change value DATABASE_URL in .env
+Change value POSTGRES_DB_URL in .env
 from
 ```
 postgres://user:123@localhost:5432/inctagram
@@ -75,6 +75,6 @@ deployment, preparingDeploy, Jenkinsfile and Dockerfile.
 ```
 To publish the code to the server make a Pull Request and leave a comment with text
 ```
-run build production paiments
+run build production payments
 ```
 The last word in a comment means a microservice name which will be published.

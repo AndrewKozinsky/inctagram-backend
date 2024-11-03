@@ -9,6 +9,8 @@ import {
 	defUserName,
 	defUserPassword,
 	patchRequest,
+	mockFilesServiceSendMethod,
+	resetMockFilesServiceSendMethod,
 } from './common'
 import RouteNames from '../../src/routes/routesConfig/routeNames'
 import { HTTP_STATUSES } from '../../src/utils/httpStatuses'
@@ -18,71 +20,106 @@ import { DeviceTokenOutModel } from '../../src/models/auth/auth.output.model'
 import { DevicesRepository } from '../../src/repositories/devices.repository'
 import { JwtAdapterService } from '@app/jwt-adapter'
 import { MainConfigService } from '@app/config'
+import { ClientProxy } from '@nestjs/microservices'
+import { FileMS_GetUserAvatarOutContract } from '@app/shared'
 
 export const userUtils = {
-	async createUserWithUnconfirmedEmail(
-		app: INestApplication,
-		userRepository: UserRepository,
-		userName?: string,
-		email?: string,
-		password?: string,
-	) {
-		const fixedUserName = userName ?? defUserName
-		const fixedEmail = email ?? defUserEmail
-		const fixedPassword = password ?? defUserPassword
+	async createUserWithUnconfirmedEmail(props: {
+		mainApp: INestApplication
+		filesMicroservice: ClientProxy
+		userRepository: UserRepository
+		userName?: string
+		email?: string
+		password?: string
+	}) {
+		const fixedUserName = props.userName ?? defUserName
+		const fixedEmail = props.email ?? defUserEmail
+		const fixedPassword = props.password ?? defUserPassword
 
-		const firstRegRes = await postRequest(app, RouteNames.AUTH.REGISTRATION.full)
+		// TODO
+		mockFilesServiceSendMethod(props.filesMicroservice, '')
+
+		const firstRegRes = await postRequest(props.mainApp, RouteNames.AUTH.REGISTRATION.full)
 			.send({ userName: fixedUserName, email: fixedEmail, password: fixedPassword })
 			.expect(HTTP_STATUSES.CREATED_201)
 
 		const userId = firstRegRes.body.data.id
-		return await userRepository.getUserById(userId)
-	},
+		const user = await props.userRepository.getUserById(userId)
 
-	async createUserWithConfirmedEmail(
-		app: INestApplication,
-		userRepository: UserRepository,
-		userName?: string,
-		email?: string,
-		password?: string,
-	) {
-		const user = await this.createUserWithUnconfirmedEmail(
-			app,
-			userRepository,
-			userName,
-			email,
-			password,
-		)
-
-		// Confirm email
-		await getRequest(
-			app,
-			RouteNames.AUTH.EMAIL_CONFIRMATION.full + '?code=' + user!.emailConfirmationCode,
-		).expect(HTTP_STATUSES.OK_200)
+		resetMockFilesServiceSendMethod(props.filesMicroservice)
 
 		return user
 	},
-	async createUserAndLogin(
-		app: INestApplication,
-		userRepository: UserRepository,
-		userName?: string,
-		email?: string,
-		password?: string,
-	) {
-		const user = await this.createUserWithConfirmedEmail(
-			app,
-			userRepository,
-			userName,
-			email,
-			password,
-		)
 
-		return this.loginUser(app, email, password)
+	async createUserWithConfirmedEmail(props: {
+		mainApp: INestApplication
+		filesMicroservice: ClientProxy
+		userRepository: UserRepository
+		userName?: string
+		email?: string
+		password?: string
+	}) {
+		const user = await this.createUserWithUnconfirmedEmail({
+			mainApp: props.mainApp,
+			filesMicroservice: props.filesMicroservice,
+			userRepository: props.userRepository,
+			userName: props.userName,
+			email: props.email,
+			password: props.password,
+		})
+
+		// TODO
+		mockFilesServiceSendMethod(props.filesMicroservice, '')
+
+		// Confirm email
+		await getRequest(
+			props.mainApp,
+			RouteNames.AUTH.EMAIL_CONFIRMATION.full + '?code=' + user!.emailConfirmationCode,
+		).expect(HTTP_STATUSES.OK_200)
+
+		resetMockFilesServiceSendMethod(props.filesMicroservice)
+
+		return user
 	},
-	async loginUser(app: INestApplication, email: string, password: string) {
-		const loginRes = await postRequest(app, RouteNames.AUTH.LOGIN.full)
-			.send({ password, email })
+	async createUserAndLogin(props: {
+		mainApp: INestApplication
+		filesMicroservice: ClientProxy
+		userRepository: UserRepository
+		userName?: string
+		email?: string
+		password?: string
+	}) {
+		const user = await this.createUserWithConfirmedEmail({
+			mainApp: props.mainApp,
+			filesMicroservice: props.filesMicroservice,
+			userRepository: props.userRepository,
+			userName: props.userName,
+			email: props.email,
+			password: props.password,
+		})
+
+		return this.loginUser({
+			mainApp: props.mainApp,
+			filesMicroservice: props.filesMicroservice,
+			email: props.email,
+			password: props.password,
+		})
+	},
+	async loginUser(props: {
+		mainApp: INestApplication
+		filesMicroservice: ClientProxy
+		email: string
+		password: string
+	}) {
+		mockFilesServiceSendMethod(props.filesMicroservice, {
+			avatarUrl: null,
+		} as FileMS_GetUserAvatarOutContract)
+
+		const loginRes = await postRequest(props.mainApp, RouteNames.AUTH.LOGIN.full)
+			.send({ password: props.password, email: props.email })
 			.expect(HTTP_STATUSES.OK_200)
+
+		resetMockFilesServiceSendMethod(props.filesMicroservice)
 
 		const { accessToken } = loginRes.body.data
 		const refreshTokenStr = loginRes.headers['set-cookie'][0]
@@ -103,6 +140,7 @@ export const userUtils = {
 		this.checkNullOrString(user.countryCode)
 		this.checkNullOrNumber(user.cityId)
 		this.checkNullOrString(user.aboutMe)
+		this.checkNullOrString(user.avatar)
 
 		expect(user.hashedPassword).toBeUndefined()
 		expect(user.emailConfirmationCode).toBeUndefined()
@@ -144,16 +182,21 @@ export const userUtils = {
 			checkErrorResponse(req, 401, 'Refresh token is not valid')
 		},
 		// should return 401 if the JWT refreshToken inside cookie is missing, expired or incorrect
-		async tokenExpired(
-			app: INestApplication,
-			methodType: 'get' | 'post' | 'put' | 'patch' | 'delete',
-			routeUrl: string,
-			userRepository: UserRepository,
-			securityRepository: DevicesRepository,
-			jwtService: JwtAdapterService,
-			mainConfig: MainConfigService,
-		) {
-			const user = await userUtils.createUserWithUnconfirmedEmail(app, userRepository)
+		async refreshTokenExpired(props: {
+			mainApp: INestApplication
+			filesMicroservice: ClientProxy
+			methodType: 'get' | 'post' | 'put' | 'patch' | 'delete'
+			routeUrl: string
+			userRepository: UserRepository
+			securityRepository: DevicesRepository
+			jwtService: JwtAdapterService
+			mainConfig: MainConfigService
+		}) {
+			const user = await userUtils.createUserWithUnconfirmedEmail({
+				mainApp: props.mainApp,
+				userRepository: props.userRepository,
+				filesMicroservice: props.filesMicroservice,
+			})
 			// Create expired token
 			const deviceId = createUniqString()
 
@@ -166,52 +209,55 @@ export const userUtils = {
 				userId: user!.id,
 			}
 
-			await securityRepository.insertDeviceRefreshToken(expiredRefreshToken)
+			await props.securityRepository.insertDeviceRefreshToken(expiredRefreshToken)
 
 			// Get created expired token
-			const refreshToken = await securityRepository.getDeviceRefreshTokenByDeviceId(deviceId)
-			const refreshTokenStr = jwtService.createRefreshTokenStr(refreshToken!.deviceId)
+			const refreshToken =
+				await props.securityRepository.getDeviceRefreshTokenByDeviceId(deviceId)
+			const refreshTokenStr = props.jwtService.createRefreshTokenStr(refreshToken!.deviceId)
 
-			if (methodType === 'get') {
-				await getRequest(app, routeUrl)
-					.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
+			if (props.methodType === 'get') {
+				await getRequest(props.mainApp, props.routeUrl)
+					.set('Cookie', props.mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
 					.expect(HTTP_STATUSES.UNAUTHORIZED_401)
-			} else if (methodType === 'post') {
-				await postRequest(app, routeUrl)
-					.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
+			} else if (props.methodType === 'post') {
+				await postRequest(props.mainApp, props.routeUrl)
+					.set('Cookie', props.mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
 					.expect(HTTP_STATUSES.UNAUTHORIZED_401)
-			} else if (methodType === 'put') {
-				await putRequest(app, routeUrl)
-					.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
+			} else if (props.methodType === 'put') {
+				await putRequest(props.mainApp, props.routeUrl)
+					.set('Cookie', props.mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
 					.expect(HTTP_STATUSES.UNAUTHORIZED_401)
-			} else if (methodType === 'patch') {
-				await patchRequest(app, routeUrl)
-					.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
+			} else if (props.methodType === 'patch') {
+				await patchRequest(props.mainApp, props.routeUrl)
+					.set('Cookie', props.mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
 					.expect(HTTP_STATUSES.UNAUTHORIZED_401)
-			} else if (methodType === 'delete') {
-				await deleteRequest(app, routeUrl)
-					.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
+			} else if (props.methodType === 'delete') {
+				await deleteRequest(props.mainApp, props.routeUrl)
+					.set('Cookie', props.mainConfig.get().refreshToken.name + '=' + refreshTokenStr)
 					.expect(HTTP_STATUSES.UNAUTHORIZED_401)
 			}
 		},
-		async tokenValid(
-			app: INestApplication,
-			routeUrl: string,
-			userRepository: UserRepository,
-			mainConfig: MainConfigService,
-		) {
-			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin(
-				app,
-				userRepository,
-				defUserName,
-				defUserEmail,
-				defUserPassword,
-			)
+		async tokenValid(props: {
+			mainApp: INestApplication
+			filesMicroservice: ClientProxy
+			routeUrl: string
+			userRepository: UserRepository
+			mainConfig: MainConfigService
+		}) {
+			const [accessToken, refreshTokenStr] = await userUtils.createUserAndLogin({
+				mainApp: props.mainApp,
+				filesMicroservice: props.filesMicroservice,
+				userRepository: props.userRepository,
+				userName: defUserName,
+				email: defUserEmail,
+				password: defUserPassword,
+			})
 
 			const refreshTokenValue = parseCookieStringToObj(refreshTokenStr).cookieValue
 
-			await postRequest(app, routeUrl)
-				.set('Cookie', mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
+			await postRequest(props.mainApp, props.routeUrl)
+				.set('Cookie', props.mainConfig.get().refreshToken.name + '=' + refreshTokenValue)
 				.expect(HTTP_STATUSES.OK_200)
 		},
 	},

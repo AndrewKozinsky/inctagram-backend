@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common'
 import { CqrsModule } from '@nestjs/cqrs'
 import { GeoController } from './geo.controller'
-import { GetCountriesHandler } from '../../features/countries/GetCountriesCommand'
+import { GetCountriesHandler } from '../../features/countries/GetCountries.query'
 import { GeoService } from './geo.service'
-import { GetCountryCitiesHandler } from '../../features/countries/GetCountryCitiesCommand'
-import { GetCityHandler } from '../../features/countries/GetCityCommand'
+import { GetCountryCitiesHandler } from '../../features/countries/GetCountryCities.query'
+import { GetCityHandler } from '../../features/countries/GetCity.query'
 
 const services = [GeoService]
 

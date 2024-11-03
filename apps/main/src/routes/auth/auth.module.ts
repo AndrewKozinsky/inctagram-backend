@@ -23,6 +23,7 @@ import { CreateRefreshTokenHandler } from '../../features/auth/CreateRefreshToke
 import { AuthService } from './auth.service'
 import { ReCaptchaAdapterService } from '@app/re-captcha-adapter'
 import { DevicesRepository } from '../../repositories/devices.repository'
+import { ClientProxyFactory, Transport } from '@nestjs/microservices'
 
 const services = [
 	GitHubService,
@@ -54,6 +55,29 @@ const commandHandlers = [
 @Module({
 	imports: [CqrsModule],
 	controllers: [AuthController],
-	providers: [...services, ...repositories, ...commandHandlers],
+	providers: [
+		...services,
+		...repositories,
+		...commandHandlers,
+		{
+			provide: 'FILES_MICROSERVICE',
+			useFactory(mainConfig: MainConfigService) {
+				const { port } = mainConfig.get().filesMicroService
+				const host =
+					mainConfig.get().mode === 'TEST'
+						? 'localhost'
+						: 'inctagram-backend-files-service'
+
+				return ClientProxyFactory.create({
+					transport: Transport.TCP,
+					options: {
+						host,
+						port,
+					},
+				})
+			},
+			inject: [MainConfigService],
+		},
+	],
 })
 export class AuthModule {}

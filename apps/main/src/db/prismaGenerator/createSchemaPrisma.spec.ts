@@ -23,6 +23,13 @@ export const bdTestConfig = {
 				default: false,
 				required: true,
 			},
+			created_at: {
+				type: 'createdAt',
+			},
+			some_date: {
+				type: 'dateString',
+				required: false,
+			},
 			DeviceToken: {
 				type: 'oneToMany',
 			},
@@ -49,7 +56,10 @@ export const bdTestConfig = {
 } satisfies BdConfig.Root
 
 describe('createSchemaPrisma', () => {
-	it.only('createSchemaPrisma', () => {
+	it.only('123', async () => {
+		expect(2).toBe(2)
+	})
+	it('createSchemaPrisma', () => {
 		const expectedPrismaSchema = `generator client {
 	provider      = "prisma-client-js"
 	binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
@@ -57,7 +67,7 @@ describe('createSchemaPrisma', () => {
 
 datasource db {
 	provider = "postgresql"
-	url      = env("DATABASE_URL")
+	url      = env("POSTGRES_DB_URL")
 }
 
 model User {
@@ -65,6 +75,8 @@ model User {
 	email	String	@unique
 	name	String	@unique
 	is_email_confirmed	Boolean	@default(false)
+	created_at	DateTime	@default(now())
+	some_date	String?
 	DeviceToken	DeviceToken[]
 }
 

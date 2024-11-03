@@ -108,9 +108,25 @@ export const RouteNames = {
 	},
 	POSTS: {
 		value: 'posts',
+		POST(postId: number) {
+			return {
+				value: postId,
+				full: 'posts/' + postId,
+			}
+		},
 		RECENT: {
 			value: 'recent',
 			full: 'posts/recent',
+		},
+		PHOTOS: {
+			value: 'photos',
+			full: 'posts/photos',
+			PHOTO(photoId: string) {
+				return {
+					value: photoId,
+					full: 'posts/photos/' + photoId,
+				}
+			},
 		},
 	},
 }

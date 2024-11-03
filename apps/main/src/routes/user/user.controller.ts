@@ -5,8 +5,10 @@ import {
 	Get,
 	Inject,
 	OnModuleInit,
+	Param,
 	Patch,
 	Post,
+	Query,
 	Req,
 	UploadedFile,
 	UseGuards,
@@ -14,23 +16,24 @@ import {
 } from '@nestjs/common'
 import { Request } from 'express'
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCookieAuth, ApiTags } from '@nestjs/swagger'
-import { CommandBus } from '@nestjs/cqrs'
+import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { ClientProxy } from '@nestjs/microservices'
 import RouteNames from '../routesConfig/routeNames'
 import { RouteDecorators } from '../routesConfig/routesDecorators'
 import { createFailResp, createSuccessResp } from '../routesConfig/createHttpRouteBody'
-import { CheckDeviceRefreshTokenGuard } from '../../infrastructure/guards/checkDeviceRefreshToken.guard'
-import { EditMyProfileDtoModel, UploadAvatarFilePipe } from '../../models/user/user.input.model'
+import {
+	EditMyProfileDtoModel,
+	GetUserPostsQueries,
+	GetUserPostsQueriesPipe,
+	UploadAvatarFilePipe,
+} from '../../models/user/user.input.model'
 import {
 	SetAvatarToMeCommand,
 	SetAvatarToMeHandler,
 } from '../../features/user/SetAvatarToMe.command'
 import { CheckAccessTokenGuard } from '../../infrastructure/guards/checkAccessToken.guard'
-import {
-	GetUserAvatarCommand,
-	GetUserAvatarHandler,
-} from '../../features/user/GetUserAvatar.command'
+import { GetUserAvatarHandler, GetUserAvatarQuery } from '../../features/user/GetUserAvatar.query'
 import { SWEmptyRouteOut } from '../routesConfig/swaggerTypesCommon'
 import {
 	DeleteUserAvatarCommand,
@@ -48,16 +51,17 @@ import {
 	EditMyProfileCommand,
 	EditMyProfileHandler,
 } from '../../features/user/EditMyProfile.command'
-import { GetMyProfileCommand, GetMyProfileHandler } from '../../features/user/GetMyProfile.command'
+import { GetMyProfileQuery, GetMyProfileHandler } from '../../features/user/GetMyProfile.query'
 import { postsRoutesConfig } from '../post/postsRoutesConfig'
-import { GetUserPostsHandler } from '../../features/posts/GetUserPosts.command'
-import { GetUsersCommand, GetUsersHandler } from '../../features/user/GetUsers.command'
+import { GetUserPostsHandler, GetUserPostsQuery } from '../../features/posts/GetUserPosts.query'
+import { GetUsersHandler, GetUsersQuery } from '../../features/user/GetUsers.query'
 
 @ApiTags('User')
 @Controller(RouteNames.USERS.value)
 export class UserController implements OnModuleInit {
 	constructor(
 		private readonly commandBus: CommandBus,
+		private readonly queryBus: QueryBus,
 		@Inject('FILES_MICROSERVICE') private filesMicroClient: ClientProxy,
 	) {}
 
@@ -69,10 +73,10 @@ export class UserController implements OnModuleInit {
 	@RouteDecorators(usersRoutesConfig.getUsers)
 	async getUsers(): Promise<undefined | SWGetAllUsersRouteOut> {
 		try {
-			const res = await this.commandBus.execute<
+			const res = await this.queryBus.execute<
 				any,
 				ReturnType<typeof GetUsersHandler.prototype.execute>
-			>(new GetUsersCommand())
+			>(new GetUsersQuery())
 
 			return createSuccessResp(usersRoutesConfig.getUsers, res)
 		} catch (err: any) {
@@ -81,9 +85,7 @@ export class UserController implements OnModuleInit {
 	}
 
 	@ApiBearerAuth('access-token')
-	@ApiBearerAuth('refresh-token')
 	@UseGuards(CheckAccessTokenGuard)
-	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Patch(RouteNames.USERS.ME.value)
 	@RouteDecorators(usersRoutesConfig.me.editProfile)
 	async editMyProfile(
@@ -103,17 +105,15 @@ export class UserController implements OnModuleInit {
 	}
 
 	@ApiBearerAuth('access-token')
-	@ApiBearerAuth('refresh-token')
 	@UseGuards(CheckAccessTokenGuard)
-	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Get(RouteNames.USERS.ME.value)
 	@RouteDecorators(usersRoutesConfig.me.getProfile)
 	async getMyProfile(@Req() req: Request): Promise<SWUserProfileRouteOut | undefined> {
 		try {
-			const res = await this.commandBus.execute<
+			const res = await this.queryBus.execute<
 				any,
 				ReturnType<typeof GetMyProfileHandler.prototype.execute>
-			>(new GetMyProfileCommand(req.user.id))
+			>(new GetMyProfileQuery(req.user.id))
 
 			return createSuccessResp(usersRoutesConfig.me.getProfile, res)
 		} catch (err: any) {
@@ -121,17 +121,21 @@ export class UserController implements OnModuleInit {
 		}
 	}
 
-	@Get(':userId/' + RouteNames.USERS.USER_ID(1).POSTS.value)
+	@Get(':userId/' + RouteNames.USERS.USER_ID(0).POSTS.value)
 	@RouteDecorators(usersRoutesConfig.posts.getUserPosts)
-	async getUserPosts(@Req() req: Request): Promise<SWGetUserPostsRouteOut | null | undefined> {
+	async getUserPosts(
+		@Param('userId') userId: number,
+		@Query(new GetUserPostsQueriesPipe()) query: GetUserPostsQueries,
+	): Promise<SWGetUserPostsRouteOut | undefined> {
 		try {
-			const commandRes = await this.commandBus.execute<
+			const commandRes = await this.queryBus.execute<
 				any,
 				ReturnType<typeof GetUserPostsHandler.prototype.execute>
-			>(new GetUserPostsHandler(req.user.id))
+			>(new GetUserPostsQuery(userId, query))
 
 			return createSuccessResp(postsRoutesConfig.getPost, commandRes)
 		} catch (err: any) {
+			console.log(err)
 			createFailResp(postsRoutesConfig.getPost, err)
 		}
 	}
@@ -152,9 +156,7 @@ export class UserController implements OnModuleInit {
 	})
 	@ApiCookieAuth()
 	@ApiBearerAuth('access-token')
-	@ApiBearerAuth('refresh-token')
 	@UseGuards(CheckAccessTokenGuard)
-	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Post([RouteNames.USERS.ME.value, RouteNames.USERS.ME.AVATAR.value].join('/'))
 	@RouteDecorators(usersRoutesConfig.me.setAvatar)
 	@UseInterceptors(FileInterceptor('avatarFile'))
@@ -176,17 +178,15 @@ export class UserController implements OnModuleInit {
 	}
 
 	@ApiBearerAuth('access-token')
-	@ApiBearerAuth('refresh-token')
 	@UseGuards(CheckAccessTokenGuard)
-	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Get([RouteNames.USERS.ME.value, RouteNames.USERS.ME.AVATAR.value].join('/'))
 	@RouteDecorators(usersRoutesConfig.me.getAvatar)
 	async getMyAvatar(@Req() req: Request): Promise<SWUserMeGetAvatarRouteOut | undefined> {
 		try {
-			const commandRes = await this.commandBus.execute<
+			const commandRes = await this.queryBus.execute<
 				any,
 				ReturnType<typeof GetUserAvatarHandler.prototype.execute>
-			>(new GetUserAvatarCommand(req.user.id))
+			>(new GetUserAvatarQuery(req.user.id))
 
 			return createSuccessResp(usersRoutesConfig.me.getAvatar, commandRes)
 		} catch (err: any) {
@@ -195,9 +195,7 @@ export class UserController implements OnModuleInit {
 	}
 
 	@ApiBearerAuth('access-token')
-	@ApiBearerAuth('refresh-token')
 	@UseGuards(CheckAccessTokenGuard)
-	@UseGuards(CheckDeviceRefreshTokenGuard)
 	@Delete([RouteNames.USERS.ME.value, RouteNames.USERS.ME.AVATAR.value].join('/'))
 	@RouteDecorators(usersRoutesConfig.me.deleteAvatar)
 	async deleteMyAvatar(@Req() req: Request): Promise<SWEmptyRouteOut | undefined> {

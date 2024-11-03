@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+    postgres:
+        image: postgres:16.2
+        restart: unless-stopped
+        container_name: inctagram-postgres
+        ports:
+            - 5432:5432
+        environment:
+            POSTGRES_PASSWORD: 123
+            POSTGRES_DB: inctagram
+            POSTGRES_USER: user
+
+    mongo:
+        image: mongo:8.0.1
+        restart: unless-stopped
+        container_name: inctagram-mongo
+        ports:
+            - "27017:27017"
+        volumes:
+            - mongo-data:/data/db
+
+volumes:
+    postgres:
+    mongo-data:
