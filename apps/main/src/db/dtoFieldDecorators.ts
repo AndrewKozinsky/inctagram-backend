@@ -149,7 +149,7 @@ export function DtoFieldDecorators(
 		}
 
 		if (updatedFieldConf.arrayItemType === 'mongoId') {
-			errorMessage = name + ' must be an array of mongoId.'
+			errorMessage = name + ' must be an array of mongoId strings.'
 		}
 
 		decorators.push(IsArray({ message: errorMessage }))

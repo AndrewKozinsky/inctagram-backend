@@ -197,6 +197,7 @@ export const bdConfig = {
 				type: 'array',
 				arrayItemType: 'mongoId',
 				required: true,
+				example: ['507f1f77bcf86cd799439011'],
 			},
 		},
 		dbFields: {

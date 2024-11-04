@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Model } from 'mongoose'
-import mongo from 'mongodb'
+import { ObjectId } from 'mongodb'
 import { InjectModel } from '@nestjs/mongoose'
 import {
 	ErrorMessage,
@@ -64,7 +64,7 @@ export class PostPhotoService {
 		// Check MongoDB identifiers
 		let isPhotosIdsCorrect = true
 		photosIds.forEach((mongoId) => {
-			if (!mongo.ObjectId.isValid(mongoId)) {
+			if (!ObjectId.isValid(mongoId)) {
 				isPhotosIdsCorrect = false
 			}
 		})
@@ -72,7 +72,13 @@ export class PostPhotoService {
 			return []
 		}
 
-		const postPhotos = await this.postPhotoModel.find({ _id: { $in: photosIds } })
+		const photosIdsInMongoFormat = photosIds.map((photoId) => {
+			return new ObjectId(photoId)
+		})
+
+		console.log(2222)
+		const postPhotos = await this.postPhotoModel.find({ _id: { $in: photosIdsInMongoFormat } })
+		console.log({ postPhotos })
 
 		return postPhotos.map((postPhoto) => {
 			return {

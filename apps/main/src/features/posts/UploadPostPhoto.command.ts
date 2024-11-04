@@ -29,7 +29,7 @@ export class UploadPostPhotoHandler implements ICommandHandler<UploadPostPhotoCo
 
 			return createPhotoRes
 		} catch (err: any) {
-			console.log(err)
+			// console.log({ err })
 			throw new Error(ErrorMessage.CannotSaveFile)
 		}
 	}

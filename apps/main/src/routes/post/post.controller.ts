@@ -97,7 +97,6 @@ export class PostController implements OnModuleInit {
 
 			return createSuccessResp(postsRoutesConfig.uploadPostPhoto, commandRes)
 		} catch (err: any) {
-			console.log({ err })
 			createFailResp(postsRoutesConfig.uploadPostPhoto, err)
 		}
 	}
@@ -155,7 +154,7 @@ export class PostController implements OnModuleInit {
 
 			return createSuccessResp(postsRoutesConfig.createPost, commandRes)
 		} catch (err: any) {
-			console.log(err)
+			console.log({ err })
 			createFailResp(postsRoutesConfig.createPost, err)
 		}
 	}
