@@ -6,6 +6,7 @@ import {
 	Inject,
 	OnModuleInit,
 	Param,
+	ParseIntPipe,
 	Patch,
 	Post,
 	Req,
@@ -161,7 +162,9 @@ export class PostController implements OnModuleInit {
 
 	@Get(':postId')
 	@RouteDecorators(postsRoutesConfig.getPost)
-	async getPost(@Param('postId') postId: number): Promise<SWGetPostRouteOut | undefined> {
+	async getPost(
+		@Param('postId', ParseIntPipe) postId: number,
+	): Promise<SWGetPostRouteOut | undefined> {
 		try {
 			const commandRes = await this.queryBus.execute<
 				any,
@@ -180,7 +183,7 @@ export class PostController implements OnModuleInit {
 	@Patch(':postId')
 	@RouteDecorators(postsRoutesConfig.getPost)
 	async updatePost(
-		@Param('postId') postId: number,
+		@Param('postId', ParseIntPipe) postId: number,
 		@Body() body: UpdatePostDtoModel,
 		@Req() req: Request,
 	): Promise<SWUpdatePostRouteOut | undefined> {
@@ -202,7 +205,7 @@ export class PostController implements OnModuleInit {
 	@Delete(':postId')
 	@RouteDecorators(postsRoutesConfig.deletePost)
 	async deletePost(
-		@Param('postId') postId: number,
+		@Param('postId', ParseIntPipe) postId: number,
 		@Req() req: Request,
 	): Promise<SWEmptyRouteOut | undefined> {
 		try {
