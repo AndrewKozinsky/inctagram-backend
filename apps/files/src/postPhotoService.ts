@@ -76,9 +76,7 @@ export class PostPhotoService {
 			return new ObjectId(photoId)
 		})
 
-		console.log(2222)
 		const postPhotos = await this.postPhotoModel.find({ _id: { $in: photosIdsInMongoFormat } })
-		console.log({ postPhotos })
 
 		return postPhotos.map((postPhoto) => {
 			return {
