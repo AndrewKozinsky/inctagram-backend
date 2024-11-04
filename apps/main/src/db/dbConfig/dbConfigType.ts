@@ -14,7 +14,7 @@ export namespace BdConfig {
 		| BooleanField
 		| EmailField
 		| NumberField
-		| StringsArrayField
+		| ArrayField
 		| CreatedAtField
 		| ManyToOneField
 		| OneToManyField
@@ -104,9 +104,9 @@ export namespace BdConfig {
 		example?: string | number | boolean
 	}
 
-	export type StringsArrayField = {
+	export type ArrayField = {
 		type: 'array'
-		arrayItemType: 'string'
+		arrayItemType: 'string' | 'mongoId'
 		// Is the field required? True by default
 		required: boolean
 		// Field description

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Model } from 'mongoose'
+import mongo from 'mongodb'
 import { InjectModel } from '@nestjs/mongoose'
 import {
 	ErrorMessage,
@@ -59,6 +60,17 @@ export class PostPhotoService {
 		getPostPhotosInContract: FileMS_GetPostPhotosInContract,
 	): Promise<FileMS_GetPostPhotosOutContract> {
 		const { photosIds } = getPostPhotosInContract
+
+		// Check MongoDB identifiers
+		let isPhotosIdsCorrect = true
+		photosIds.forEach((mongoId) => {
+			if (!mongo.ObjectId.isValid(mongoId)) {
+				isPhotosIdsCorrect = false
+			}
+		})
+		if (!isPhotosIdsCorrect) {
+			return []
+		}
 
 		const postPhotos = await this.postPhotoModel.find({ _id: { $in: photosIds } })
 

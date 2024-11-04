@@ -10,11 +10,28 @@ import {
 	MaxLength,
 	Min,
 	MinLength,
+	Validate,
+	ValidationArguments,
+	ValidatorConstraint,
+	ValidatorConstraintInterface,
 } from 'class-validator'
 import { BdConfig } from './dbConfig/dbConfigType'
 import { Trim } from '../infrastructure/pipes/Trim.decorator'
 import { Type } from 'class-transformer'
 import { ApiProperty, ApiPropertyOptions } from '@nestjs/swagger'
+import { Types } from 'mongoose'
+
+@ValidatorConstraint({ name: 'IsMongoIdArray', async: false })
+export class IsMongoIdArrayConstraint implements ValidatorConstraintInterface {
+	validate(ids: any, args: ValidationArguments) {
+		// Check that every element in the array is a valid MongoDB ObjectId
+		return Array.isArray(ids) && ids.every((id) => Types.ObjectId.isValid(id))
+	}
+
+	defaultMessage(args: ValidationArguments) {
+		return 'Each item in $property must be a valid MongoDB ObjectId'
+	}
+}
 
 // @IsIn(['desc', 'asc'])
 // @IsEnum(LikeStatuses)
@@ -126,11 +143,24 @@ export function DtoFieldDecorators(
 		}
 	} else if (updatedFieldConf.type === 'array') {
 		let errorMessage = name + ' must be an array.'
+
 		if (updatedFieldConf.arrayItemType === 'string') {
 			errorMessage = name + ' must be an array of strings.'
 		}
 
+		if (updatedFieldConf.arrayItemType === 'mongoId') {
+			errorMessage = name + ' must be an array of mongoId.'
+		}
+
 		decorators.push(IsArray({ message: errorMessage }))
+
+		if (updatedFieldConf.arrayItemType === 'string') {
+			decorators.push(IsString({ each: true }))
+		}
+
+		if (updatedFieldConf.arrayItemType === 'mongoId') {
+			decorators.push(Validate(IsMongoIdArrayConstraint))
+		}
 
 		if (!updatedFieldConf.required) {
 			decorators.push(IsOptional())

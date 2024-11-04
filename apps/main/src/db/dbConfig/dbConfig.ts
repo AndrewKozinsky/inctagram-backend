@@ -195,7 +195,7 @@ export const bdConfig = {
 		dtoProps: {
 			photosIds: {
 				type: 'array',
-				arrayItemType: 'string',
+				arrayItemType: 'mongoId',
 				required: true,
 			},
 		},
