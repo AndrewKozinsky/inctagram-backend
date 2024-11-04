@@ -91,11 +91,11 @@ export class PostPhotoService {
 	): Promise<FileMS_DeletePostPhotoOutContract> {
 		const { photoId } = deletePostPhotosInContract
 
-		const postPhoto = await this.postPhotoModel.findOne({ _id: photoId })
+		const postPhoto = await this.postPhotoModel.findOne({ _id: new ObjectId(photoId) })
 
 		if (postPhoto) {
 			await this.commonService.deleteFile(postPhoto.url)
-			await this.postPhotoModel.deleteOne({ _id: photoId })
+			await this.postPhotoModel.deleteOne({ _id: new ObjectId(photoId) })
 		}
 
 		return null
