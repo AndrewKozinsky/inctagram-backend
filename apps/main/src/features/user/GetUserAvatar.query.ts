@@ -10,10 +10,7 @@ export class GetUserAvatarQuery {
 
 @QueryHandler(GetUserAvatarQuery)
 export class GetUserAvatarHandler implements IQueryHandler<GetUserAvatarQuery> {
-	constructor(
-		private userRepository: UserRepository,
-		private mainConfig: MainConfigService,
-	) {}
+	constructor(private userRepository: UserRepository) {}
 
 	async execute(command: GetUserAvatarQuery) {
 		const { userId } = command

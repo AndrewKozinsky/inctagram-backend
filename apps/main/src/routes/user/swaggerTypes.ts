@@ -61,7 +61,7 @@ export class SWUserMeGetAvatarRouteOut {
 		},
 	})
 	data: {
-		avatarUrl: string
+		avatarUrl: string | null
 	}
 }
 
