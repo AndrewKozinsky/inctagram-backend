@@ -59,7 +59,6 @@ export const bdConfig = {
 				unique: true,
 				minLength: 6,
 				maxLength: 30,
-				match: /^[A-Za-z0-9_-]+$/,
 				matchErrorMessage: 'Name must contain only letters, numbers and _ - symbols',
 				description: 'Username',
 				example: 'AndrewKozinsky',
