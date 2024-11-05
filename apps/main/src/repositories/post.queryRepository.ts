@@ -115,15 +115,21 @@ export class PostQueryRepository {
 	}
 
 	async getUserPosts(userId: number, query: GetUserPostsQueries) {
+		console.log({ userId })
+		console.log({ query })
 		const pageNumber = query.pageNumber ? +query.pageNumber : 1
+		console.log({ pageNumber })
 		const pageSize = query.pageSize ? +query.pageSize : 10
+		console.log({ pageSize })
 
 		const totalUserPostsCount = await this.prisma.post.count({
 			where: { user_id: userId },
 			orderBy: [{ created_at: 'desc' }],
 		})
+		console.log({ totalUserPostsCount })
 
 		const pagesCount = Math.ceil(totalUserPostsCount / pageSize)
+		console.log({ pagesCount })
 
 		const userPosts = await this.prisma.post.findMany({
 			where: { user_id: userId },
@@ -136,6 +142,7 @@ export class PostQueryRepository {
 				created_at: 'desc',
 			},
 		})
+		console.log({ userPosts })
 
 		const allPostsPhotosIds: string[] = []
 		userPosts.forEach((post) => {
@@ -143,8 +150,10 @@ export class PostQueryRepository {
 				allPostsPhotosIds.push(photo.files_ms_post_photo_id)
 			}
 		})
+		console.log({ allPostsPhotosIds })
 
 		const allPostsPhotos = await this.postBaseRepository.getPostPhotos(allPostsPhotosIds)
+		console.log({ allPostsPhotos })
 
 		return {
 			pagesCount,

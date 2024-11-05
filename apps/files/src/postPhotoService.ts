@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Model } from 'mongoose'
+import { ObjectId } from 'mongodb'
 import { InjectModel } from '@nestjs/mongoose'
 import {
 	ErrorMessage,
@@ -60,7 +61,22 @@ export class PostPhotoService {
 	): Promise<FileMS_GetPostPhotosOutContract> {
 		const { photosIds } = getPostPhotosInContract
 
-		const postPhotos = await this.postPhotoModel.find({ _id: { $in: photosIds } })
+		// Check MongoDB identifiers
+		let isPhotosIdsCorrect = true
+		photosIds.forEach((mongoId) => {
+			if (!ObjectId.isValid(mongoId)) {
+				isPhotosIdsCorrect = false
+			}
+		})
+		if (!isPhotosIdsCorrect) {
+			return []
+		}
+
+		const photosIdsInMongoFormat = photosIds.map((photoId) => {
+			return new ObjectId(photoId)
+		})
+
+		const postPhotos = await this.postPhotoModel.find({ _id: { $in: photosIdsInMongoFormat } })
 
 		return postPhotos.map((postPhoto) => {
 			return {
@@ -75,11 +91,11 @@ export class PostPhotoService {
 	): Promise<FileMS_DeletePostPhotoOutContract> {
 		const { photoId } = deletePostPhotosInContract
 
-		const postPhoto = await this.postPhotoModel.findOne({ _id: photoId })
+		const postPhoto = await this.postPhotoModel.findOne({ _id: new ObjectId(photoId) })
 
 		if (postPhoto) {
 			await this.commonService.deleteFile(postPhoto.url)
-			await this.postPhotoModel.deleteOne({ _id: photoId })
+			await this.postPhotoModel.deleteOne({ _id: new ObjectId(photoId) })
 		}
 
 		return null

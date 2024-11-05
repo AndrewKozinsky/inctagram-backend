@@ -6,6 +6,7 @@ import {
 	Inject,
 	OnModuleInit,
 	Param,
+	ParseIntPipe,
 	Patch,
 	Post,
 	Req,
@@ -73,7 +74,7 @@ export class PostController implements OnModuleInit {
 		schema: {
 			type: 'object',
 			properties: {
-				photoFile: {
+				postPhotoFile: {
 					format: 'binary',
 				},
 			},
@@ -97,7 +98,6 @@ export class PostController implements OnModuleInit {
 
 			return createSuccessResp(postsRoutesConfig.uploadPostPhoto, commandRes)
 		} catch (err: any) {
-			console.log({ err })
 			createFailResp(postsRoutesConfig.uploadPostPhoto, err)
 		}
 	}
@@ -155,14 +155,16 @@ export class PostController implements OnModuleInit {
 
 			return createSuccessResp(postsRoutesConfig.createPost, commandRes)
 		} catch (err: any) {
-			console.log(err)
+			console.log({ err })
 			createFailResp(postsRoutesConfig.createPost, err)
 		}
 	}
 
 	@Get(':postId')
 	@RouteDecorators(postsRoutesConfig.getPost)
-	async getPost(@Param('postId') postId: number): Promise<SWGetPostRouteOut | undefined> {
+	async getPost(
+		@Param('postId', ParseIntPipe) postId: number,
+	): Promise<SWGetPostRouteOut | undefined> {
 		try {
 			const commandRes = await this.queryBus.execute<
 				any,
@@ -181,7 +183,7 @@ export class PostController implements OnModuleInit {
 	@Patch(':postId')
 	@RouteDecorators(postsRoutesConfig.getPost)
 	async updatePost(
-		@Param('postId') postId: number,
+		@Param('postId', ParseIntPipe) postId: number,
 		@Body() body: UpdatePostDtoModel,
 		@Req() req: Request,
 	): Promise<SWUpdatePostRouteOut | undefined> {
@@ -203,7 +205,7 @@ export class PostController implements OnModuleInit {
 	@Delete(':postId')
 	@RouteDecorators(postsRoutesConfig.deletePost)
 	async deletePost(
-		@Param('postId') postId: number,
+		@Param('postId', ParseIntPipe) postId: number,
 		@Req() req: Request,
 	): Promise<SWEmptyRouteOut | undefined> {
 		try {

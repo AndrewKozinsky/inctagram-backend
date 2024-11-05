@@ -51,26 +51,3 @@ export class UploadPostPhotoPipe implements PipeTransform {
 		return file
 	}
 }
-
-/*export class EditMyProfileDtoModel {
-	@DtoFieldDecorators('userName', bdConfig.User.dbFields.user_name)
-	userName: string
-
-	@DtoFieldDecorators('firstName', bdConfig.User.dbFields.first_name)
-	firstName: null | string
-
-	@DtoFieldDecorators('lastName', bdConfig.User.dbFields.last_name)
-	lastName: null | string
-
-	@DtoFieldDecorators('dateOfBirth', bdConfig.User.dbFields.date_of_birth)
-	dateOfBirth: null | string
-
-	@DtoFieldDecorators('countryCode', bdConfig.User.dbFields.country_code)
-	countryCode: null | string
-
-	@DtoFieldDecorators('cityId', bdConfig.User.dbFields.city_id)
-	cityId: null | number
-
-	@DtoFieldDecorators('aboutMe', bdConfig.User.dbFields.about_me)
-	aboutMe: null | string
-}*/

@@ -39,8 +39,8 @@ export class MainConfigService {
 				// Секретный ключ доступа к учётной записи
 				secretAccessKey: this.configService.get<string>('S3_SECRET_ACCESS_KEY_ID') || '',
 				// Название своей корзины
-				bucket: 'sociable-people',
-				filesRootUrl: 'https://sociable-people.storage.yandexcloud.net',
+				bucketName: this.configService.get<string>('S3_BASKET_NAME') || '',
+				filesRootUrl: this.configService.get<string>('S3_FILES_ROOT_URL') || '',
 			},
 			countryStateCity: {
 				apiKey: 'ajVyS0t2bjI4dzZHU3hUclA4Rjg4YUdLeDJLbkpDN2dCZnZRNDBJdA==',

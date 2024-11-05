@@ -10,10 +10,7 @@ export class GetUserAvatarQuery {
 
 @QueryHandler(GetUserAvatarQuery)
 export class GetUserAvatarHandler implements IQueryHandler<GetUserAvatarQuery> {
-	constructor(
-		private userRepository: UserRepository,
-		private mainConfig: MainConfigService,
-	) {}
+	constructor(private userRepository: UserRepository) {}
 
 	async execute(command: GetUserAvatarQuery) {
 		const { userId } = command
@@ -24,10 +21,8 @@ export class GetUserAvatarHandler implements IQueryHandler<GetUserAvatarQuery> {
 			throw new Error(ErrorMessage.UserNotFound)
 		}
 
-		const avatarUrl = this.mainConfig.get().s3.filesRootUrl + '/' + user.avatar
-
 		return {
-			avatarUrl,
+			avatarUrl: user.avatar,
 		}
 	}
 }
