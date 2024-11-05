@@ -24,10 +24,8 @@ export class GetUserAvatarHandler implements IQueryHandler<GetUserAvatarQuery> {
 			throw new Error(ErrorMessage.UserNotFound)
 		}
 
-		const avatarUrl = this.mainConfig.get().s3.filesRootUrl + '/' + user.avatar
-
 		return {
-			avatarUrl,
+			avatarUrl: user.avatar,
 		}
 	}
 }
